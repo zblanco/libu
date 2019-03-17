@@ -1,0 +1,35 @@
+<%= render_layout "app.html", assigns do %>
+    <div class="bg-grey-lightest">
+<div class="flex flex-col min-h-screen">
+
+        <header>
+            <div class="container mx-auto">
+                <nav id="site-navigation" class="relative select-none lg:flex lg:items-stretch w-full items-center border-b-2 border-transparent">
+                    <div class="flex flex-no-shrink items-stretch">
+                        <a href="/" class="no-underline ">
+                            <h1 class="text-grey-darkest font-serif font-thin px-4 p-4 hover:text-orange border-b-2 border-transparent">
+                            LIBU
+                            </h1>
+                        </a>
+                    </div>
+                    <div class="lg:flex lg:items-stretch lg:flex-no-shrink lg:flex-grow" id="right-menu-options">
+                        <div class="lg:flex lg:items-stretch lg:justify-end ml-auto">
+                            <%= link("KanBan", to: "/projects", 
+                                class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-grey-darker font-serif font-thin no-underline flex items-center hover:text-red border-b-2 border-transparent"
+                            ) %>
+                            <%= link("Blog", to: "/blog", 
+                                class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-grey-darker font-serif font-thin no-underline flex items-center hover:text-red border-b-2 border-transparent"
+                            ) %>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <div id="content" class="container mx-auto pt-4 pb-4">
+            <%= render @view_module, @view_template, assigns %>
+        </div>
+
+        </div>
+    </div>
+<% end %>

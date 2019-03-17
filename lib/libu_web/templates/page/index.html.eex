@@ -1,0 +1,5 @@
+<div class="flex flex-col justify-center">
+  <div class="m-16">
+    <li><%= link "Clock", to: Routes.live_path(@conn, LibuWeb.LiveClock) %></li>
+  </div>
+</div>

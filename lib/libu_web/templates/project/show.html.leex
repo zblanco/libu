@@ -1,0 +1,18 @@
+<h1>Show Project</h1>
+
+<ul>
+
+  <li>
+    <strong>Status:</strong>
+    <%= @project.status %>
+  </li>
+
+  <li>
+    <strong>Description:</strong>
+    <%= @project.description %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.project_path(@conn, :edit, @project) %></span>
+<span><%= link "Back", to: Routes.project_path(@conn, :index) %></span>

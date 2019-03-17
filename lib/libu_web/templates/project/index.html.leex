@@ -1,0 +1,28 @@
+<h1>Listing Projects</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>Description</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for project <- @projects do %>
+    <tr>
+      <td><%= project.status %></td>
+      <td><%= project.description %></td>
+
+      <td>
+        <%= link "Show", to: Routes.project_path(@conn, :show, project) %>
+        <%= link "Edit", to: Routes.project_path(@conn, :edit, project) %>
+        <%= link "Delete", to: Routes.project_path(@conn, :delete, project), method: :delete, data: [confirm: "Are you sure?"] %>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Project", to: Routes.project_path(@conn, :new) %></span>
