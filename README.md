@@ -4,6 +4,8 @@ A basic project management tool juiced up with [Phoenix LiveView](https://github
 
 Styled with [Tailwind CSS](https://github.com/tailwindcss/tailwindcss) Utilities.
 
+<img align="center" alt="screenshot" src="libu-screenshot.png"/>
+
 TODO:
 
 - [x] Basic Clock Working
