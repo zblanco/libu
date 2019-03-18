@@ -5,8 +5,9 @@ defmodule LibuWeb.ProjectController do
   alias Libu.ProjectManagement.Project
 
   def index(conn, _params) do
-    projects = ProjectManagement.list_projects()
-    render(conn, "index.html", projects: projects)
+    conn
+    |> put_view(LibuWeb.ProjectIndexView)
+    |> render("index.html")
   end
 
   def new(conn, _params) do

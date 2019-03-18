@@ -1,18 +1,26 @@
-<h1>Show Project</h1>
-
-<ul>
-
-  <li>
-    <strong>Status:</strong>
-    <%= @project.status %>
-  </li>
-
-  <li>
-    <strong>Description:</strong>
-    <%= @project.description %>
-  </li>
-
-</ul>
-
-<span><%= link "Edit", to: Routes.project_path(@conn, :edit, @project) %></span>
-<span><%= link "Back", to: Routes.project_path(@conn, :index) %></span>
+<div class="flex justify-center pt-5">
+  <div class="flex-col">
+    <div class="overflow-hidden shadow-lg p-2 border-t-2 border-black">
+      <div class="px-6 py-4">
+        <div class="font-bold text-3xl mb-2">
+          <%= @project.name %> · <span class="text-grey-darker font-thin"><%= @project.status %></span>
+        </div>
+        <p class="text-grey-darker text-base text-xl">
+          <%= @project.description %>
+        </p>
+      </div>
+    </div>
+    <div class="flex justify-center pt-5">
+      <span class="p-2">
+        <%= button("Edit", to: Routes.live_path(@socket, ProjectLive.Edit, @project), 
+          class: "inline-block text-black bg-grey-lighter hover:bg-black border border-grey hover:text-white py-2 px-4 text-md", 
+          method: :get)%>
+      </span>
+      <span class="p-2">
+        <%= button("Back", to: Routes.live_path(@socket, ProjectLive.Index), 
+          class: "inline-block text-black bg-grey-lighter hover:bg-black border border-grey hover:text-white py-2 px-4 text-md" , 
+          method: :get)%>
+      </span>
+    </div>
+  </div> 
+</div>

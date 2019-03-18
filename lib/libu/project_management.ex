@@ -20,6 +20,12 @@ defmodule Libu.ProjectManagement do
 
   alias Libu.ProjectManagement.Project
 
+  def projects_by_status() do
+    Project
+    |> Repo.all()
+    |> Enum.group_by(fn %Project{status: status} -> status end)
+  end
+
   @doc """
   Returns the list of projects.
 
@@ -114,8 +120,8 @@ defmodule Libu.ProjectManagement do
       %Ecto.Changeset{source: %Project{}}
 
   """
-  def change_project(%Project{} = project) do
-    Project.changeset(project, %{})
+  def change_project(%Project{} = project, attrs \\ %{}) do
+    Project.changeset(project, attrs)
   end
 
   defp notify_subscribers({:ok, result}, event) do

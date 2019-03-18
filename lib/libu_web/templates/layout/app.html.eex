@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Libu · Phoenix Framework</title>
+    <title>Libu · LiveView Experiments</title>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
   </head>
   <body>
@@ -12,7 +12,40 @@
       <main role="main">
         <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
         <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
-        <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>
+
+        <div class="font-sans">
+          <div class="flex flex-col min-h-screen">
+              <header>
+                  <div class="container mx-auto">
+                      <nav id="site-navigation" class="relative select-none lg:flex lg:items-stretch w-full items-center border-b-2">
+                          <div class="flex flex-no-shrink items-stretch">
+                              <a href="/" class="no-underline ">
+                                  <div class="px-4 p-4 max-w-xs">
+                                    <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
+                                  </div>
+                              </a>
+                          </div>
+                          <div class="lg:flex lg:items-stretch lg:flex-no-shrink lg:flex-grow" id="right-menu-options">
+                              <div class="lg:flex lg:items-stretch lg:justify-end ml-auto">
+                                  <%= link("Projects", to: "/projects", 
+                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red"
+                                  ) %>
+                                  <%= link("Kanban", to: "/projects/kanban", 
+                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red"
+                                  ) %>
+                              </div>
+                          </div>
+                      </nav>
+                  </div>
+              </header>
+
+              <div id="content" class="container mx-auto pt-4 pb-4">
+                  <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>
+              </div>
+
+          </div>
+      </div>
+
       </main>
       <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
     </div>

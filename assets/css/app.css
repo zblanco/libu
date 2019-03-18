@@ -1,6 +1,6 @@
 /* This file is for your main application css. */
 
-@import "./phoenix.css";
+ /* @import "./phoenix.css";  */
 
 /**
  * This injects Tailwind's base styles, which is a combination of
@@ -64,3 +64,5 @@
   * @import "utilities/background-patterns";
   * @import "utilities/skew-transforms";
   */
+
+  @import "custom.css";

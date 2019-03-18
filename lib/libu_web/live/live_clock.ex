@@ -5,7 +5,7 @@ defmodule LibuWeb.LiveClock do
   def render(assigns) do
     ~L"""
     <div>
-      <h2 class="font-sans text-5xl" phx-click="boom">It's <%= strftime!(@date, "%r") %></h2>
+      <h3 class="font-sans text-2xl">It's <%= strftime!(@date, "%r") %></h3>
     </div>
     """
   end

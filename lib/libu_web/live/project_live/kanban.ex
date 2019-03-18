@@ -1,7 +1,4 @@
-defmodule LibuWeb.ProjectLive.Index do
-  @moduledoc """
-  Index View for Projects
-  """
+defmodule LibuWeb.ProjectLive.KanBan do
   use Phoenix.LiveView
 
   alias Libu.ProjectManagement
@@ -12,10 +9,13 @@ defmodule LibuWeb.ProjectLive.Index do
     {:ok, fetch(socket)}
   end
 
-  def render(assigns), do: ProjectView.render("index.html", assigns)
+  def render(assigns), do: ProjectView.render("kanban.html", assigns)
 
   defp fetch(socket) do
-    assign(socket, projects: ProjectManagement.list_projects())
+    assign(socket,
+      projects_by_status: ProjectManagement.projects_by_status(),
+      status_options: ProjectManagement.Project.status_options()
+    )
   end
 
   def handle_info({ProjectManagement, [:project | _], _}, socket) do

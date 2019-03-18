@@ -1,28 +1,46 @@
-<h1>Listing Projects</h1>
 
-<table>
-  <thead>
-    <tr>
-      <th>Status</th>
-      <th>Description</th>
+<div class="flex justify-center pt-5">
+  <div class="w-4/5 mx-auto pt-4x overflow-hidden shadow-lg pt-5 pr-5 pl-5 border-t-2 border-black">
+    <div class="flex justify-between p-4">
+      <h1 class="font-light">Projects</h1>
+      <span class="">
+        <%= button( "New Project", to: Routes.live_path(@socket, ProjectLive.New), method: :get,
+          class: "text-black bg-grey-lighter hover:bg-black border border-grey hover:text-white py-2 px-4"
+        )%>
+      </span>
+    </div>
+    <div class="p-4">
+    <table class="table-auto">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Description</th>
 
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-<%= for project <- @projects do %>
-    <tr>
-      <td><%= project.status %></td>
-      <td><%= project.description %></td>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+    <%= for project <- @projects do %>
+        <tr class="hover:bg-grey-lighter">
+          <td><%= project.name %></td>
+          <td><%= project.status %></td>
+          <td><%= project.description %></td>
 
-      <td>
-        <%= link "Show", to: Routes.project_path(@conn, :show, project) %>
-        <%= link "Edit", to: Routes.project_path(@conn, :edit, project) %>
-        <%= link "Delete", to: Routes.project_path(@conn, :delete, project), method: :delete, data: [confirm: "Are you sure?"] %>
-      </td>
-    </tr>
-<% end %>
-  </tbody>
-</table>
-
-<span><%= link "New Project", to: Routes.project_path(@conn, :new) %></span>
+          <td>
+            <%= link("Show", to: Routes.live_path(@socket, ProjectLive.Show, project),
+              class: "hover:text-red"
+            )%>
+            <%= link "Edit", to: Routes.live_path(@socket, ProjectLive.Edit, project) %>
+            <%= link "Delete", to: "#", 
+              phx_click: "delete project", 
+              phx_value: project.id %>
+          </td>
+        </tr>
+    <% end %>
+      </tbody>
+    </table>
+  </div>
+    
+  </div>
+</div>
