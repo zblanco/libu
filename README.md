@@ -1,35 +1,22 @@
 # Libu
 
-Experimental Live View implementations:
+A basic project management tool juiced up with [Phoenix LiveView](https://github.com/phoenixframework/phoenix_live_view).
 
- `/kanban` see a live KanBan view of Projects and their statuses.
- `/projects` see a list of projects in a table instead
-  - Full live resources of Projects
-
-Styled with Tailwind CSS Utilities.
+Styled with [Tailwind CSS](https://github.com/tailwindcss/tailwindcss) Utilities.
 
 TODO:
 
 - [x] Basic Clock Working
-- [ ] Basic Styling of Index Page 
-- [ ] Projects CRUD with FSM Changeset validation
-- [ ] KanBan LiveView of Projects FSM
+- [x] Basic Styling of Index and App
+- [x] Styled, Live CRUD with FSM Changeset validation
+- [x] KanBan LiveView of FSM
 
-To start your Phoenix server:
+Take it for a spin:
 
+  * Clone the repo: `git clone https://github.com/zblanco/libu.git`
   * Install dependencies with `mix deps.get`
   * Create and migrate your database with `mix ecto.setup`
   * Install Node.js dependencies with `cd assets && npm install`
-  * Start Phoenix endpoint with `mix phx.server`
+  * Start Phoenix endpoint with `mix phx.server` or `iex -S mix phx.server`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: http://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
