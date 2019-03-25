@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
   </head>
   <body>
-    <div class="min-h-screen font-sans antialiased leading-tight">
+    <div class="min-h-screen font-sans antialiased leading-tight " style="background-image: url('<%= Routes.static_url(@conn, "/images/seigaiha.png") %>')">
       <main role="main">
         <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
         <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
@@ -17,7 +17,7 @@
           <div class="flex flex-col min-h-screen">
               <header>
                   <div class="container mx-auto">
-                      <nav id="site-navigation" class="relative select-none lg:flex lg:items-stretch w-full items-center border-b-2">
+                      <nav id="site-navigation" class="relative select-none lg:flex lg:items-stretch w-full items-center border-b-2 bg-white">
                           <div class="flex flex-no-shrink items-stretch">
                               <a href="/" class="no-underline ">
                                   <div class="px-4 p-4 max-w-xs">
@@ -28,10 +28,10 @@
                           <div class="lg:flex lg:items-stretch lg:flex-no-shrink lg:flex-grow" id="right-menu-options">
                               <div class="lg:flex lg:items-stretch lg:justify-end ml-auto">
                                   <%= link("Projects", to: "/projects", 
-                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red"
+                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red-400"
                                   ) %>
                                   <%= link("Kanban", to: "/projects/kanban", 
-                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red"
+                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red-400"
                                   ) %>
                               </div>
                           </div>
@@ -39,7 +39,7 @@
                   </div>
               </header>
 
-              <div id="content" class="container mx-auto pt-4 pb-4">
+              <div id="content" class="container mx-auto pt-4 pb-4 app-page">
                   <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>
               </div>
 

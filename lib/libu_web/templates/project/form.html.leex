@@ -5,34 +5,34 @@
     <!-- </div> -->
   <% end %>
 
-  <%= label(f, :name, class: "block text-grey-darkest mb-2" )%>
+  <%= label(f, :name, class: "block text-gray-800 mb-2" )%>
   <%= text_input(f, :name,
-    class: "appearance-none border-b-2 focus:border-black w-full py-2 px-3 text-grey-darker mb-3 leading-tight bg-grey-lighter",
+    class: "appearance-none border-b-2 focus:border-black w-full py-2 px-3 text-gray-700 mb-3 leading-tight bg-gray-200",
     placeholder: "Project Name" 
   )%>
   <%= error_tag f, :name %>
 
-  <%= label(f, :status, class: "block text-grey-darkest mb-2" )%>
+  <%= label(f, :status, class: "block text-gray-800 mb-2" )%>
   <%= select(f, :status, ["Not Started": "Not Started", "In Progress": "In Progress", "On Hold": "On Hold", "Complete": "Complete"],
-    class: "appearance-none border-b-2 focus:border-black w-full py-2 px-3 text-grey-darker mb-3 leading-tight bg-grey-lighter",
+    class: "appearance-none border-b-2 focus:border-black w-full py-2 px-3 text-gray-700 mb-3 leading-tight bg-gray-200",
     selected: "Not Started"
   ) %>
-  <div class="pointer-events-none absolute pin-y pin-r flex items-center px-2 text-grey-darker">
+  <div class="pointer-events-none absolute pin-y pin-r flex items-center px-2 text-gray-700">
     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
   </div>
   <%= error_tag f, :status %>
 
   <%= label( f, :description,
-    class: "block mb-2 text-grey-darkest"
+    class: "block mb-2 text-gray-800"
    )%>
   <%= textarea( f, :description, 
-    class: "appearance-none border-b-2 focus:border-black w-full py-2 px-3 text-grey-darker mb-3 leading-tight bg-grey-lighter"
+    class: "appearance-none border-b-2 focus:border-black w-full py-2 px-3 text-gray-700 mb-3 leading-tight bg-gray-200"
   )%>
-  <%= error_tag f, :description %>
+  <%= error_tag( f, :description )%>
 
   <div class="flex items-center justify-center">
     <%= submit("Save", phx_disable_with: "Saving...", 
-      class: "bg-grey-lighter hover:bg-black hover:text-white text-grey-darkest border border-black font-bold py-2 px-4 focus:outline-none focus:shadow-outline" 
+      class: "bg-gray-200 hover:bg-black hover:text-white text-gray-800 border border-black font-bold py-2 px-4 focus:outline-none focus:shadow-outline" 
     )%>
   </div>
 </form>

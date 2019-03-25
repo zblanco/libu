@@ -1,17 +1,17 @@
 <div class="flex w-full justify-center">
   <%= for status <- @status_options do %>
     <div class="flex flex-col p-4 w-full">
-      <div class="font-medium text-grey-darkest text-2xl mb-2 flex justify-center">
+      <div class="font-medium text-gray-800 text-2xl mb-2 flex justify-center">
         <%= status %>
       </div>
       <div>
         <%= for project <- projects_for_status(@projects_by_status, status) do %>
-          <div class="overflow-hidden shadow-lg p-2 border-l-2 border-black m-4 bg-white">
+          <div class="overflow-hidden shadow-lg p-2 border-l-2 border-black m-4 bg-white hover:shadow-xl">
             <div class="px-4 py-3">
-              <div class="font-medium text-grey-darkest text-2xl mb-2">
+              <div class="font-medium text-gray-800 text-2xl mb-2">
                 <%= project.name %>
               </div>
-              <p class="text-grey-darker text-base text-l">
+              <p class="text-gray-700 text-base text-l">
                 <%= project.description %>
               </p>
             </div>

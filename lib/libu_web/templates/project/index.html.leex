@@ -1,11 +1,11 @@
 
 <div class="flex justify-center pt-5">
-  <div class="w-4/5 mx-auto pt-4x overflow-hidden shadow-lg pt-5 pr-5 pl-5 border-t-2 border-black">
+  <div class="w-4/5 mx-auto pt-4x overflow-hidden shadow-lg pt-5 pr-5 pl-5 border-t-2 border-black bg-white">
     <div class="flex justify-between p-4">
-      <h1 class="font-light">Projects</h1>
+      <h1 class="font-light text-xl ">Projects</h1>
       <span class="">
         <%= button( "New Project", to: Routes.live_path(@socket, ProjectLive.New), method: :get,
-          class: "text-black bg-grey-lighter hover:bg-black border border-grey hover:text-white py-2 px-4"
+          class: "text-black bg-gray-100 hover:bg-black border border-gray hover:text-white py-2 px-4"
         )%>
       </span>
     </div>
@@ -22,19 +22,19 @@
       </thead>
       <tbody>
     <%= for project <- @projects do %>
-        <tr class="hover:bg-grey-lighter">
+        <tr class="hover:bg-gray-100">
           <td><%= project.name %></td>
           <td><%= project.status %></td>
           <td><%= project.description %></td>
 
           <td>
             <%= link("Show", to: Routes.live_path(@socket, ProjectLive.Show, project),
-              class: "hover:text-red"
+              class: "hover:text-red-400"
             )%>
-            <%= link "Edit", to: Routes.live_path(@socket, ProjectLive.Edit, project) %>
-            <%= link "Delete", to: "#", 
+            <%= link( "Edit", to: Routes.live_path(@socket, ProjectLive.Edit, project), class: "hover:text-red-400" )%>
+            <%= link( "Delete", to: "#", 
               phx_click: "delete project", 
-              phx_value: project.id %>
+              phx_value: project.id, class: "hover:text-red-400" )%>
           </td>
         </tr>
     <% end %>
