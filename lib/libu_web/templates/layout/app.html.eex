@@ -16,22 +16,22 @@
         <div class="font-sans">
           <div class="flex flex-col min-h-screen">
               <header>
-                  <div class="container mx-auto">
+                  <div class="container mx-auto w-full">
                       <nav id="site-navigation" class="relative select-none lg:flex lg:items-stretch w-full items-center border-b-2 bg-white">
                           <div class="flex flex-no-shrink items-stretch">
                               <a href="/" class="no-underline ">
-                                  <div class="px-4 p-4 max-w-xs">
-                                    <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
+                                  <div class="px-4 p-4 w-24">
+                                    <img src="<%= Routes.static_path(@conn, "/images/darkphoenix.png") %>" alt="Phoenix Framework Logo"/>
                                   </div>
                               </a>
                           </div>
                           <div class="lg:flex lg:items-stretch lg:flex-no-shrink lg:flex-grow" id="right-menu-options">
                               <div class="lg:flex lg:items-stretch lg:justify-end ml-auto">
                                   <%= link("Projects", to: "/projects", 
-                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red-400"
+                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red-800 border-b-2 border-transparent hover:border-black"
                                   ) %>
                                   <%= link("Kanban", to: "/projects/kanban", 
-                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red-400"
+                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red-800 border-b-2 border-transparent hover:border-black"
                                   ) %>
                               </div>
                           </div>
@@ -39,7 +39,7 @@
                   </div>
               </header>
 
-              <div id="content" class="container mx-auto pt-4 pb-4 app-page">
+              <div id="content" class="container mx-auto pt-4 pb-4 app-page flex justify-center">
                   <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>
               </div>
 

@@ -6,16 +6,20 @@
       </div>
       <div>
         <%= for project <- projects_for_status(@projects_by_status, status) do %>
-          <div class="overflow-hidden shadow-lg p-2 border-l-2 border-black m-4 bg-white hover:shadow-xl">
-            <div class="px-4 py-3">
-              <div class="font-medium text-gray-800 text-2xl mb-2">
-                <%= project.name %>
+          
+          <%= link to: "/projects/#{project.id}" do %>
+            <div class="overflow-hidden shadow-lg p-2 border-l-2 border-black m-4 bg-white hover:shadow-xl">
+              <div class="px-4 py-3">
+                <div class="font-medium text-gray-800 text-2xl mb-2">
+                  <%= project.name %>
+                </div>
+                <p class="text-gray-700 text-base text-l">
+                  <%= project.description %>
+                </p>
               </div>
-              <p class="text-gray-700 text-base text-l">
-                <%= project.description %>
-              </p>
             </div>
-          </div>
+          <% end %>
+
         <% end %>
       </div>
     </div>
