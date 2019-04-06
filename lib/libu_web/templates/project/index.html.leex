@@ -17,10 +17,10 @@
             <th class="py-4 px-6 hover:bg-gray-100">Name</th>
             <th class="py-4 px-6 hover:bg-gray-100">Status</th>
             <th class="py-4 px-6 hover:bg-gray-100">Description</th>
-
             <th></th>
           </tr>
         </thead>
+        
         <tbody>
       <%= for project <- @projects do %>
           <tr class="hover:bg-gray-100 border-b border-gray-200">
@@ -41,11 +41,13 @@
               <%= link("Edit", to: Routes.live_path(@socket, ProjectLive.Edit, project), class: "hover:text-red-500" )%>
               <%= link("Delete", to: "#", 
                 phx_click: "delete project", 
-                phx_value: project.id, class: "hover:text-red-500" )%>
+                phx_value: project.id, 
+                class: "hover:text-red-500" )%>
             </td>
           </tr>
       <% end %>
         </tbody>
+        
       </table>
     </div>
   </div>

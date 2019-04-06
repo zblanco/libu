@@ -9,9 +9,14 @@ Styled with [Tailwind CSS](https://github.com/tailwindcss/tailwindcss) Utilities
 TODO:
 
 - [x] Basic Clock Working
-- [x] Basic Styling of Index and App
-- [x] Styled, Live CRUD with FSM Changeset validation
+- [x] Live CRUD with FSM Changeset validation
 - [x] KanBan LiveView of FSM
+- [x] Styling
+- [ ] Pagination, Sorting, Filters & Search
+
+- [ ] Live Chat
+- [ ] Github OAuth Identity
+- [ ] Chat Persistence
 
 Take it for a spin:
 

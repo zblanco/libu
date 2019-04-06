@@ -46,6 +46,7 @@ defmodule Libu.MixProject do
       {:plug, "~> 1.7"},
       {:phoenix_live_view, github: "phoenixframework/phoenix_live_view"},
       {:calendar, "~> 0.17.4"},
+      {:uuid, "~> 1.1"},
     ]
   end
 
