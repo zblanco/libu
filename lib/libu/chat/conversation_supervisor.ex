@@ -1,9 +1,6 @@
 defmodule Libu.Chat.ConversationSupervisor do
-  @moduledoc """
-
-  """
   use DynamicSupervisor
-  alias Libu.Chat.{Conversation, ConversationProcess}
+  alias Libu.Chat.{ConversationProcess}
 
   def start_link(_arg) do
     DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -14,8 +11,9 @@ defmodule Libu.Chat.ConversationSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def start_conversation(%Conversation{} = conv) do
-    child_spec = {ConversationProcess, conv}
+  def start_conversation(via) do
+    {:via, Registry, {Registry.Conversations, id}} = via
+    child_spec = {ConversationProcess, id}
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 

@@ -5,5 +5,6 @@ defmodule Libu.Chat.Events.MessagePublished do
     :publisher_id,
     :message_body,
     :published_on,
+    :parent_message_id,
   ]
 end

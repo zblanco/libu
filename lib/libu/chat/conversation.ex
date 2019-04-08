@@ -23,7 +23,7 @@ defmodule Libu.Chat.Conversation do
     }
   end
 
-  def publish_message(%Conversation{messages: messages} = conv, %Message{} = message) do
+  def add_to(%Conversation{messages: messages} = conv, %Message{} = message) do
     %Conversation{ conv |
       messages: messages ++ message,
       last_activity: message.published_on,

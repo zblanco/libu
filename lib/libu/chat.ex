@@ -1,32 +1,31 @@
 defmodule Libu.Chat do
   @moduledoc """
   Users can publish messages to conversations.
-
-  The first published message also starts a conversation.
-
-  This conversation is a process. Conversations last only 30 minutes after their last message to their context.
-
+  The first published message starts a conversation.
+  This conversation is a process.
   Anyone else can reply to the conversation linking their message to the parent.
 
-  Others can link their message to one or many other messages.
-
-  Context, the linking mechanism, is part of every message except the root message of which it defaults to a root context.
-
-  Any message that is referenced as context spawns another process initiating another conversation process.
-
-  Each conversation is supervised by a pool of Dynamic Supervisors.
-
   This is mostly an excuse to play with the Registry and Dynamic Supervisors.
+  We might only store state transiently within ETS for initially.
 
-  We might store state only transiently within ETS.
+  Features that would be neat:
 
-  We could also persist streams of converations into an event store.
+    * Lazily stream messages as a person is scrolling through a page
+    * Event Sourced Persistence
+    * Dynamic, many-to-many contextual linking
+    * ConversationSupervisor pool
+    * Persistence Contract
+    * Websocket API
+    * FIFO Command Handling
+
   """
   alias Libu.Chat.{
     Events.ConversationStarted,
     Events.MessagePublished,
     Message,
     Conversation,
+    ConversationProcess,
+    ConversationSupervisor,
   }
 
   @topic inspect(__MODULE__)
@@ -46,13 +45,17 @@ defmodule Libu.Chat do
   #     |> PublishMessage.
   #   end
   # end
-  def publish_message(message_attrs, conversation_id) do
-    with {:ok, message} <- Message.new(message_attrs) do
 
+
+  def publish_message(message_attrs, conversation_id) do
+    with {:ok, message} <- Message.new(message_attrs, conversation_id) do
+      Communication
     end
     # Find Conversation
     # Deliver message to conversation process
   end
+
+  def publish_message(message_attrs), do: initiate_conversation(message_attrs)
 
   @doc """
   Creates a new conversation of which other users can reply to.
@@ -69,7 +72,7 @@ defmodule Libu.Chat do
     end
   end
 
-  defp notify_subscribers(event) do
+  def notify_subscribers(event) do
     Phoenix.PubSub.broadcast(Libu.PubSub, @topic, {__MODULE__, event})
     Phoenix.PubSub.broadcast(Libu.PubSub, @topic <> "#{event.conversation_id}", {__MODULE__, event})
     {:ok, event}
