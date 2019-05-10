@@ -17,7 +17,7 @@
           <div class="flex flex-col min-h-screen">
               <header>
                   <div class="container mx-auto w-full">
-                      <nav id="site-navigation" class="relative select-none lg:flex lg:items-stretch w-full items-center border-b-2 bg-white">
+                      <nav id="site-navigation" class="relative select-none lg:flex lg:items-stretch w-full items-center bg-white shadow-md rounded-b-sm">
                           <div class="flex flex-no-shrink items-stretch">
                               <a href="/" class="no-underline ">
                                   <div class="px-4 p-4 w-24">
@@ -27,11 +27,14 @@
                           </div>
                           <div class="lg:flex lg:items-stretch lg:flex-no-shrink lg:flex-grow" id="right-menu-options">
                               <div class="lg:flex lg:items-stretch lg:justify-end ml-auto">
+                                  <%= link("Chat", to: "/chat", 
+                                      class: "nav-item flex flex-no-grow flex-no-shrink"
+                                  ) %>
                                   <%= link("Projects", to: "/projects", 
-                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red-800 border-b-2 border-transparent hover:border-black"
+                                      class: "nav-item flex flex-no-grow flex-no-shrink"
                                   ) %>
                                   <%= link("Kanban", to: "/projects/kanban", 
-                                      class: "px-4 text-xl flex-no-grow flex-no-shrink relative py-2 px-4 leading-normal text-black no-underline flex items-center hover:text-red-800 border-b-2 border-transparent hover:border-black"
+                                      class: "nav-item flex flex-no-grow flex-no-shrink"
                                   ) %>
                               </div>
                           </div>

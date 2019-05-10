@@ -20,14 +20,14 @@ defmodule LibuWeb.Router do
 
     get "/", PageController, :index
 
-    live "/clock", LiveClock
-
-
     live "/projects", ProjectLive.Index
     live "/projects/kanban", ProjectLive.KanBan
     live "/projects/new", ProjectLive.New
     live "/projects/:id", ProjectLive.Show
     live "/projects/:id/edit", ProjectLive.Edit
+
+    live "/clock", LiveClock
+    live "/chat", LiveChat
 
     resources "/plain/projects", ProjectController
   end

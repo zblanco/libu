@@ -4,11 +4,14 @@ defmodule Libu.Chat.ConversationProcess do
   """
   use GenServer, restart: :transient
 
+  alias Libu.Chat
   alias Libu.Chat.{
     Conversation,
     ConversationSupervisor,
     Message,
     Query,
+    Events.ConversationStarted,
+    Events.MessagePublished,
   }
 
   @default_timeout :timer.minutes(60)
@@ -26,7 +29,7 @@ defmodule Libu.Chat.ConversationProcess do
   def handle_continue(:init, id) do
     case Query.conversation(id) do
       {:ok, conversation} -> {:noreply, conversation}
-      # {:error, _} -> {:noreply, }
+      {:error, _} -> {:noreply, }
     end
 
   end
@@ -46,11 +49,18 @@ defmodule Libu.Chat.ConversationProcess do
   def add_to_conversation(via, %Message{} = msg), do: call(via, {:add_to_conversation, msg})
 
   def handle_call({:intiate_conversation, msg}, _from, _conv) do
+    conversation = Conversation.start(msg)
 
+    # conversation
+    # |> ConversationStarted.new()
+    # |> Chat.notify_subscribers()
+
+    {:reply, :ok, conversation}
   end
 
   def handle_call({:add_to_conversation, msg}, _from, %Conversation{} = conv) do
     # Publish messages to pub sub
+
     # Check with Conversation rules
     # Persist updated state
     # Return Updated State

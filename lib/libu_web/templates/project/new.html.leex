@@ -1,12 +1,11 @@
 
 <div class="pt-5">
     <h2 class="flex justify-center text-xl">New Project</h2></br>
-    <div class="w-full max-w-xs mx-auto pt-4x overflow-hidden shadow-lg px-8 pt-6 pb-8 mb-4 border-t-2 border-black bg-white">
+    <div class="w-full max-w-xs mx-auto pt-4x overflow-hidden shadow-lg px-8 pt-6 pb-8 box">
         <%= render "form.html", assigns %>
     </div>
-</div
-<div class="flex justify-center">
-    <%= button( "Back", to: Routes.live_path(@socket, ProjectLive.Index), method: :get,
-        class: "bg-grey-200 hover:bg-black hover:text-white text-grey-darkest border border-grey-200 font-bold py-2 px-4 focus:outline-none focus:shadow-outline"
-    )%>
-</div
+</div>
+
+<%= button( "Back", to: Routes.live_path(@socket, ProjectLive.Index), method: :get,
+    class: "btn-quiet mt-4"
+)%>

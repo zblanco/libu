@@ -13,7 +13,7 @@ defmodule Libu.Chat.Conversation do
     :last_activity,
   ]
 
-  def start(%Message{conversation_id: nil} = initial_message) do
+  def start(%Message{parent_id: nil} = initial_message) do
     %Conversation{
       id: UUID.uuid4(),
       messages: [initial_message],

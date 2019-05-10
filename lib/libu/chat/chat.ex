@@ -11,6 +11,7 @@ defmodule Libu.Chat do
   Features that would be neat:
 
     * Lazily stream messages as a person is scrolling through a page
+    * Dynamic rendering of nested messages
     * Event Sourced Persistence
     * Dynamic, many-to-many contextual linking
     * ConversationSupervisor pool
@@ -47,26 +48,26 @@ defmodule Libu.Chat do
   # end
 
 
-  def publish_message(message_attrs, conversation_id) do
-    with {:ok, message} <- Message.new(message_attrs, conversation_id) do
-      Communication
+  def publish_message(%{} = msg_attrs, conversation_id) do
+    with {:ok, message} <- Message.new(msg_attrs, conversation_id) do
+      ConversationProcess.add_to(message)
     end
     # Find Conversation
     # Deliver message to conversation process
   end
 
-  def publish_message(message_attrs), do: initiate_conversation(message_attrs)
+  def publish_message(msg_attrs), do: initiate_conversation(msg_attrs)
 
   @doc """
   Creates a new conversation of which other users can reply to.
   """
   def initiate_conversation(message_attrs) do
     with {:ok, message}      <- Message.new(message_attrs),
-         {:ok, conversation} <- Conversation.start(message)
+         conversation        <- Conversation.start(message)
     do
-      conversation
-      |> ConversationStarted.new()
-      |> notify_subscribers()
+      # conversation
+      # |> ConversationStarted.new()
+      # |> notify_subscribers()
 
       {:ok, conversation}
     end

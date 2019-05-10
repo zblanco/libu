@@ -9,7 +9,6 @@ defmodule LibuWeb.ProjectLive.New do
   def mount(_session, socket) do
     {:ok,
      assign(socket, %{
-       count: 0,
        changeset: ProjectManagement.change_project(%Project{})
      })}
   end

@@ -24,8 +24,12 @@ defmodule LibuWeb.ProjectLive.Index do
 
   def handle_event("delete_project", id, socket) do
     project = ProjectManagement.get_project!(id)
-    {:ok, _user} = ProjectManagement.delete_project(project)
+    {:ok, _project} = ProjectManagement.delete_project(project)
 
     {:noreply, socket}
+  end
+
+  def handle_event("search", %{"query" => query}, socket) do
+    {:noreply, assign(socket, query: query, page: 1)}
   end
 end

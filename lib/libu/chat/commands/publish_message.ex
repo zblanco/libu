@@ -1,11 +1,11 @@
-defmodule Libu.Chat.Message do
+defmodule Libu.Chat.Commands.PublishMessage do
   @moduledoc """
   A message published as part of a conversation.
   """
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, :binary_id, autogenerate: false}
+  @primary_key {:message_id, :binary_id, autogenerate: false}
   embedded_schema do
     field :publisher_id, :string
     field :body, :string
@@ -25,7 +25,7 @@ defmodule Libu.Chat.Message do
 
   defp changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:parent_id, :publisher_id, :body])
+    |> cast(attrs, [:conversation_id, :publisher_id, :body])
     |> validate_required([:publisher_id, :body])
     |> put_change(:published_on, DateTime.utc_now())
     |> put_change(:id, UUID.uuid4())

@@ -1,6 +1,81 @@
 /* This file is for your main application css. */
 
  /* @import "./phoenix.css";  */
+.btn {
+    @apply font-bold;
+}
+
+.btn-gray {
+    @apply bg-gray-200 text-gray-800 border border-black py-2 px-4 text-black font-bold rounded-sm;
+}
+
+.btn-quiet {
+    @apply bg-transparent text-gray-700 border border-gray-400 py-2 px-4;
+}
+
+.btn-quiet-gray {
+    @apply bg-gray-100 text-gray-700 text-black border border-gray-400 py-2 px-4 rounded-sm;
+}
+
+.btn-quiet-gray:hover {
+    @apply bg-black text-white;
+}
+
+.btn-quiet:hover {
+    @apply bg-black text-white;
+}
+
+.btn-gray:hover {
+    @apply bg-black text-white;
+} 
+
+.box {
+    @apply border-t-2 border-black bg-white rounded-sm;
+}
+
+.tr-head {
+    @apply text-gray-600;
+}
+
+.th {
+    @apply py-2 px-4;
+}
+
+.th:hover {
+    @apply bg-gray-100;
+}
+
+.tr {
+    @apply border-b border-gray-200;
+}
+
+.tr:hover {
+    @apply bg-gray-100;
+}
+
+.td {
+    @apply py-2 px-4;
+}
+
+.td:hover {
+    @apply bg-gray-200;
+}
+
+.nav-item {
+    @apply px-4 text-xl relative py-2 px-4 leading-normal text-black no-underline items-center;
+}
+
+.nav-item:hover {
+    @apply bg-gray-200 shadow-inner text-red-800;
+}
+
+.text-input {
+    @apply appearance-none border-b-2 border-gray-400 w-full py-2 px-3 text-gray-800 leading-tight bg-gray-200;
+}
+
+.text-input:focus {
+    @apply border-black bg-gray-300;
+}
 
  @tailwind base;
 

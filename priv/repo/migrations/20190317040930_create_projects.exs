@@ -3,6 +3,7 @@ defmodule Libu.Repo.Migrations.CreateProjects do
 
   def change do
     create table(:projects) do
+      add :owner_id, :string
       add :name, :string
       add :status, :string
       add :description, :string

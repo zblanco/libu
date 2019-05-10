@@ -1,5 +1,6 @@
 defmodule Libu.Chat.Events.MessagePublished do
   @moduledoc """
+  Emitted from Chat when a message is published.
   """
   defstruct [
     :publisher_id,

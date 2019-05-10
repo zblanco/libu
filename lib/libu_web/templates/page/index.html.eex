@@ -2,7 +2,7 @@
 
   <div class="flex justify-center">
     <p>
-    Project to experiment with LiveView.
+    A series of Liveview experiments.
 
     Styled with Tailwind CSS Utilities.
     </p>
