@@ -5,6 +5,6 @@ defmodule Libu.Analysis.GoogleNLP do
   @behaviour Libu.Analysis.Analyzer
 
   def analyze(text) when is_binary(text) do
-
+    {:ok, "Nothing yet."}
   end
 end

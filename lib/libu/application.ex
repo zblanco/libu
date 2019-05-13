@@ -7,8 +7,10 @@ defmodule Libu.Application do
     children = [
       Libu.Repo,
       LibuWeb.Endpoint,
-      {Registry, keys: :unique, name: Registry.Conversations},
-      {DynamicSupervisor, strategy: :one_for_one, name: Libu.Chat.ConversationSupervisor},
+      {Registry, name: Libu.Chat.ConversationRegistry, keys: :unique},
+      {Registry, name: Libu.Analysis.SessionRegistry,  keys: :unique},
+      {DynamicSupervisor, name: Libu.Chat.ConversationSupervisor, strategy: :one_for_one},
+      {DynamicSupervisor, name: Libu.Analysis.SessionSupervisor,  strategy: :one_for_one},
     ]
 
     opts = [strategy: :one_for_one, name: Libu.Supervisor]

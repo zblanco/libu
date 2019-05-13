@@ -62,8 +62,8 @@ defmodule Libu.Chat do
   Creates a new conversation of which other users can reply to.
   """
   def initiate_conversation(message_attrs) do
-    with {:ok, message}      <- Message.new(message_attrs),
-         conversation        <- Conversation.start(message)
+    with {:ok, message} <- Message.new(message_attrs),
+         conversation   <- Conversation.start(message)
     do
       # conversation
       # |> ConversationStarted.new()

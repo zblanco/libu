@@ -1,28 +1,24 @@
+<div class="flex flex-col justify-center w-screen px-2">
+    <h2 class="flex justify-center font-serif text-2xl font-medium">Live Analysis</h2></br>
 
-<h2 class="flex justify-center font-serif text-2xl font-medium">Chat</h2></br>
+    <div class="flex pt-2">
+        <div class="box flex-grow m-2 overflow-hidden shadow-lg border-gray-500">
+            
+            <form phx-change="say">
+                <div class="flex bg-gray-100 content-end">
+                    <%= textarea(:chat, :name,
+                        class: "appearance-none border-b-2 p-3 border-gray-400 focus:border-black focus:bg-gray-200 w-full p-0 text-gray-800 leading-tight bg-gray-100",
+                        name: "msg",
+                        placeholder: "Say Something",
+                        phx_change: "say",
+                        rows: 10,
+                    )%>
+                </div>
+            </form>
+        </div>
 
-<div class="flex">
-    <div class="box m-2 overflow-hidden shadow-lg p-6 w-1/2">
-        <%= f = form_for @analyzer_config, "#", [phx_change: :update_config] %>
-            <%= for analyzer <- @analyzer_options do %>
-                <%= label(f, analyzer.name, class: "block text-gray-800 mb-2")%>
-                <%= radio_button(f, analyzer.selected, class: "") %>
-            <% end %>
-        </form>
-
-        <form phx-change="say">
-            <div class="flex bg-gray-100 content-end">
-                <%= textarea(:chat, :name,
-                    class: "appearance-none border-b-2 border-gray-400 focus:border-black focus:bg-gray-200 w-full p-3 text-gray-800 leading-tight bg-gray-100",
-                    name: "msg",
-                    placeholder: "Say Something",
-                    phx_change: "say",
-                )%>
-            </div>
-        </form>
-    </div>
-
-    <div class="box m-2 overflow-hidden shadow-lg p-6 w-1/2">
-        <div>Naive Analysis: <%= raw @analysis%></div>
+        <div class="box flex-grow m-2 overflow-hidden shadow-lg p-6">
+            <div>Naive Analysis: <%= raw @analysis%></div>
+        </div>
     </div>
 </div>

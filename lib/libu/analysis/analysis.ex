@@ -8,30 +8,31 @@ defmodule Libu.Analysis do
 
   Upon receiving a `:text_analyzed` event the parent session can update it's set of results per strategy.
   """
+  alias Libu.Analysis.{NaiveSentiment, SessionProcess, Session}
 
-  # def analyze(text, opts \\ []) when is_binary(text) do
-  #   # fetch all configured strategies from session
-  # end
+  def analyze(text) when is_binary(text) do
+    with {:ok, analysis} <- NaiveSentiment.analyze(text) do
+      analysis
+    end
+  end
+
+  def analyze(session_id, text) do
+    SessionProcess.analyze(session_id, text)
+  end
 
   @doc """
-  Used on mount of a LiveView component.
+  Used on mount of a LiveView.
 
-  Starts a stateful session that maintains the set of analyzers to queue commands to.
+  Starts a stateful session that maintains the set of analyzers and the text to analyze.
   """
-  # def start_analysis_session(intial_text, analyzers \\ [:naive_sentiment]) do
-  #   # Use a dynamic supervisor to spawn an analysis session
-
-  #   session = AnalysisManager.start_session(initial_text, analyzers)
-  # end
+  def start_session() do
+    with session_id <- Session.start(),
+         {:ok, _}   <- SessionProcess.start(session_id) do
+      session_id
+    end
+  end
 
   # def update_analyzers(session_id, analyzers) do
 
   # end
-
-  def analyzer_options() do
-    [
-      %{name: "Naive Analysis"},
-      %{name: "Google NLP"},
-    ]
-  end
 end
