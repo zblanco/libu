@@ -18,7 +18,10 @@
         </div>
 
         <div class="box flex-grow m-2 overflow-hidden shadow-lg p-6">
-            <div>Naive Analysis: <%= raw @analysis%></div>
+            <div>Basic Sentiment: <%= @analysis.overall_sentiment %></div>
+            <div>Average Sentiment Score Per Word: <%= @analysis.overall_sentiment %></div>
+            <div>Total Word Count:<%= @analysis.overall_sentiment %></div>
+            <div>Words Count: </div>
         </div>
     </div>
 </div>

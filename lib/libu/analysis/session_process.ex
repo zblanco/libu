@@ -4,14 +4,12 @@ defmodule Libu.Analysis.SessionProcess do
 
   Using a Dynamic Supervisor we maintain a 1:1 Analysis Session with a LiveView.
 
-  initial state:
-  ```elixir
-  %Session{
-    session_id: "an id we share with the liveview session"
-    analyzers: [naive_sentiment: Libu.Analysis.NaiveSentiment],
-    text: "",
-    analysis: %{},
-  }
+  In an ideal world the LiveView connects and agrees to a send us Operational Transform events based on edits.
+  From there we rebuild the text into it's latest version stored in ets.
+  Each configured analyzer is queued analysis jobs based on the full text state.
+  When the analyzer is done, the result is resolved back to the session state then stored in ETS.
+    - Late results that have been preceded by another job of the same analyzer with fresher state are discarded.
+  Whenever an analysis change is made, we publish to a pub sub where our LiveView client can be notified to refetch the analysis results for a session.
   ```
 
   Basic Lifecycle:
@@ -22,7 +20,14 @@ defmodule Libu.Analysis.SessionProcess do
 
   """
   use GenServer
-  alias Libu.Analysis.{Session, NaiveSentiment}
+  alias Libu.Analysis.{
+    Session,
+    BasicSentiment,
+    Utilities,
+    AnalysisResult,
+    # Persistence,
+    # Query,
+  }
 
   def child_spec(session_id) do
     %{
@@ -53,11 +58,24 @@ defmodule Libu.Analysis.SessionProcess do
     GenServer.call(via(session_id), {:analyze, text})
   end
 
-  def handle_call({:analyze, text}, _from, %Session{} = session) do
-    with {:ok, rating} <- NaiveSentiment.analyze(text) do
-      {:reply, {:ok, rating}, %Session{ session |
-        analysis: [naive_analysis: rating]
-      }}
+  def handle_call({:analyze, text}, _from, %Session{edit_count: edit_count} = session) do
+    with total_word_count             <- Utilities.number_of_words(text),
+         words_count                  <- Utilities.word_count(text),
+         {:ok, basic_sentiment_score} <- BasicSentiment.analyze(text)
+    do
+      new_analysis_results = %AnalysisResult{
+        overall_sentiment: basic_sentiment_score,
+        sentiment_score_per_word: basic_sentiment_score / total_word_count,
+        total_word_count: total_word_count,
+        words_count: words_count,
+      }
+
+      new_session = %Session{ session |
+        analysis: new_analysis_results,
+        text: text,
+        edit_count: edit_count + 1,
+      }
+      {:reply, {:ok, new_session}, new_session}
     else
       _ -> {:reply, :error, session}
     end

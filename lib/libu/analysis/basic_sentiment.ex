@@ -1,4 +1,4 @@
-defmodule Libu.Analysis.NaiveSentiment do
+defmodule Libu.Analysis.BasicSentiment do
   @moduledoc """
   Uses Veritaserum for basic sentiment analysis.
   """

@@ -15,7 +15,7 @@
 
         <div class="font-sans">
           <div class="flex flex-col min-h-screen">
-              <header>
+                <header>
                     <nav id="site-navigation" class="relative select-none lg:flex lg:items-stretch w-full items-center bg-white shadow-md rounded-b-sm">
                         <div class="flex flex-no-shrink items-stretch">
                             <a href="/" class="no-underline ">
@@ -38,7 +38,7 @@
                             </div>
                         </div>
                     </nav>
-              </header>
+                </header>
 
               <div id="content" class="container mx-auto pt-4 pb-4 app-page flex justify-center">
                   <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>

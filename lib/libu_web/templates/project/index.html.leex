@@ -12,16 +12,18 @@
             phx_change: "search",
         )%>
       </form>
-      <span class="p-2">
-        <%= link("New Project", 
-          to: Routes.live_path(@socket, ProjectLive.New), 
-          class: "btn-quiet-gray p-2 rounded-l"
-        )%>
-        <%= link("Kanban", 
-          to: Routes.live_path(@socket, ProjectLive.KanBan), 
-          class: "btn-quiet-gray rounded-r"
-        )%>
-      </span>
+      <div class="inline-flex h-10">
+        <div class=" lg:flex lg:items-stretch">
+        <%= link to: Routes.live_path(@socket, ProjectLive.New), class: "rounded hover:border-black hover:bg-gray-300 border p-2 mr-2 " do %>
+          New
+        <% end %>
+        <%= link to: Routes.live_path(@socket, ProjectLive.KanBan),  class: "rounded hover:border-black border hover:bg-gray-300 items-center inline-flex p-1 pb-0" do %>
+          <div class="">
+            <img class="fill-current h-10" src="<%= Routes.static_path(@socket, "/images/kanban.svg") %>" alt="Kanban"/>
+          </div>
+        <% end %>
+        </div>
+      </div>
     </div>
 
     <div class="box w-auto mx-auto overflow-hidden shadow-lg border-gray-200">
@@ -40,28 +42,28 @@
           <tbody>
             <%= for project <- @projects do %>
                 <tr class="tr">
-                  
-                    <td class="td">
-                      <%= link to: "/projects/#{project.id}", class: "hover:underline" do %> 
-                        <%= project.name %>
-                      <% end %>
-                    </td> 
-                  
+                    
+                  <td class="td">
+                    <%= link to: "/projects/#{project.id}", class: "hover:underline" do %> 
+                      <%= project.name %>
+                    <% end %>
+                  </td>
+                    
                   <td class="td"><%= project.status %></td>
                   <td class="td"><%= project.description %></td>
 
                   <td class="td">
                     <div class="inline-flex">
                       <%= button("Show", to: Routes.live_path(@socket, ProjectLive.Show, project), method: :get,
-                        class: "btn-quiet py-2 px-2 hover:bg-white hover:border-gray-400 hover:text-red-800 border border-transparent border font-normal text-gray-700"
+                        class: "btn-quiet py-2 px-2 hover:bg-white hover:border-gray-400 hover:text-red-800 border-b-2 border-transparent font-normal text-gray-700 rounded-t"
                       )%>
                       <%= button("Edit", to: Routes.live_path(@socket, ProjectLive.Edit, project), method: :get, 
-                        class: "btn-quiet py-2 px-2 hover:bg-white hover:border-gray-400 hover:text-red-800 border border-transparent border font-normal text-gray-700" 
+                        class: "btn-quiet py-2 px-2 hover:bg-white hover:border-gray-400 hover:text-red-800 border-b-2 border-transparent font-normal text-gray-700 rounded-t" 
                       )%>
                       <%= button("Delete", to: "#", method: :get,
                         phx_click: "delete project", 
                         phx_value: project.id, 
-                        class: "btn-quiet py-2 px-2 hover:bg-white hover:border-gray-400 hover:text-red-800 border border-transparent border font-normal text-gray-700" 
+                        class: "btn-quiet py-2 px-2 hover:bg-white hover:border-gray-400 hover:text-red-800 border border-transparent border font-normal text-gray-700 rounded-t" 
                       )%>
                     </div>
                   </td>

@@ -27,7 +27,10 @@ defmodule LibuWeb.Router do
     live "/projects/:id/edit", ProjectLive.Edit
 
     live "/clock", LiveClock
+
     live "/chat", LiveChat
+    live "/chat/conversations/:id", Conversation
+
     live "/analysis", LiveAnalysis
 
     resources "/plain/projects", ProjectController

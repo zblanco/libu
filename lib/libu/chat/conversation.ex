@@ -1,6 +1,6 @@
 defmodule Libu.Chat.Conversation do
   @moduledoc """
-  A Process which represents a tree of related messages.
+  A simple container of messages.
   """
   alias Libu.Chat.Message
   alias __MODULE__

@@ -8,17 +8,11 @@ defmodule Libu.Analysis do
 
   Upon receiving a `:text_analyzed` event the parent session can update it's set of results per strategy.
   """
-  alias Libu.Analysis.{NaiveSentiment, SessionProcess, Session}
-
-  def analyze(text) when is_binary(text) do
-    with {:ok, analysis} <- NaiveSentiment.analyze(text) do
-      analysis
-    end
-  end
-
-  def analyze(session_id, text) do
-    SessionProcess.analyze(session_id, text)
-  end
+  alias Libu.Analysis.{
+    SessionProcess,
+    Session,
+    Query,
+  }
 
   @doc """
   Used on mount of a LiveView.
@@ -32,7 +26,15 @@ defmodule Libu.Analysis do
     end
   end
 
-  # def update_analyzers(session_id, analyzers) do
+  def handle_text_change(session_id, text) do
+    with {:ok, session} <- SessionProcess.analyze(session_id, text) do
+      session
+    else
+      _ -> {:error, "Error analyzing text"}
+    end
+  end
 
-  # end
+  def fetch_analysis_results(session_id), do: Query.get(session_id)
+
+  def setup_persistence(), do: :ets.new(:analysis_results, [:public, :named_table])
 end

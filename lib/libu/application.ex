@@ -13,6 +13,7 @@ defmodule Libu.Application do
       {DynamicSupervisor, name: Libu.Analysis.SessionSupervisor,  strategy: :one_for_one},
     ]
 
+    Libu.Analysis.setup_persistence()
     opts = [strategy: :one_for_one, name: Libu.Supervisor]
     Supervisor.start_link(children, opts)
   end

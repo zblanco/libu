@@ -73,6 +73,20 @@ defmodule Libu.Chat do
     end
   end
 
+  def demo_conversations() do
+    [
+      demo_conversation(),
+      demo_conversation(),
+    ]
+  end
+
+  def get_conversation(_), do: demo_conversation()
+
+  defp demo_conversation() do
+    {:ok, msg} = Message.new(%{publisher_id: "doops", body: "liveview is pretty neat"})
+    Conversation.start(msg)
+  end
+
   def notify_subscribers(event) do
     Phoenix.PubSub.broadcast(Libu.PubSub, @topic, {__MODULE__, event})
     Phoenix.PubSub.broadcast(Libu.PubSub, @topic <> "#{event.conversation_id}", {__MODULE__, event})

@@ -6,7 +6,12 @@ defmodule LibuWeb.LiveAnalysis do
   def mount(_session, %{} = socket) do
     {:ok, assign(socket,
       analysis_session: Analysis.start_session(),
-      analysis: "Nothing yet."
+      analysis: %{
+        overall_sentiment: 0,
+        sentiment_score_per_word: 0,
+        total_word_count: 0,
+        words_count: %{}
+      }
     )}
   end
 
@@ -21,7 +26,7 @@ defmodule LibuWeb.LiveAnalysis do
   when is_binary(msg) do
     case Analysis.analyze(session, msg) do
       {:ok, analysis} ->
-        {:noreply, assign(socket, analysis: Integer.to_string(analysis))}
+        {:noreply, assign(socket, analysis: analysis)}
       _ ->
         {:noreply, socket}
     end
