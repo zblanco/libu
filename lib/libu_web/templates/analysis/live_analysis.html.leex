@@ -18,10 +18,32 @@
         </div>
 
         <div class="box flex-grow m-2 overflow-hidden shadow-lg p-6">
-            <div>Basic Sentiment: <%= @analysis.overall_sentiment %></div>
-            <div>Average Sentiment Score Per Word: <%= @analysis.overall_sentiment %></div>
-            <div>Total Word Count:<%= @analysis.overall_sentiment %></div>
-            <div>Words Count: <%= raw() %></div>
+            <table>
+            <tr class="tr">
+                <td class="td">
+                Basic Sentiment:
+                </td>
+                <td class="td">
+                <%= @analysis.overall_sentiment %>
+                </td>
+            </tr>
+            <tr class="tr">
+                <td class="td">
+                Average Sentiment Score Per Word:
+                </td>
+                <td class="td">
+                <%= @analysis.sentiment_score_per_word %>
+                </td>
+            </tr>
+            <tr class="tr">
+                <td class="td">
+                Total Word Count:
+                </td>
+                <td class="td">
+                <%= @analysis.total_word_count %>
+                </td>
+            </tr>
+            </table>
         </div>
     </div>
 </div>
