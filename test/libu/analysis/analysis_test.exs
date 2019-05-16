@@ -2,17 +2,14 @@ defmodule Libu.AnalysisTest do
   use ExUnit.Case
   alias Libu.Analysis
 
-
-  describe "text analysis: " do
-    test "basic analysis returns a map of analytics data for text" do
-      {:ok, rating} = Analysis.BasicSentiment.analyze("Some text input")
-      assert is_map(rating)
-      assert %{
-        total_score: _,
-        score_per_word: ,
-        word_count: ,
-        registered_edits: ,
-      }
-    end
+  test "basic/stateless text analysis" do
+    result = Analysis.analyze("A sentence of text does great good")
+    assert is_map(result)
+    assert %{
+      overall_sentiment: _,
+      sentiment_score_per_word: _,
+      total_word_count: _,
+      words_count: _,
+    } = result
   end
 end

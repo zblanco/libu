@@ -14,27 +14,33 @@ defmodule Libu.Analysis do
     Query,
   }
 
-  @doc """
-  Used on mount of a LiveView.
-
-  Starts a stateful session that maintains the set of analyzers and the text to analyze.
-  """
-  def start_session() do
-    with session_id <- Session.start(),
-         {:ok, _}   <- SessionProcess.start(session_id) do
-      session_id
+  def analyze(text) when is_nil(text), do: {:error, :nothing_to_analyze}
+  def analyze(text) when is_binary(text) do
+    with sentiment_score  <- Veritaserum.analyze(text),
+         total_word_count <- number_of_words(text),
+         word_count       <- word_count(text)
+    do
+      %{
+        overall_sentiment: sentiment_score,
+        sentiment_score_per_word: sentiment_score / total_word_count,
+        total_word_count: total_word_count,
+        words_count: word_count,
+      }
     end
   end
 
-  def handle_text_change(session_id, text) do
-    with {:ok, session} <- SessionProcess.analyze(session_id, text) do
-      session
-    else
-      _ -> {:error, "Error analyzing text"}
-    end
+  def word_count(text) do
+    text
+    |> String.downcase
+    |> String.split(~R/[^[:alnum:]\-]/u, trim: true)
+    |> Enum.reduce(Map.new, fn(word, map) ->
+      Map.update(map, word, 1, &(&1 + 1))
+    end)
   end
 
-  def fetch_analysis_results(session_id), do: Query.get(session_id)
-
-  def setup_persistence(), do: :ets.new(:analysis_results, [:public, :named_table])
+  def number_of_words(text) do
+    text
+    |> String.split(~R/[^[:alnum:]\-]/u, trim: true)
+    |> Enum.count()
+  end
 end
