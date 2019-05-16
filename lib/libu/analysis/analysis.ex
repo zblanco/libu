@@ -2,8 +2,6 @@ defmodule Libu.Analysis do
   @moduledoc """
   Analyzes text on-demand with configurable strategies.
 
-  We start a stateful session with the contents of the updated anytime the text changes.
-
   Upon a change we queue up a text analysis job and cancel all existing work per strategy if it's still running.
 
   Upon receiving a `:text_analyzed` event the parent session can update it's set of results per strategy.
@@ -12,29 +10,28 @@ defmodule Libu.Analysis do
     SessionProcess,
     Session,
     Query,
+    Persistence,
   }
 
+  @topic inspect(__MODULE__)
+
   @doc """
-  Used on mount of a LiveView.
-
-  Starts a stateful session that maintains the set of analyzers and the text to analyze.
+  Starts a stateful session updated with analysis results.
   """
-  def start_session() do
-    with session_id <- Session.start(),
-         {:ok, _}   <- SessionProcess.start(session_id) do
-      session_id
-    end
-  end
-
-  def handle_text_change(session_id, text) do
-    with {:ok, session} <- SessionProcess.analyze(session_id, text) do
-      session
+  def start_session(session_id) do
+    with session  <- Session.new(session_id),
+         {:ok, _} <- SessionProcess.start(session) do
+      :ok
     else
-      _ -> {:error, "Error analyzing text"}
+      _ -> :error
     end
   end
 
-  def fetch_analysis_results(session_id), do: Query.get(session_id)
+  def subscribe(session_id) do
+    Phoenix.PubSub.subscribe(Libu.PubSub, @topic <> "#{session_id}")
+  end
 
-  def setup_persistence(), do: :ets.new(:analysis_results, [:public, :named_table])
+  defdelegate analyze(session_id, text),          to: SessionProcess
+  defdelegate fetch_analysis_results(session_id), to: Query,       as: :fetch
+  defdelegate setup_persistence,                  to: Persistence, as: :setup
 end

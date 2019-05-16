@@ -22,12 +22,16 @@ defmodule Libu.Analysis.SessionProcess do
   use GenServer
   alias Libu.Analysis.{
     Session,
-    BasicSentiment,
+    SimpleText,
     Utilities,
     AnalysisResult,
-    # Persistence,
-    # Query,
+    Persistence,
+    Query,
   }
+
+  def via(session_id) when is_binary(session_id) do
+    {:via, Registry, {Libu.Analysis.SessionRegistry, session_id}}
+  end
 
   def child_spec(session_id) do
     %{
@@ -52,36 +56,47 @@ defmodule Libu.Analysis.SessionProcess do
     )
   end
 
-  def init(session_id), do: {:ok, Session.new(session_id)}
+  def init(session_id),
+    do: {:ok, session_id, {:continue, :init}}
 
+  def handle_continue(:init, session_id) do
+    {:noreply, Query.fetch(session_id)}
+  end
+
+
+  def analyze(_session_id, text) when is_nil(text), do: {:error, :nothing_to_analyze}
   def analyze(session_id, text) do
     GenServer.call(via(session_id), {:analyze, text})
   end
 
-  def handle_call({:analyze, text}, _from, %Session{edit_count: edit_count} = session) do
-    with total_word_count             <- Utilities.number_of_words(text),
-         words_count                  <- Utilities.word_count(text),
-         {:ok, basic_sentiment_score} <- BasicSentiment.analyze(text)
-    do
-      new_analysis_results = %AnalysisResult{
-        overall_sentiment: basic_sentiment_score,
-        sentiment_score_per_word: basic_sentiment_score / total_word_count,
-        total_word_count: total_word_count,
-        words_count: words_count,
-      }
+  def handle_call({:analyze, text}, _from, session) do
+    with {:ok, result} <- SimpleText.analyze(text) do
 
-      new_session = %Session{ session |
-        analysis: new_analysis_results,
-        text: text,
+    end
+    case SimpleText.analyze(text) do
+      {:ok, result} ->
+        new_session = %Session{ session |
+        analysis: result
         edit_count: edit_count + 1,
       }
+    end
+  end
+
+  @doc """
+  Things to do:
+    - Run
+  end
+  """
+  def handle_call({:analyze, text}, _from, %Session{} = session) do
+
+
+
+
+
+
       {:reply, {:ok, new_session}, new_session}
     else
       _ -> {:reply, :error, session}
     end
-  end
-
-  def via(session_id) when is_binary(session_id) do
-    {:via, Registry, {Libu.Analysis.SessionRegistry, session_id}}
   end
 end

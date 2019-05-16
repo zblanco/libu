@@ -7,7 +7,7 @@
             <form phx-change="say">
                 <div class="flex bg-gray-100 content-end">
                     <%= textarea(:chat, :name,
-                        class: "appearance-none border-b-2 p-3 border-gray-400 focus:border-black focus:bg-gray-200 w-full p-0 text-gray-800 leading-tight bg-gray-100",
+                        class: "text-xl appearance-none border-b-2 p-3 border-gray-400 focus:border-black focus:bg-gray-200 w-full p-0 text-gray-800 leading-tight bg-gray-100",
                         name: "msg",
                         placeholder: "Say Something",
                         phx_change: "say",
@@ -18,10 +18,40 @@
         </div>
 
         <div class="box flex-grow m-2 overflow-hidden shadow-lg p-6">
-            <div>Basic Sentiment: <%= @analysis.overall_sentiment %></div>
-            <div>Average Sentiment Score Per Word: <%= @analysis.overall_sentiment %></div>
-            <div>Total Word Count:<%= @analysis.overall_sentiment %></div>
-            <div>Words Count: </div>
+            <tbody>
+                <tr class="tr">
+                    <td class="td">
+                    Basic Sentiment:
+                    </td>
+                    <td class="td">
+                    <%= @analysis.overall_sentiment %>
+                    </td>
+                </tr>
+                <tr class="tr">
+                    <td class="td">
+                    Average Sentiment Score Per Word:
+                    </td>
+                    <td class="td">
+                    <%= @analysis.sentiment_per_word %>
+                    </td>
+                </tr>
+                <tr class="tr">
+                    <td class="td">
+                    Total Word Count:
+                    </td>
+                    <td class="td">
+                    <%= @analysis.total_word_count %>
+                    </td>
+                </tr>
+                <tr class="tr">
+                    <td class="td">
+                    WPM:
+                    </td>
+                    <td class="td">
+                    <%= words_per_minute(total_word_count) %>
+                    </td>
+                </tr>
+          </tbody>
         </div>
     </div>
 </div>

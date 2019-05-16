@@ -9,6 +9,8 @@ defmodule LibuWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :put_layout, {LibuWeb.LayoutView, :app}
+    plug LibuWeb.StickySession # ensure we have a session_uuid
+
   end
 
   pipeline :api do
@@ -31,7 +33,7 @@ defmodule LibuWeb.Router do
     live "/chat", LiveChat
     live "/chat/conversations/:id", Conversation
 
-    live "/analysis", LiveAnalysis
+    live "/analysis", LiveAnalysis, session: [:uuid]
 
     resources "/plain/projects", ProjectController
   end
