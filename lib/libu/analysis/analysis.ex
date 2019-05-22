@@ -2,7 +2,7 @@ defmodule Libu.Analysis do
   @moduledoc """
   Analyzes text on-demand with configurable strategies.
 
-  Upon a change we queue up a text analysis job and cancel all existing work per strategy if it's still running.
+  Upon a change we queue up a text analysis job and always prioritize results from latest events.
 
   Upon receiving a `:text_analyzed` event the parent session can update it's set of results per strategy.
   """

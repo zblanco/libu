@@ -15,7 +15,7 @@ defmodule Libu.Analysis.SessionProcess do
   Basic Lifecycle:
 
   * @first live view mount: start an analysis session under a Dynamic Supervisor with the initial state
-  * @live view de-mount: kill the analysis session
+  * @liveview de-mount: kill the analysis session (mercilessly) or keep hot for a period of time.
   * @text change: call the analyzer modules, update and return the result in the `analysis` map.
 
   """
@@ -82,11 +82,7 @@ defmodule Libu.Analysis.SessionProcess do
     end
   end
 
-  @doc """
-  Things to do:
-    - Run
-  end
-  """
+
   def handle_call({:analyze, text}, _from, %Session{} = session) do
 
 

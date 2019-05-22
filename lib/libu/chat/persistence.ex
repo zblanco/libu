@@ -6,19 +6,7 @@ defmodule Libu.Chat.Persistence do
     Conversation,
     Message,
   }
-  def create(%Conversation{} = conv) do
-    # ets
-  end
-
-  def update(%Conversation{} = conv) do
-
-  end
-
-  def delete(%Conversation{} = conv) do
-
-  end
-
-  def delete(%Message{} = conv) do
+  def persist(%Event{} = event) do
 
   end
 end
