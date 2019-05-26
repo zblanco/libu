@@ -1,6 +1,9 @@
 defmodule Libu.Analysis.Analyzer do
   @moduledoc """
-  A Text Analyzer must conform to this contract.
+  TODO:
+  * Consider this might be the wrong boundary for the contract.
+  * A text analysis function should be stateless and composable.
+  * The real contract should be around our workers the produce results.
   """
   @type msg :: String.t()
   @type analysis ::

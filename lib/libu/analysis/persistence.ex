@@ -1,7 +1,7 @@
 defmodule Libu.Analysis.Persistence do
   alias Libu.Analysis.Session
 
-  def create(%Session{session_id: session_id} = result) do
+  def create(%Session{id: session_id} = result) do
     case :ets.insert_new(:analysis_sessions, {session_id, result}) do
       true  -> {:ok, result}
       false -> {:error, :duplicate_item}

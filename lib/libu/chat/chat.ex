@@ -2,11 +2,11 @@ defmodule Libu.Chat do
   @moduledoc """
   Users can publish messages to conversations.
   The first published message starts a conversation.
-  This conversation is a process.
+  A conversation is a top level thread or channel for which more messages are posted.
   Anyone else can reply to the conversation linking their message to the parent.
 
   This is mostly an excuse to play with the Registry and Dynamic Supervisors.
-  We might only store state transiently within ETS for initially.
+  We might only store state transiently within ETS initially.
 
   Features that would be neat:
 
