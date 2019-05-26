@@ -25,7 +25,7 @@ defmodule Libu.Chat.Conversation do
 
   def add_to(%Conversation{messages: messages} = conv, %Message{} = message) do
     %Conversation{ conv |
-      messages: messages ++ message,
+      messages: [messages | message], List.
       last_activity: message.published_on,
     }
   end

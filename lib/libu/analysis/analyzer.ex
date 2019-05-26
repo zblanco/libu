@@ -1,9 +1,7 @@
 defmodule Libu.Analysis.Analyzer do
   @moduledoc """
   TODO:
-  * Consider this might be the wrong boundary for the contract.
-  * A text analysis function should be stateless and composable.
-  * The real contract should be around our workers the produce results.
+  * Consider implementing something like Phoenix.HTML.Safe
   """
   @type msg :: String.t()
   @type analysis ::

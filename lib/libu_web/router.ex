@@ -9,7 +9,7 @@ defmodule LibuWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :put_layout, {LibuWeb.LayoutView, :app}
-    plug LibuWeb.StickySession # ensure we have a session_uuid
+    # plug LibuWeb.StickySession # ensure we have a session_uuid
 
   end
 

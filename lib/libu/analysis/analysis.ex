@@ -15,6 +15,9 @@ defmodule Libu.Analysis do
 
   def topic, do: inspect(__MODULE__)
 
+  def analyzers, do: [
+  ]
+
   @doc """
   Starts a stateful session updated with analysis results.
   """
