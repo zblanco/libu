@@ -6,7 +6,6 @@ defmodule LibuWeb.Conversation do
 
   def mount(%{path_params: %{"id" => id}}, socket) do
     if connected?(socket), do: Chat.subscribe(id)
-
     {:ok, fetch(assign(socket, id: id))}
   end
 

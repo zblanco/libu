@@ -5,7 +5,6 @@ defmodule LibuWeb.LiveChat do
 
   def mount(_session, socket) do
     if connected?(socket), do: Chat.subscribe()
-
     {:ok, assign(socket, conversations: Chat.demo_conversations())}
   end
 

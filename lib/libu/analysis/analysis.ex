@@ -4,7 +4,7 @@ defmodule Libu.Analysis do
 
   Upon a change we queue up a text analysis job and always prioritize results from latest events.
 
-  Upon receiving a `:text_analyzed` event the parent session can update it's set of results per strategy.
+  Upon receiving a `AnalysisResultProduced` event the parent session can update it's set of results per strategy.
   """
   alias Libu.Analysis.{
     SessionProcess,
@@ -15,13 +15,13 @@ defmodule Libu.Analysis do
 
   def topic, do: inspect(__MODULE__)
 
-  def analyzers, do: [
-  ]
-
   @doc """
-  Starts a stateful session updated with analysis results.
+  Either starts a stateful session with a purpose to deliver serialized `TextChanged` events downstream, or
+    refreshes a recent/existing one.
+
+  # TODO: Enable a sticky, transient behavior with the Liveview/Browser session.
   """
-  def start_session(session_id) do
+  def setup_session(session_id) do
     with session  <- Session.new(session_id),
          {:ok, _} <- SessionProcess.start(session) do
       :ok
@@ -31,7 +31,7 @@ defmodule Libu.Analysis do
   end
 
   def subscribe(session_id) do
-    Phoenix.PubSub.subscribe(Libu.PubSub, topic() <> "#{session_id}")
+    Phoenix.PubSub.subscribe(Libu.PubSub, topic() <> ":#{session_id}")
   end
 
   defdelegate analyze(session_id, text),          to: SessionProcess

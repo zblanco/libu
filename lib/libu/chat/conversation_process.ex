@@ -29,7 +29,7 @@ defmodule Libu.Chat.ConversationProcess do
   def handle_continue(:init, id) do
     case Query.conversation(id) do
       {:ok, conversation} -> {:noreply, conversation}
-      {:error, _}         -> {:noreply, }
+      {:error, _}         -> {:noreply, :error}
     end
 
   end

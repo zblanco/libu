@@ -47,7 +47,9 @@ defmodule Libu.MixProject do
       {:phoenix_live_view, github: "phoenixframework/phoenix_live_view"},
       {:calendar, "~> 0.17.4"},
       {:uuid, "~> 1.1"},
-      {:veritaserum, github: "zblanco/veritaserum", override: true},
+      {:veritaserum, "~> 0.2.1"},
+      {:flow, "~> 0.14.3"},
+      {:essence, "~> 0.2.0"},
     ]
   end
 

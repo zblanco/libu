@@ -66,7 +66,7 @@
 }
 
 .nav-item:hover {
-    @apply bg-gray-200 shadow-inner text-red-800;
+    @apply bg-gray-200 shadow-inner text-purple-800;
 }
 
 .text-input {

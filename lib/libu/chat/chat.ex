@@ -83,8 +83,9 @@ defmodule Libu.Chat do
   def get_conversation(_), do: demo_conversation()
 
   defp demo_conversation() do
-    {:ok, msg} = Message.new(%{publisher_id: "doops", body: "liveview is pretty neat"})
-    Conversation.start(msg)
+    {:ok, msg}  = Message.new(%{publisher_id: "doops", body: "liveview is pretty neat"})
+    {:ok, msg2} = Message.new(%{publisher_id: "doops", body: "tailwind is smooth"})
+    Conversation.start(msg) |> Conversation.add_to(msg2)
   end
 
   def notify_subscribers(event) do

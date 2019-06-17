@@ -20,36 +20,8 @@
         <div class="box flex-grow m-2 overflow-hidden shadow-lg p-6">
             <tbody>
                 <tr class="tr">
-                    <td class="td">
-                    Basic Sentiment:
-                    </td>
-                    <td class="td">
-                    <%= @analysis.overall_sentiment %>
-                    </td>
-                </tr>
-                <tr class="tr">
-                    <td class="td">
-                    Average Sentiment Score Per Word:
-                    </td>
-                    <td class="td">
-                    <%= @analysis.sentiment_per_word %>
-                    </td>
-                </tr>
-                <tr class="tr">
-                    <td class="td">
-                    Total Word Count:
-                    </td>
-                    <td class="td">
-                    <%= @analysis.total_word_count %>
-                    </td>
-                </tr>
-                <tr class="tr">
-                    <td class="td">
-                    WPM:
-                    </td>
-                    <td class="td">
-                    <%= words_per_minute(total_word_count) %>
-                    </td>
+                    <td class="td">Basic Sentiment:</td>
+                    <td class="td"><%= @analysis.overall_sentiment %></td>
                 </tr>
           </tbody>
         </div>

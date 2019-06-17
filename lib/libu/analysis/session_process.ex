@@ -25,55 +25,81 @@ defmodule Libu.Analysis.SessionProcess do
   alias Libu.Analysis.{
     Session,
     Events.TextChanged,
+    AnalyzerSubscriber,
   }
 
   def via(session_id) when is_binary(session_id) do
     {:via, Registry, {Libu.Analysis.SessionRegistry, session_id}}
   end
 
-  def child_spec(session_id) do
+  def child_spec(%Session{id: session_id} = session) do
     %{
       id: {__MODULE__, session_id},
-      start: {__MODULE__, :start_link, [session_id]},
+      start: {__MODULE__, :start_link, [session]},
       restart: :temporary,
     }
   end
 
-  def start_link(session_id) do
+  def start_link(%Session{id: session_id} = session) do
     GenServer.start_link(
       __MODULE__,
-      session_id,
+      session,
       name: via(session_id)
     )
   end
 
-  def start(session_id) do
+  def start(session) do
     DynamicSupervisor.start_child(
       Libu.Analysis.SessionSupervisor,
-      {__MODULE__, session_id}
+      {__MODULE__, session}
     )
   end
 
-  def init(session_id),
-    do: {:ok, session_id, {:continue, :init}}
+  def init(session),
+    do: {:ok, session, {:continue, :init}}
 
-  def handle_continue(:init, session_id) do
-    {:noreply, Query.fetch(session_id)}
+  def handle_continue(:init, session) do
+    # tid = :ets.new()
+    setup_subscriptions(session)
+    {:noreply, session}
   end
 
   def analyze(_session_id, text) when is_nil(text), do: {:error, :nothing_to_analyze}
-  def analyze(session_id, text) do
+  def analyze(session_id, text) when is_binary(text) do
     GenServer.call(via(session_id), {:analyze, text})
   end
 
+  # def toggle_analyzer(session_id, analyzer) when is_atom(analyzer) do
+  #   GenServer.call(via(session_id), {:toggle_analyzer, analyzer})
+  # end
+
   def handle_call({:analyze, text}, _from, session) do
     session = Session.set_text(session, text)
-    publish_text_changed(session)
+    event = TextChanged.new(session)
+    call_analyzers(session, event)
     {:reply, :ok, session}
   end
 
-  defp publish_text_changed(session) do
-    event = TextChanged.new(session)
-    Phoenix.PubSub.broadcast(Libu.PubSub, Libu.Analysis.topic(), {__MODULE__, event})
+  # def handle_call({:toggle_analyzer, analyzer}, %Session{analyzers: analyzers} = session) do
+  #   Session.toggle_analyzer(analyzer)
+  #   {:reply, :ok, session}
+  # end
+
+  # defp publish_event(%TextChanged{} = event) do
+  #   Phoenix.PubSub.broadcast(Libu.PubSub, Libu.Analysis.topic(), {__MODULE__, event})
+  # end
+
+  # We should publish text changed to a set of analyzer subscribers instead
+  # Each subscriber can call the Analyzer
+  defp call_analyzers(%Session{analyzers: analyzers}, %TextChanged{} = event) do
+    Enum.each(analyzers, fn analyzer ->
+      analyzer.analyze(event)
+    end)
+  end
+
+  defp setup_subscriptions(%Session{analyzers: analyzers, id: session_id}) do
+    Enum.each(analyzers, fn analyzer ->
+      AnalyzerSubscriber.subscribe(analyzer, session_id)
+    end)
   end
 end

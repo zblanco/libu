@@ -1,29 +1,21 @@
 defmodule Libu.Analysis.Text do
   @moduledoc """
-  Uses Veritaserum for basic sentiment analysis.
-
-  TODO:
-  * just produce overall sentiment, move Utility functions out.
-  *
-
+  Standard sets of text analysis.
   """
   @behaviour Libu.Analysis.Analyzer
 
   def analyze(text) when is_binary(text) do
-    with total_word_count  <- total_word_count(text, :eager),
-         words_count       <- word_count(text),
-         overall_sentiment <- Veritaserum.analyze(text)
+    with total_word_count  <- word_counts(text, :eager),
+         words_count       <- count_of_words(text)
     do
       {:ok, %{
-        overall_sentiment:        overall_sentiment,
-        sentiment_score_per_word: overall_sentiment / total_word_count,
-        total_word_count:         total_word_count,
-        words_count:              words_count,
+        total_word_count: total_word_count,
+        words_count:      words_count,
       }}
     end
   end
 
-  def total_word_count(text, :eager) when is_binary(text) do
+  def word_counts(text, :eager) when is_binary(text) do
     text
     |> String.downcase
     |> String.split(~R/[^[:alnum:]\-]/u, trim: true)
@@ -32,8 +24,12 @@ defmodule Libu.Analysis.Text do
     end)
   end
 
-  def total_word_count(text, :lazy) when is_binary(text) do
-    text
+  # TODO, return a map instead of tuple list
+  def word_counts(text, :lazy) when is_binary(text) do
+    {:ok, stream_text} = StringIO.open(text)
+
+    stream_text
+    |> IO.binstream(:line)
     |> Stream.flat_map(&String.split(&1, " "))
     |> Enum.reduce(%{}, fn word, acc ->
       Map.update(acc, word, 1, & &1 + 1)
@@ -41,8 +37,11 @@ defmodule Libu.Analysis.Text do
     |> Enum.to_list()
   end
 
-  def total_word_count(text, :flow) when is_binary(text) do
-    text
+  def word_counts(text, :flow) when is_binary(text) do
+    {:ok, stream_text} = StringIO.open(text)
+
+    stream_text
+    |> IO.binstream(:line)
     |> Flow.from_enumerable()
     |> Flow.flat_map(&String.split(&1, " "))
     |> Flow.partition()
@@ -52,7 +51,7 @@ defmodule Libu.Analysis.Text do
     |> Enum.to_list()
   end
 
-  def number_of_words(text) when is_binary(text) do
+  def count_of_words(text) when is_binary(text) do
     text
     |> String.split(~R/[^[:alnum:]\-]/u, trim: true)
     |> Enum.count()

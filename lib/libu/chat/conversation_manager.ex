@@ -2,7 +2,7 @@ defmodule Libu.Chat.ConversationManager do
   @moduledoc """
   Maintains a registry of Conversations ocurring.
 
-  Handles commands
+  Starts conversations when asked to.
   """
   use GenServer
 
@@ -18,5 +18,6 @@ defmodule Libu.Chat.ConversationManager do
 
   end
 
-  def end_conversation
+  def end_conversation(convo_id) when is_binary(convo_id),
+    do: :stuff
 end

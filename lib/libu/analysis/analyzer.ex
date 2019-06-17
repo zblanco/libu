@@ -3,7 +3,8 @@ defmodule Libu.Analysis.Analyzer do
   TODO:
   * Consider implementing something like Phoenix.HTML.Safe
   """
-  @type msg :: String.t()
+  alias Libu.Analysis.Session
+  @type msg :: String.t() | Session.t()
   @type analysis ::
     String.t()
     | map()
