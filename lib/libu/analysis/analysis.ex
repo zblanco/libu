@@ -34,7 +34,8 @@ defmodule Libu.Analysis do
     Phoenix.PubSub.subscribe(Libu.PubSub, topic() <> ":#{session_id}")
   end
 
-  defdelegate analyze(session_id, text),          to: SessionProcess
-  defdelegate fetch_analysis_results(session_id), to: Query,       as: :fetch
-  defdelegate setup_persistence,                  to: Persistence, as: :setup
+  defdelegate analyze(session_id, text),             to: SessionProcess
+  defdelegate toggle_analyzer(session_id, analyzer), to: SessionProcess
+  defdelegate fetch_analysis_results(session_id),    to: Query,       as: :fetch
+  defdelegate setup_persistence,                     to: Persistence, as: :setup
 end

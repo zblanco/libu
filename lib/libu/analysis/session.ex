@@ -6,7 +6,6 @@ defmodule Libu.Analysis.Session do
     Sentiment,
     Text,
     Editing,
-    Events.TextChanged,
   }
 
   defstruct id: nil,
@@ -16,11 +15,11 @@ defmodule Libu.Analysis.Session do
             start: nil,
             last_edited_on: nil
 
-  defp analyzer_defaults, do: [
+  defp analyzer_defaults, do: MapSet.new([
     Sentiment,
     Text,
     Editing,
-  ]
+  ])
 
   def new(session_id) do
     struct(__MODULE__, [
@@ -43,4 +42,6 @@ defmodule Libu.Analysis.Session do
   when is_list(new_analyzers) do
     %__MODULE__{session | analyzers: new_analyzers}
   end
+
+  # def toggle_analyzer(%__MODULE__{active_analyzers: })
 end

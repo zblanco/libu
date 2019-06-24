@@ -26,6 +26,7 @@ defmodule Libu.Analysis.SessionProcess do
     Session,
     Events.TextChanged,
     AnalyzerSubscriber,
+    Query,
   }
 
   def via(session_id) when is_binary(session_id) do
@@ -69,9 +70,9 @@ defmodule Libu.Analysis.SessionProcess do
     GenServer.call(via(session_id), {:analyze, text})
   end
 
-  # def toggle_analyzer(session_id, analyzer) when is_atom(analyzer) do
-  #   GenServer.call(via(session_id), {:toggle_analyzer, analyzer})
-  # end
+  def toggle_analyzer(session_id, analyzer) when is_atom(analyzer) do
+    GenServer.call(via(session_id), {:toggle_analyzer, analyzer})
+  end
 
   def handle_call({:analyze, text}, _from, session) do
     session = Session.set_text(session, text)
@@ -80,14 +81,20 @@ defmodule Libu.Analysis.SessionProcess do
     {:reply, :ok, session}
   end
 
-  # def handle_call({:toggle_analyzer, analyzer}, %Session{analyzers: analyzers} = session) do
-  #   Session.toggle_analyzer(analyzer)
-  #   {:reply, :ok, session}
-  # end
+  def handle_call({:toggle_analyzer, analyzer}, %Session{} = session) do
+    session =
+      case available_analyzer?(analyzer) do
+        :ok -> Session.toggle_analyzer(session, analyzer)
+      end
 
-  # defp publish_event(%TextChanged{} = event) do
-  #   Phoenix.PubSub.broadcast(Libu.PubSub, Libu.Analysis.topic(), {__MODULE__, event})
-  # end
+      # terminate_subscriber(session_id, analyzer)
+
+    {:reply, :ok, session}
+  end
+
+  defp available_analyzer?(analyzer) do
+    Map.has_key?(Query.analyzers_by_key(), analyzer)
+  end
 
   # We should publish text changed to a set of analyzer subscribers instead
   # Each subscriber can call the Analyzer
@@ -99,7 +106,7 @@ defmodule Libu.Analysis.SessionProcess do
 
   defp setup_subscriptions(%Session{analyzers: analyzers, id: session_id}) do
     Enum.each(analyzers, fn analyzer ->
-      AnalyzerSubscriber.subscribe(analyzer, session_id)
+      AnalyzerSubscriber.setup(analyzer, session_id)
     end)
   end
 end
