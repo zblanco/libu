@@ -6,28 +6,44 @@ defmodule Libu.Analysis.Session do
     Sentiment,
     Text,
     Editing,
+    Difficulty,
   }
 
   defstruct id: nil,
             text: "",
             version: 0,
-            analyzers: [],
+            active_analyzers: %{},
             start: nil,
             last_edited_on: nil
-
-  defp analyzer_defaults, do: MapSet.new([
-    Sentiment,
-    Text,
-    Editing,
-  ])
 
   def new(session_id) do
     struct(__MODULE__, [
       id: session_id,
       start: DateTime.utc_now(),
-      analyzers: analyzer_defaults(),
+      active_analyzers: default_analyzer_config(),
     ])
   end
+
+  defp default_analyzer_config do
+    for {k, _v} <- analyzers_by_key(), into: %{}, do: {k, true}
+  end
+
+  def analyzer_for_key(key) when is_atom(key) do
+    Map.get(analyzers_by_key(), key)
+  end
+
+  def analyzers_by_key do
+    %{
+      text: Text,
+      editing: Editing,
+      sentiment: Sentiment,
+      difficulty: Difficulty,
+    }
+  end
+
+  # def new(session_id, active_analyzers: []) do
+    # Consider how or if the Liveview should set default analyzers
+  # end
 
   def set_text(%__MODULE__{version: version} = session, text)
   when is_binary(text) do
@@ -38,10 +54,7 @@ defmodule Libu.Analysis.Session do
     }
   end
 
-  def configure_analyzers(%__MODULE__{} = session, new_analyzers)
-  when is_list(new_analyzers) do
-    %__MODULE__{session | analyzers: new_analyzers}
+  def toggle_analyzer(%__MODULE__{active_analyzers: active_analyzers} = session, analyzer) do
+    %__MODULE__{session | active_analyzers: :stuff}
   end
-
-  # def toggle_analyzer(%__MODULE__{active_analyzers: })
 end

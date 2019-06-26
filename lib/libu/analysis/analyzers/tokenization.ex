@@ -4,12 +4,6 @@ defmodule Libu.Analysis.Tokenization do
 
   Both an Analyzer implementation and an at-will module for use by other Analyzers.
   """
-  @behaviour Libu.Analysis.Analyzer
-
-  def analyze(text) when is_binary(text) do
-
-  end
-
   def tokenize(text) do
     Essence.Tokenizer.tokenize(text)
   end

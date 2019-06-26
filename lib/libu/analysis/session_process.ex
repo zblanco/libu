@@ -82,6 +82,8 @@ defmodule Libu.Analysis.SessionProcess do
   end
 
   def handle_call({:toggle_analyzer, analyzer}, %Session{} = session) do
+
+    # Terminate the subscriber process
     session =
       case available_analyzer?(analyzer) do
         :ok -> Session.toggle_analyzer(session, analyzer)
@@ -93,19 +95,21 @@ defmodule Libu.Analysis.SessionProcess do
   end
 
   defp available_analyzer?(analyzer) do
-    Map.has_key?(Query.analyzers_by_key(), analyzer)
+    Map.has_key?(Session.analyzers_by_key(), analyzer)
   end
 
   # We should publish text changed to a set of analyzer subscribers instead
   # Each subscriber can call the Analyzer
-  defp call_analyzers(%Session{analyzers: analyzers}, %TextChanged{} = event) do
-    Enum.each(analyzers, fn analyzer ->
-      analyzer.analyze(event)
-    end)
+  defp call_analyzers(%Session{active_analyzers: analyzer_config}, %TextChanged{} = event) do
+    analyzer_config
+    |> Enum.map(&Session.analyzer_for_key(&1))
+    |> Enum.each(fn analyzer -> analyzer.analyze(event) end)
   end
 
-  defp setup_subscriptions(%Session{analyzers: analyzers, id: session_id}) do
-    Enum.each(analyzers, fn analyzer ->
+  defp setup_subscriptions(%Session{active_analyzers: analyzer_config, id: session_id}) do
+    analyzer_config
+    |> Enum.map(&Session.analyzer_for_key(&1))
+    |> Enum.each(fn analyzer ->
       AnalyzerSubscriber.setup(analyzer, session_id)
     end)
   end

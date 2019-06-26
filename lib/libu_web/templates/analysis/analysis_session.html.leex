@@ -23,6 +23,10 @@
                 <span class="flex flex-row">
                     <%= if is_analyzer_active?(:editing, @analyzer_config) do %>
                         <button phx-click="toggle_editing" class="text-xl"> > </button>
+                        <span class="border rounded-full border-gray-200 flex items-center cursor-pointer w-12 justify-start">
+                            <span class="rounded-full border w-6 h-6 border-gray-200 shadow-inner bg-white shadow">
+                            </span>
+                        </span>
                         <h2 class="text-xl">Editing:</h2>
                         <div class="p-2">
                             <%= live_render(@socket, EditingResults, session: %{session_id: @session_id}) %>
