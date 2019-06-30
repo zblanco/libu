@@ -37,4 +37,11 @@ defmodule LibuWeb.Router do
 
     resources "/plain/projects", ProjectController
   end
+
+  scope "/auth", LibuWeb do
+    pipe_through :browser
+
+    get "/:provider", IdentityController, :index
+    get "/:provider/callback", IdentityController, :callback
+  end
 end

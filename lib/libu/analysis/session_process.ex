@@ -85,7 +85,7 @@ defmodule Libu.Analysis.SessionProcess do
 
     # Terminate the subscriber process
     session =
-      case available_analyzer?(analyzer) do
+      case Session.available_analyzer?(analyzer) do
         :ok -> Session.toggle_analyzer(session, analyzer)
       end
 
@@ -94,9 +94,7 @@ defmodule Libu.Analysis.SessionProcess do
     {:reply, :ok, session}
   end
 
-  defp available_analyzer?(analyzer) do
-    Map.has_key?(Session.analyzers_by_key(), analyzer)
-  end
+
 
   # We should publish text changed to a set of analyzer subscribers instead
   # Each subscriber can call the Analyzer

@@ -6,7 +6,7 @@ defmodule Libu.Analysis.AnalyzerSubscriberSupervisor do
   """
   use DynamicSupervisor
 
-  def start_link([session_id: session_id, initial_analyzers: initial_analyzers]) do
+  def start_link(session_id) do
     DynamicSupervisor.start_link(__MODULE__, session_id)
   end
 

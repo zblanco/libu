@@ -1,24 +1,22 @@
 defmodule Libu.ProjectManagement do
   @moduledoc """
-  The ProjectManagement context.
-  """
+  ### Notes:
+  This started as a quick way to try out Liveview + CRUD to render a kanban board.
 
+  A more useful feature would be to submit, post, comment, and vote on other Liveview projects.
+  """
   import Ecto.Query, warn: false
   alias Libu.Repo
 
   alias Libu.ProjectManagement.Project
+  alias Libu.Messaging
 
-  @topic inspect(__MODULE__)
+  def topic, do: inspect(__MODULE__)
 
-  def subscribe do
-    Phoenix.PubSub.subscribe(Libu.PubSub, @topic)
-  end
+  def subscribe, do: Messaging.subscribe(topic())
 
-  def subscribe(id) do
-    Phoenix.PubSub.subscribe(Libu.PubSub, @topic <> "#{id}")
-  end
-
-  alias Libu.ProjectManagement.Project
+  def subscribe(id),
+    do: Messaging.subscribe(topic() <> "#{id}")
 
   def projects_by_status() do
     Project
@@ -125,8 +123,8 @@ defmodule Libu.ProjectManagement do
   end
 
   defp notify_subscribers({:ok, result}, event) do
-    Phoenix.PubSub.broadcast(Libu.PubSub, @topic, {__MODULE__, event, result})
-    Phoenix.PubSub.broadcast(Libu.PubSub, @topic <> "#{result.id}", {__MODULE__, event, result})
+    Messaging.publish({__MODULE__, event, result}, topic())
+    Messaging.publish({__MODULE__, event, result}, topic() <> "#{result.id}")
     {:ok, result}
   end
 

@@ -50,6 +50,7 @@ defmodule Libu.MixProject do
       {:veritaserum, "~> 0.2.1"},
       {:flow, "~> 0.14.3"},
       {:essence, "~> 0.2.0"},
+      {:oauth2, "~> 1.0"},
     ]
   end
 

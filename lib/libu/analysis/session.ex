@@ -32,6 +32,10 @@ defmodule Libu.Analysis.Session do
     Map.get(analyzers_by_key(), key)
   end
 
+  def available_analyzer?(analyzer) do
+    Map.has_key?(analyzers_by_key(), analyzer)
+  end
+
   def analyzers_by_key do
     %{
       text: Text,
