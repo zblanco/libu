@@ -24,6 +24,12 @@ defmodule Libu.Analysis.Session do
     ])
   end
 
+  def increment_version(%__MODULE__{version: version} = session) do
+    %__MODULE__{session |
+    version: version + 1
+    }
+  end
+
   defp default_analyzer_config do
     for {k, _v} <- analyzers_by_key(), into: %{}, do: {k, true}
   end
@@ -58,7 +64,16 @@ defmodule Libu.Analysis.Session do
     }
   end
 
-  def toggle_analyzer(%__MODULE__{active_analyzers: active_analyzers} = session, analyzer) do
-    %__MODULE__{session | active_analyzers: :stuff}
+  def toggle_analyzer(
+    %__MODULE__{active_analyzers: active_analyzers} = session,
+      analyzer
+  ) do
+    toggle = Map.get(active_analyzers, analyzer)
+    case toggle do
+        nil -> session
+        _ -> %__MODULE__{
+          active_analyzers: %{active_analyzers | analyzer => !toggle}
+        }
+    end
   end
 end

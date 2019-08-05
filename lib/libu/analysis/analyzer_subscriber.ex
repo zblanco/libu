@@ -30,14 +30,11 @@ defmodule Libu.Analysis.AnalyzerSubscriber do
     {:ok, %{analyzer: analyzer, session_id: session_id}}
   end
 
-  # Should the Analzyer Subscriber know that it's supervised via a Dynamic Supervisor? Maybe not...
   def setup(session_id, analyzer) do
-    DynamicSupervisor.start_child(
-      Libu.Analysis.AnalyzerSubscriberSupervisor,
-      {__MODULE__, analyzer: analyzer, session_id: session_id}
-    )
+    AnalyzerSubscriberSupervisor.start_subscriber(session_id, analyzer)
   end
 
+  # Should this be under our supervisor?*
   def deactivate(session_id, analyzer) do
     via(session_id, analyzer)
     |> GenServer.whereis()
@@ -53,8 +50,8 @@ defmodule Libu.Analysis.AnalyzerSubscriber do
   def handle_info(%AnalysisResultProduced{} = event, subscription) do
     IO.inspect(event, label: "analysis result produced:: ")
     # Persist to a ETS under a tuple key of {session_id, analyzer}
+
     {:noreply, subscription}
   end
-
 
 end

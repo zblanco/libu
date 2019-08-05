@@ -6,4 +6,22 @@ defmodule Libu.Analysis.Editing do
 
   Consumed AnalysisResultProduced events to calculate various metrics about text editing.
   """
+
+  # def analyze(text) when is_binary(text) do
+  #   with total_word_count  <- word_counts(text, :eager),
+  #        words_count       <- count_of_words(text)
+  #   do
+  #     {:ok, %{
+  #       wpm: ,
+  #       words_count:      words_count,
+  #     }}
+  #   end
+  # end
+
+  # def results_set, do: MapSet.new([
+  #   :wpm,
+  #   :changes,
+  #   :duration,
+  #   :
+  # ])
 end

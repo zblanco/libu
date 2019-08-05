@@ -27,6 +27,7 @@ defmodule Libu.Analysis.SessionProcess do
     Events.TextChanged,
     AnalyzerSubscriber,
     Query,
+    AnalyzerSubscriberSupervisor,
   }
 
   def via(session_id) when is_binary(session_id) do
@@ -56,8 +57,13 @@ defmodule Libu.Analysis.SessionProcess do
     )
   end
 
-  def init(session),
-    do: {:ok, session, {:continue, :init}}
+  def init(session) do
+    # Start Analyzer Subscriber Dynamic Supervisor
+    # We should be able to find and communicate to the subscriber supervisor just from our Session Id and via/registry
+    {:ok, _pid} = AnalyzerSubscriberSupervisor.start(session.id)
+    # Create the Session ETS table?
+    {:ok, session, {:continue, :init}}
+  end
 
   def handle_continue(:init, session) do
     # tid = :ets.new()
@@ -83,7 +89,7 @@ defmodule Libu.Analysis.SessionProcess do
 
   def handle_call({:toggle_analyzer, analyzer}, %Session{} = session) do
 
-    # Terminate the subscriber process
+    # Terminate the subscriber processes toggled off
     session =
       case Session.available_analyzer?(analyzer) do
         :ok -> Session.toggle_analyzer(session, analyzer)
@@ -94,10 +100,6 @@ defmodule Libu.Analysis.SessionProcess do
     {:reply, :ok, session}
   end
 
-
-
-  # We should publish text changed to a set of analyzer subscribers instead
-  # Each subscriber can call the Analyzer
   defp call_analyzers(%Session{active_analyzers: analyzer_config}, %TextChanged{} = event) do
     analyzer_config
     |> Enum.map(&Session.analyzer_for_key(&1))

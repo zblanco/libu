@@ -1,4 +1,4 @@
-defmodule LibuWeb.LiveAnalysis do
+defmodule LibuWeb.AnalysisSession do
   @moduledoc """
   A Text Editing LiveView session with the Analysis Context.
 
@@ -9,7 +9,7 @@ defmodule LibuWeb.LiveAnalysis do
   It should only tell the Analysis Session of text changes and active analyzers.
 
   The Session Process setup during `mount/2` of this LiveView is responsible for backend communication such as
-    managing subscriptions, and calling analyzers to minimizing the the interface exposed here.
+    managing subscriptions, and calling analyzers to minimize the Analysis API consumption here.
   """
   use Phoenix.LiveView
   alias LibuWeb.AnalysisView
@@ -17,20 +17,15 @@ defmodule LibuWeb.LiveAnalysis do
   alias Phoenix.LiveView.Socket
 
   def mount(session, %Socket{} = socket) do
-    socket =
       if connected?(socket) do
         id = UUID.uuid4()
         Analysis.setup_session(id)
         Analysis.subscribe(id)
 
-        assign(socket,
+       {:ok, assign(socket,
             session_id: id,
             analyzer_config: default_analyzer_config(),
-            results: %{})
-      else
-        assign(socket,
-          analyzer_config: default_analyzer_config(),
-          results: %{})
+            results: %{})}
       end
     IO.inspect(session, label: "session: ")
     IO.inspect(socket, label: "socket: ")
@@ -39,7 +34,7 @@ defmodule LibuWeb.LiveAnalysis do
 
   def default_analyzer_config do
     %{
-      editing: false,
+      editing: true,
       text: false,
       difficulty: false,
       sentiment: false,

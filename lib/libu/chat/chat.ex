@@ -19,6 +19,11 @@ defmodule Libu.Chat do
     * Websocket API
     * FIFO Command Handling
 
+  If we're to make an event-sourced chat system, what would that require?
+
+    * route `message_published` events to the right aggregate process
+      * restart aggregate process if not available (use Registry)
+    * persistent event-store (PostgresQL EventStore probably)
   """
   alias Libu.Chat.{
     Events.ConversationStarted,
@@ -28,16 +33,15 @@ defmodule Libu.Chat do
     ConversationProcess,
     ConversationSupervisor,
   }
+  alias Libu.Messaging
 
-  @topic inspect(__MODULE__)
+  defp topic(), do: inspect(__MODULE__)
 
-  def subscribe do
-    Phoenix.PubSub.subscribe(Libu.PubSub, @topic)
-  end
+  def subscribe, do: Messaging.subscribe(topic())
 
-  def subscribe(conversation_id) do
-    Phoenix.PubSub.subscribe(Libu.PubSub, @topic <> "#{conversation_id}")
-  end
+  def subscribe(conversation_id), do:
+    Messaging.subscribe("#{topic()}:#{conversation_id}")
+
 
   # def publish_message(params, [form: true]), do: PublishMessage.new(params, form: true)
   # def publish_message(params \\ %{}) do
@@ -65,17 +69,20 @@ defmodule Libu.Chat do
     with {:ok, message} <- Message.new(message_attrs),
          conversation   <- Conversation.start(message)
     do
-      # conversation
-      # |> ConversationStarted.new()
-      # |> notify_subscribers()
+      conversation
+      |> ConversationStarted.new()
+      |> Messaging.publish(topic())
 
       {:ok, conversation}
     end
   end
 
+  def active_conversations do
+
+  end
+
   def demo_conversations() do
     [
-      demo_conversation(),
       demo_conversation(),
     ]
   end
@@ -85,13 +92,10 @@ defmodule Libu.Chat do
   defp demo_conversation() do
     {:ok, msg}  = Message.new(%{publisher_id: "doops", body: "liveview is pretty neat"})
     {:ok, msg2} = Message.new(%{publisher_id: "doops", body: "tailwind is smooth"})
-    Conversation.start(msg) |> Conversation.add_to(msg2)
-  end
 
-  def notify_subscribers(event) do
-    Phoenix.PubSub.broadcast(Libu.PubSub, @topic, {__MODULE__, event})
-    Phoenix.PubSub.broadcast(Libu.PubSub, @topic <> "#{event.conversation_id}", {__MODULE__, event})
-    {:ok, event}
+    Conversation.start(msg)
+    |> IO.inspect(label: "message before add_to")
+    |> Conversation.add_to(msg2)
+    |> IO.inspect(label: "messages after add_to")
   end
-
 end

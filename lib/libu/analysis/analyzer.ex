@@ -1,7 +1,5 @@
 defmodule Libu.Analysis.Analyzer do
   @moduledoc """
-  TODO:
-  * Consider implementing something like Phoenix.HTML.Safe
   """
   alias Libu.Analysis.Session
   @type msg :: String.t() | Session.t()

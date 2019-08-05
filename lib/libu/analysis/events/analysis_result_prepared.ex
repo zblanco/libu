@@ -1,6 +1,8 @@
 defmodule Libu.Analysis.Events.AnalysisResultsPrepared do
   @moduledoc """
-  Used to
+  Signals Query model readiness to our front-end for a given Analysis Strategy.
+
+  Reacting to this event should consist of calling `Analysis.fetch_analysis_results/2` for the session_id and analyzer.
   """
   defstruct [
     :session_id,
@@ -8,6 +10,6 @@ defmodule Libu.Analysis.Events.AnalysisResultsPrepared do
   ]
   @type t()  :: %__MODULE__{
     session_id: String.t(),
-    analyzer: module() | function(),
+    analyzer: atom(),
   }
 end

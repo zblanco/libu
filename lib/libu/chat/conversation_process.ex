@@ -31,7 +31,6 @@ defmodule Libu.Chat.ConversationProcess do
       {:ok, conversation} -> {:noreply, conversation}
       {:error, _}         -> {:noreply, :error}
     end
-
   end
 
   defp call(via, action) do
@@ -53,7 +52,7 @@ defmodule Libu.Chat.ConversationProcess do
 
     # conversation
     # |> ConversationStarted.new()
-    # |> Chat.notify_subscribers()
+    # |> Messaging.notify_subscribers()
 
     {:reply, :ok, conversation}
   end

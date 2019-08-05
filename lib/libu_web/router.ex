@@ -33,7 +33,7 @@ defmodule LibuWeb.Router do
     live "/chat", LiveChat
     live "/chat/conversations/:id", Conversation
 
-    live "/analysis", LiveAnalysis, session: [:uuid]
+    live "/analysis", AnalysisSession, session: [:uuid]
 
     resources "/plain/projects", ProjectController
   end

@@ -1,4 +1,4 @@
-defmodule Libu.Chat.Events.MessagePublished do
+defmodule Libu.Chat.Events.MessageAddedToConversation do
   @moduledoc """
   Emitted from Chat when a message is published.
   """

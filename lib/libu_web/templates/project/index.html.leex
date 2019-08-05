@@ -2,8 +2,8 @@
   
   <div class="box w-full mx-auto overflow-hidden shadow-lg">
 
-    <div class="flex justify-between p-4">
-      <h1 class="font-bold text-3xl font-serif text-purple-800">Projects</h1>
+    <div class="flex justify-end p-4 border-b">
+      <h1 class="font-extrabold text-3xl font-serif italic text-purple-700">Projects</h1>
       <form phx-change="search" class="flex-grow px-4">
         <%= text_input(:search, :name,
             class: "text-input bg-gray-100 focus:bg-gray-200 rounded-t-sm",
@@ -12,18 +12,14 @@
             phx_change: "search",
         )%>
       </form>
-      <div class="inline-flex h-10">
-        <div class=" lg:flex lg:items-stretch">
-        <%= link to: Routes.live_path(@socket, ProjectLive.New), class: "rounded hover:border-black hover:bg-gray-300 border p-2 mr-2 " do %>
-          New
-        <% end %>
-        <%= link to: Routes.live_path(@socket, ProjectLive.KanBan),  class: "rounded hover:border-black border hover:bg-gray-300 items-center inline-flex p-1 pb-0" do %>
-          <div class="">
-            <img class="fill-current h-10" src="<%= Routes.static_path(@socket, "/images/kanban.svg") %>" alt="Kanban"/>
-          </div>
-        <% end %>
+      <%= link to: Routes.live_path(@socket, ProjectLive.New), class: "btn-quiet" do %>
+        New
+      <% end %>
+      <%= link to: Routes.live_path(@socket, ProjectLive.KanBan),  class: "btn-quiet items-center inline-flex p-1 pb-0" do %>
+        <div class="">
+          <img class="fill-current h-10" src="<%= Routes.static_path(@socket, "/images/kanban.svg") %>" alt="Kanban"/>
         </div>
-      </div>
+      <% end %>
     </div>
 
     <div class="box w-auto mx-auto overflow-hidden shadow-lg border-gray-200">
@@ -55,15 +51,15 @@
                   <td class="td">
                     <div class="inline-flex">
                       <%= button("Show", to: Routes.live_path(@socket, ProjectLive.Show, project), method: :get,
-                        class: "btn-quiet py-2 px-2 hover:bg-white hover:border-gray-400 hover:text-red-800 border-b-2 border-transparent font-normal text-gray-700 rounded-t"
+                        class: "btn-quiet border-b-2 px-2"
                       )%>
                       <%= button("Edit", to: Routes.live_path(@socket, ProjectLive.Edit, project), method: :get, 
-                        class: "btn-quiet py-2 px-2 hover:bg-white hover:border-gray-400 hover:text-red-800 border-b-2 border-transparent font-normal text-gray-700 rounded-t" 
+                        class: "btn-quiet border-b-2 ml-1 px-2" 
                       )%>
                       <%= button("Delete", to: "#", method: :get,
                         phx_click: "delete project", 
                         phx_value: project.id, 
-                        class: "btn-quiet py-2 px-2 hover:bg-white hover:border-gray-400 hover:text-red-800 border border-transparent border font-normal text-gray-700 rounded-t" 
+                        class: "btn-quiet border-b-2 ml-1 px-2" 
                       )%>
                     </div>
                   </td>

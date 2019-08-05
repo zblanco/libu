@@ -8,7 +8,7 @@ defmodule Libu.Identity do
   ### Capabilities to implemement:
 
   * Authenticate via OAuth2 with Github
-  * Persist to Ecto a user struct storing a github user id over some kind.
+  * Persist to Ecto a user struct storing a github user id of some kind.
   * Keep session states in-memory.
   * transform and persist the avatar url for use across app
   """

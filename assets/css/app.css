@@ -6,11 +6,11 @@
 }
 
 .btn-gray {
-    @apply bg-gray-200 text-gray-800 border border-black py-2 px-4 text-black font-bold rounded-sm;
+    @apply bg-gray-200 text-purple-700 border border-transparent py-2 px-4 font-medium rounded-lg;
 }
 
 .btn-quiet {
-    @apply bg-transparent text-gray-700 border border-gray-400 py-2 px-4;
+    @apply bg-transparent text-gray-700 border border-gray-300 py-2 px-4 rounded-lg;
 }
 
 .btn-quiet-gray {
@@ -18,19 +18,19 @@
 }
 
 .btn-quiet-gray:hover {
-    @apply bg-black text-white;
+    @apply bg-purple-700 text-white;
 }
 
 .btn-quiet:hover {
-    @apply bg-black text-white;
+    @apply bg-purple-700 text-white;
 }
 
 .btn-gray:hover {
-    @apply bg-black text-white;
+    @apply bg-purple-700 text-white;
 } 
 
 .box {
-    @apply border-t-2 border-black bg-white rounded-sm;
+    @apply bg-white rounded-lg;
 }
 
 .tr-head {
@@ -62,19 +62,23 @@
 }
 
 .nav-item {
-    @apply px-4 text-xl relative py-2 px-4 leading-normal text-black no-underline items-center;
+    @apply font-serif font-extrabold px-4 text-xl relative py-2 px-4 leading-normal text-purple-700 italic no-underline items-center;
 }
 
 .nav-item:hover {
-    @apply bg-gray-200 shadow-inner text-purple-800;
+    @apply bg-gray-200 shadow-inner text-black;
 }
 
 .text-input {
-    @apply appearance-none border-b-2 border-gray-400 w-full py-2 px-3 text-gray-800 leading-tight bg-gray-200;
+    @apply appearance-none border-b-2 border-gray-400 w-full py-2 px-3 text-gray-800 leading-tight bg-gray-100 rounded;
 }
 
 .text-input:focus {
-    @apply border-black bg-gray-300;
+    @apply border-purple-700 bg-gray-200;
+}
+
+.select-input {
+    @apply appearance-none border-b-2 border-gray-400 w-full py-2 px-3 text-gray-800 leading-tight bg-gray-100 rounded;
 }
 
  @tailwind base;

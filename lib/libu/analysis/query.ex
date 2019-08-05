@@ -7,4 +7,11 @@ defmodule Libu.Analysis.Query do
       _               -> {:error, :no_analysis_results_found}
     end
   end
+
+  def fetch(session_id, analyzer_key)
+  when is_binary(session_id) and is_atom(analyzer_key) do
+    # The query formats of some analysis strategies may be different.
+    # Some analysis strategy results will want a windowed time-series set of events
+    # Others will just want to store terms with key-values.
+  end
 end
