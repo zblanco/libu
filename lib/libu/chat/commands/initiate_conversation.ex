@@ -24,8 +24,8 @@ defmodule Libu.Chat.Commands.InitiateConversation do
 
   defp changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:initiator_id, :topic, :initial_message])
-    |> validate_required([:initiator_id, :initial_message, :topic])
+    |> cast(attrs, [:initiator_id, :initial_message])
+    |> validate_required([:initiator_id, :initial_message])
     |> put_change(:conversation_id, UUID.uuid4())
   end
 end

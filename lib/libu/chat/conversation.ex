@@ -40,14 +40,18 @@ defmodule Libu.Chat.Conversation do
     }
   end
 
-  def apply(%Conversation{} = conv, %ConversationStarted{conversation_id: conv_id, initial_message: initial_message}) do
+  def apply(%Conversation{} = conv,
+    %ConversationStarted{conversation_id: conv_id, initial_message: initial_message})
+  do
     %Conversation{ conv |
       id: conv_id,
       messages: [initial_message],
     }
   end
 
-  def apply(%Conversation{messages: previous_messages} = conv, %MessageAddedToConversation{conversation_id: conv_id, message: message}) do
+  def apply(%Conversation{messages: previous_messages} = conv,
+    %MessageAddedToConversation{conversation_id: conv_id, message: message})
+  do
     %Conversation{ conv |
       id: conv_id,
       messages: [previous_messages | message],

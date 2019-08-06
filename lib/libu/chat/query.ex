@@ -1,4 +1,11 @@
 defmodule Libu.Chat.Query do
+  @moduledoc """
+  Query responsibilities for our Chat context.
+
+  Things we'd like to do:
+
+  *
+  """
   import Ecto.Query, warn: false
   alias Libu.{
     Repo,

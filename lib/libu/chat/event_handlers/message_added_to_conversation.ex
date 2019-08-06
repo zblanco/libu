@@ -9,11 +9,11 @@ defmodule Libu.Chat.EventHandlers.MessageAddedToConversation do
 
   alias Libu.Chat.Events.MessageAddedToConversation
   alias Libu.Messaging
-  alias Libu.Chat.Persistence
+  alias Libu.Chat.Projections
   alias Libu.Chat
 
   def handle(%MessageAddedToConversation{conversation_id: convo_id} = event, _metadata) do
-    with :ok <- Persistence.add_to_conversation(event) do
+    with :ok <- Projections.add_to_conversation(event) do
       Messaging.publish(event, Chat.topic() <> convo_id)
       :ok
     else

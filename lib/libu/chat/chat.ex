@@ -5,25 +5,13 @@ defmodule Libu.Chat do
   A conversation is a top level thread or channel for which more messages are posted.
   Anyone else can reply to the conversation linking their message to the parent.
 
-  This is mostly an excuse to play with the Registry and Dynamic Supervisors.
-  We might only store state transiently within ETS initially.
+  We're currently using Commanded for CQRS event-sourcing runtime support.
 
-  Features that would be neat:
-
-    * Lazily stream messages as a person is scrolling through a page
-    * Dynamic rendering of nested messages
-    * Event Sourced Persistence
-    * Dynamic, many-to-many contextual linking
-    * ConversationSupervisor pool
-    * Persistence Contract
-    * Websocket API
-    * FIFO Command Handling
-
-  If we're to make an event-sourced chat system, what would that require?
-
-    * route `message_published` events to the right aggregate process
-      * restart aggregate process if not available (use Registry)
-    * persistent event-store (PostgresQL EventStore probably)
+  What we're doing different is an in-memory read-model (projections).
+  We're doing this by caching to ETS optimistically based on any given users view of a conversation.
+  We dynamically supervise a Conversation View Session which holds the scroll state of viewable messages to ensure
+    messages in a conversation are prepared in ETS with a time-out or memory maximum.
+  This means we need to stream from the eventstore but only if the message isn't cached.
   """
   alias Libu.Chat.{
     Commands.InitiateConversation,
