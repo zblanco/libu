@@ -26,76 +26,56 @@ defmodule Libu.Chat do
     * persistent event-store (PostgresQL EventStore probably)
   """
   alias Libu.Chat.{
-    Events.ConversationStarted,
-    Events.MessagePublished,
-    Message,
-    Conversation,
-    ConversationProcess,
-    ConversationSupervisor,
+    Commands.InitiateConversation,
+    Commands.AddToConversation,
+    Commands.EndConversation,
+    Router,
+    Query,
   }
   alias Libu.Messaging
 
-  defp topic(), do: inspect(__MODULE__)
+  def topic(), do: inspect(__MODULE__)
 
   def subscribe, do: Messaging.subscribe(topic())
 
   def subscribe(conversation_id), do:
     Messaging.subscribe("#{topic()}:#{conversation_id}")
 
-
-  # def publish_message(params, [form: true]), do: PublishMessage.new(params, form: true)
-  # def publish_message(params \\ %{}) do
-  #   with {:ok, command} <- PublishMessage.new(params) do
-  #     command
-  #     |> PublishMessage.
-  #   end
-  # end
-
-
-  def publish_message(%{} = msg_attrs, conversation_id) do
-    with {:ok, message} <- Message.new(msg_attrs, conversation_id) do
-      ConversationProcess.add_to(message)
+  @doc """
+  Appends your message to an existing conversation.
+  """
+  def add_to_conversation(params, [form: true]), do: AddToConversation.new(params, form: true)
+  def add_to_conversation(params \\ %{}) do
+    with {:ok, cmd} <- AddToConversation.new(params),
+         :ok        <- Router.dispatch(cmd, consistency: :strong) do
+      Query.conversation(cmd.conversation_id)
+    else
+      error -> error
     end
-    # Find Conversation
-    # Deliver message to conversation process
   end
-
-  def publish_message(msg_attrs), do: initiate_conversation(msg_attrs)
 
   @doc """
-  Creates a new conversation of which other users can reply to.
+  Initiates a new conversation of which other users can add to.
   """
-  def initiate_conversation(message_attrs) do
-    with {:ok, message} <- Message.new(message_attrs),
-         conversation   <- Conversation.start(message)
-    do
-      conversation
-      |> ConversationStarted.new()
-      |> Messaging.publish(topic())
-
-      {:ok, conversation}
+  def initiate_conversation(params, [form: true]), do: InitiateConversation.new(params, form: true)
+  def initiate_conversation(initial_conversation_attrs) do
+    with {:ok, cmd} <- InitiateConversation.new(initial_conversation_attrs),
+         :ok        <- Router.dispatch(cmd, consistency: :strong) do
+      Query.conversation(cmd.conversation_id)
+    else
+      error -> error
     end
   end
 
-  def active_conversations do
-
+  def end_conversation(conversation_id, reason)
+  when is_binary(conversation_id)
+  and is_binary(reason) do
+    with {:ok, cmd} <- EndConversation.new(%{conversation_id: conversation_id, reason: reason}) do
+      Router.dispatch(cmd, consistency: :strong)
+    else
+      error -> error
+    end
   end
 
-  def demo_conversations() do
-    [
-      demo_conversation(),
-    ]
-  end
-
-  def get_conversation(_), do: demo_conversation()
-
-  defp demo_conversation() do
-    {:ok, msg}  = Message.new(%{publisher_id: "doops", body: "liveview is pretty neat"})
-    {:ok, msg2} = Message.new(%{publisher_id: "doops", body: "tailwind is smooth"})
-
-    Conversation.start(msg)
-    |> IO.inspect(label: "message before add_to")
-    |> Conversation.add_to(msg2)
-    |> IO.inspect(label: "messages after add_to")
-  end
+  defdelegate active_conversations, to: Query
 end

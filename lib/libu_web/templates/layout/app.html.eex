@@ -8,62 +8,63 @@
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
   </head>
   <body>
-    <div class="min-h-screen font-sans antialiased leading-tight " style="background-image: url('<%= Routes.static_url(@conn, "/images/seigaiha.png") %>')">
+    <div class="min-h-screen font-sans antialiased leading-tight " 
+         style="background-image: url('<%= Routes.static_url(@conn, "/images/swirl_pattern.png") %>')">
       <main role="main">
-        
-
         <div class="font-sans">
           <div class="flex flex-col min-h-screen">
-                <header>
-                    <nav id="site-navigation" class="relative select-none lg:flex lg:items-stretch w-full items-center bg-white shadow-md rounded-b-sm">
-                        <div class="flex flex-no-shrink items-stretch">
-                            <a href="/" class="no-underline ">
-                                <div class="px-4 p-4 w-24">
-                                <img src="<%= Routes.static_path(@conn, "/images/darkphoenix.png") %>" alt="Phoenix Framework Logo"/>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="lg:flex lg:items-stretch lg:flex-no-shrink lg:flex-grow" id="right-menu-options">
-                            <div class="lg:flex lg:items-stretch lg:justify-end ml-auto">
-                                <%= link("Chat", to: "/chat", 
-                                    class: "nav-item flex flex-no-grow flex-no-shrink"
-                                ) %>
-                                <%= link("Analysis", to: "/analysis", 
-                                    class: "nav-item flex flex-no-grow flex-no-shrink"
-                                ) %>
-                                <%= link("Projects", to: "/projects", 
-                                    class: "nav-item flex flex-no-grow flex-no-shrink"
-                                ) %>
+            
+            <header>
+                <nav id="site-navigation" class="relative select-none lg:flex lg:items-stretch w-full items-center bg-white shadow-md rounded-b-sm">
+                    <div class="flex flex-no-shrink items-stretch">
+                        <a href="/" class="no-underline ">
+                            <div class="px-4 p-4 w-24">
+                            <img src="<%= Routes.static_path(@conn, "/images/darkphoenix.png") %>" alt="Phoenix Framework Logo"/>
                             </div>
+                        </a>
+                    </div>
+                    <div class="lg:flex lg:items-stretch lg:flex-no-shrink lg:flex-grow" id="right-menu-options">
+                        <div class="lg:flex lg:items-stretch lg:justify-end ml-auto">
+                            <%= link("Chat", to: "/chat", 
+                                class: "nav-item flex flex-no-grow flex-no-shrink"
+                            ) %>
+                            <%= link("Analysis", to: "/analysis", 
+                                class: "nav-item flex flex-no-grow flex-no-shrink"
+                            ) %>
+                            <%= link("Projects", to: "/projects", 
+                                class: "nav-item flex flex-no-grow flex-no-shrink"
+                            ) %>
                         </div>
-                    </nav>
-                </header>
+                    </div>
+                </nav>
+            </header>
 
-              <div id="content" class="container mx-auto pt-4 pb-4 app-page flex justify-center">
-                  <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>
-                  
-                  <%= if get_flash(@conn, :info) do %>
-                    <div role="alert" class="alert alert-info bg-white border-l-4 border-purple-800 rounded-lg text-gray-800 px-4 py-3 shadow-md" role="alert">
-                      <div class="flex">
-                        <div class="py-1"><svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
-                        <div>
-                          <p class="font-bold"><%= get_flash(@conn, :info) %></p>
-                        </div>
-                      </div>
+            <div id="content" class="container mx-auto pt-4 pb-4 app-page flex justify-center">
+                <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>
+            </div>
+
+            <div class="flex max-w-xs justify-center container mx-auto">
+              <%= if get_flash(@conn, :info) do %>
+                <div role="alert" class="alert alert-info bg-white border-l-4 border-purple-800 rounded-lg text-gray-800 px-4 py-3 shadow-md" role="alert">
+                  <div class="flex">
+                    <div class="py-1"><svg class="fill-current h-6 w-6 text-purple-700 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+                    <div>
+                      <p class="font-bold"><%= get_flash(@conn, :info) %></p>
                     </div>
-                  <% end %>
-                  <%= if get_flash(@conn, :error) do %>
-                    <div role="alert" class="alert alert-info bg-white border-l-4 border-red-700 rounded-lg text-gray-800 px-4 py-3 shadow-md" role="alert">
-                      <div class="flex">
-                        <div class="py-1"><svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
-                        <div>
-                          <p class="font-bold"><%= get_flash(@conn, :error) %></p>
-                        </div>
-                      </div>
+                  </div>
+                </div>
+              <% end %>
+              <%= if get_flash(@conn, :error) do %>
+                <div role="alert" class="alert alert-info bg-white border-l-4 border-red-700 rounded-lg text-gray-800 px-4 py-3 shadow-md" role="alert">
+                  <div class="flex">
+                    <div class="py-1"><svg class="fill-current h-6 w-6 text-purple-700 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+                    <div>
+                      <p class="font-bold"><%= get_flash(@conn, :error) %></p>
                     </div>
-                  <% end %>
-              </div>
-              
+                  </div>
+                </div>
+              <% end %>
+            </div>
 
           </div>
       </div>

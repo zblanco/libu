@@ -17,6 +17,8 @@ config :libu, LibuWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
+
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
@@ -69,3 +71,4 @@ config :logger, level: :info
 # Finally import the config/prod.secret.exs which should be versioned
 # separately.
 import_config "prod.secret.exs"
+

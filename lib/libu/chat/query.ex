@@ -12,4 +12,12 @@ defmodule Libu.Chat.Query do
   # def message(id) when is_binary(id) do
   #   Repo.get!(Chat.Message, id)
   # end
+
+  def active_conversations() do
+    # check
+  end
+
+  def stream_conversation(index_start, index_end) do
+    # cache conversations to ets
+  end
 end

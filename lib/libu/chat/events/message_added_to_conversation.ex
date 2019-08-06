@@ -3,9 +3,9 @@ defmodule Libu.Chat.Events.MessageAddedToConversation do
   Emitted from Chat when a message is published.
   """
   defstruct [
+    :conversation_id,
     :publisher_id,
-    :message_body,
-    :published_on,
+    :message,
     :parent_message_id,
   ]
 end
