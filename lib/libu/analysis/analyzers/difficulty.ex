@@ -1,5 +1,9 @@
 defmodule Libu.Analysis.Readability do
   @moduledoc """
+  Metrics we want to collect:
+
+  * Current reading difficulties
+  * Reading difficulties over time
 
   """
 

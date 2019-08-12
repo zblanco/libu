@@ -10,11 +10,13 @@ defmodule Libu.Analysis.SessionProcess do
   When the analyzer is done, the result is resolved back to the session state then stored in ETS.
     - Late results that have been preceded by another job of the same analyzer with fresher state are discarded.
   Whenever an analysis change is made, we publish to a pub sub where our LiveView client can be notified to refetch the analysis results from ETS.
-  ```
 
   Basic Lifecycle:
 
   * @first live view mount: start an analysis session under a Dynamic Supervisor with the initial state.
+    * Prepare the ETS tables keyed under our session_id
+      - Results
+      - Session/Text Versions (last minute?)
   * @liveview de-mount: kill the analysis session (temporary)
     * or keep hot for a period of time (transient) - worthwhile only if we have Identity Sessions.
   * @text change: queue analysis jobs to the configured analyzers in the session,
@@ -91,8 +93,8 @@ defmodule Libu.Analysis.SessionProcess do
 
     # Terminate the subscriber processes toggled off
     session =
-      case Session.available_analyzer?(analyzer) do
-        :ok -> Session.toggle_analyzer(session, analyzer)
+      if Session.available_analyzer?(analyzer) do
+        Session.toggle_analyzer(session, analyzer)
       end
 
       # terminate_subscriber(session_id, analyzer)

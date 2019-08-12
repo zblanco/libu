@@ -1,6 +1,13 @@
 defmodule Libu.Analysis.Sentiment do
   @moduledoc """
   Utilities and Analyzer Behaviour implementation for [Sentiment](https://web.stanford.edu/class/cs124/lec/sentiment.pdf) analysis.
+
+  ### Metrics we want to gather about Sentiment:
+
+  * Current basic sentiment
+  * Basic sentiment over time
+  * Average Sentiment score per word
+  * Average Sentiment score per word over time
   """
   alias Libu.Analysis.Text
   @behaviour Libu.Analysis.Analyzer

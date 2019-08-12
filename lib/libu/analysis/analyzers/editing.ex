@@ -5,6 +5,13 @@ defmodule Libu.Analysis.Editing do
   An aggregator process supervised under a Session that builds a sliding window of state for the editing of some text.
 
   Consumed AnalysisResultProduced events to calculate various metrics about text editing.
+
+  ## Metrics to track:
+
+  * # of Changes / Current Text Version
+  * Frequency of changes over time
+  * Words Per Minute
+  * Editing Session Length
   """
 
   # def analyze(text) when is_binary(text) do
@@ -22,6 +29,5 @@ defmodule Libu.Analysis.Editing do
   #   :wpm,
   #   :changes,
   #   :duration,
-  #   :
   # ])
 end

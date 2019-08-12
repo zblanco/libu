@@ -13,9 +13,15 @@ defmodule Libu.Chat.Projections do
     MessageAddedToConversation,
     ConversationEnded,
   }
-  def prepare_conversation(%ConversationStarted{} = _convo_started) do
+  def prepare_conversation(%ConversationStarted{} = convo_started) do
     # Initiate a transient genserver that for a given conversation caches the conversation in ets
-    :ok
+    # with :ok <- ConversationStreamer.start(convo_started),
+    #      :ok <- ConversationTracker.handle_event(convo_started)
+    # do
+      :ok
+    # else
+    #   :error
+    # end
   end
 
   def add_to_conversation(%MessageAddedToConversation{} = _convo_added_to) do

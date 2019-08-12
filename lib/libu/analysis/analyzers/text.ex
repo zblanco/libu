@@ -1,6 +1,13 @@
 defmodule Libu.Analysis.Text do
   @moduledoc """
   Standard sets of text analysis.
+
+  ### Text Metrics we want to collect
+
+  * Total word count
+  * Count of a given word
+  * # of characters
+  * Tokenized text?
   """
   @behaviour Libu.Analysis.Analyzer
 
