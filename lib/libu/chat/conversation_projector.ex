@@ -1,4 +1,4 @@
-defmodule Libu.ConversationProjector do
+defmodule Libu.Chat.ConversationProjector do
   @moduledoc """
   Process responsible for maintaining an ordered set ETS table of a conversation.
 
@@ -16,6 +16,12 @@ defmodule Libu.ConversationProjector do
     - we use the message availability state to re-stream old messages as needed
 
   A separate Chat Session process can keep
+
+  TODO:
+
+  - [ ] Cursor stream queries / write-through cache
+  - [ ] Re-initialization of dead/timed-out conversations by streaming in from event-store
+  - [ ] Implement per-message timeouts
   """
   use GenServer, restart: :transient
 
@@ -24,7 +30,6 @@ defmodule Libu.ConversationProjector do
     MessageAddedToConversation,
     ConversationEnded,
   }
-
   alias Libu.Chat.Message
 
   def via(convo_id) when is_binary(convo_id) do
@@ -66,6 +71,7 @@ defmodule Libu.ConversationProjector do
   end
 
   def add_message_to_projection(convo_id, %Message{} = message) do
+    # TODO: If not alive, restart and refresh with last 20 messages or so
     GenServer.call(via(convo_id), {:add_message_to_projection, message})
   end
 
@@ -97,6 +103,7 @@ defmodule Libu.ConversationProjector do
     {:reply, results, state}
   end
 
+  # TODO: Change to cursor based instead of time based
   def do_get_messages(tid, [start_time: start_time, end_time: end_time]) do
     messages = []
     {next_key, messages} =

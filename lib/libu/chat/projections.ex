@@ -13,18 +13,23 @@ defmodule Libu.Chat.Projections do
     MessageAddedToConversation,
     ConversationEnded,
   }
-  alias Libu.Chat.ConversationProjector
+  alias Libu.Chat.{ConversationProjector, Message}
+
   def handle_event(%ConversationStarted{} = convo_started) do
     # Initiate a transient genserver that for a given conversation caches the conversation in ets
-    with :ok <- ConversationProjector.start(convo_started) do
-
+    with {:ok, _pid} <- ConversationProjector.start(convo_started) do
+      :ok
     end
   end
 
-  def handle_event(%MessageAddedToConversation{} = _convo_added_to) do
+  def handle_event(%MessageAddedToConversation{conversation_id: convo_id} = convo_added_to) do
     # If it doesn't exist already, restart the conversation cache process
     # the cache process should only include the latest few messages in the conversation that we're adding
-    :ok
+    with message     <- Message.new(convo_added_to),
+         {:ok, _pid} <- ConversationProjector.add_message_to_projection(convo_id, message)
+    do
+      :ok
+    end
   end
 
   def handle_event(%ConversationEnded{} = _conv_ended) do

@@ -23,4 +23,15 @@ defmodule Libu.Chat.Message do
       published_on: DateTime.utc_now(),
     }
   end
+
+  def new(%MessageAddedToConversation{
+    publisher_id: publisher_id,
+    message: body,
+  }) do
+    %__MODULE__{
+      publisher_id: publisher_id,
+      body: body,
+      published_on: DateTime.utc_now(),
+    }
+  end
 end

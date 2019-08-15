@@ -13,7 +13,7 @@ defmodule Libu.Chat.EventHandlers.ConversationStarted do
   alias Libu.Chat.Projections
 
   def handle(%ConversationStarted{conversation_id: convo_id} = event, _metadata) do
-    Messaging.publish(event, Chat.topic() <> ":" <>convo_id)
+    Messaging.publish(event, Chat.topic() <> ":" <> convo_id)
     with :ok <- Projections.handle_event(event) do
       :ok
     else
