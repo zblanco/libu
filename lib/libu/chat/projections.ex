@@ -13,24 +13,21 @@ defmodule Libu.Chat.Projections do
     MessageAddedToConversation,
     ConversationEnded,
   }
-  def prepare_conversation(%ConversationStarted{} = convo_started) do
+  alias Libu.Chat.ConversationProjector
+  def handle_event(%ConversationStarted{} = convo_started) do
     # Initiate a transient genserver that for a given conversation caches the conversation in ets
-    # with :ok <- ConversationStreamer.start(convo_started),
-    #      :ok <- ConversationTracker.handle_event(convo_started)
-    # do
-      :ok
-    # else
-    #   :error
-    # end
+    with :ok <- ConversationProjector.start(convo_started) do
+
+    end
   end
 
-  def add_to_conversation(%MessageAddedToConversation{} = _convo_added_to) do
+  def handle_event(%MessageAddedToConversation{} = _convo_added_to) do
     # If it doesn't exist already, restart the conversation cache process
     # the cache process should only include the latest few messages in the conversation that we're adding
     :ok
   end
 
-  def deactivate_conversation(%ConversationEnded{} = _conv_ended) do
+  def handle_event(%ConversationEnded{} = _conv_ended) do
     # Let our read model know
     :ok
   end

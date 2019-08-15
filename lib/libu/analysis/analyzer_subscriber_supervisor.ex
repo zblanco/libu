@@ -6,8 +6,11 @@ defmodule Libu.Analysis.AnalyzerSubscriberSupervisor do
   """
   use DynamicSupervisor
 
+  alias Libu.Analysis.AnalyzerSubscriber
+
+
   def via(session_id) when is_binary(session_id) do
-    {:via, Registry, {Libu.Analysis.SessionRegistry, session_id}}
+    {:via, Registry, {Libu.Analysis.SubscriberSupervisorRegistry, session_id}}
   end
 
   def start_link(session_id) do
@@ -16,14 +19,21 @@ defmodule Libu.Analysis.AnalyzerSubscriberSupervisor do
 
   @impl true
   def init(_) do
-    DynamicSupervisor.init(
-      strategy: :one_for_one,
-      extra_arguments: []
-    )
+    DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def start_child() do
+  def start_subscriber(session_id, analyzer_module) do
+    identifier = {session_id, analyzer_module}
 
+    DynamicSupervisor.start_child(
+      __MODULE__,
+      %{
+        id: identifier,
+        start: {AnalyzerSubscriber, :start_link, [identifier]},
+        type: :worker,
+        restart: :permanent,
+      }
+    )
   end
 
   def toggle_subscriber(analyzer_module) do

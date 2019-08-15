@@ -6,10 +6,24 @@ defmodule Libu.Analysis.Readability do
   * Reading difficulties over time
 
   """
-
-  def overall_difficulty(text) when is_binary(text) do
+  alias Libu.Analysis.Metric
+  def dale_chall_difficulty(text) when is_binary(text) do
     text
     |> Essence.Document.from_text()
     |> Essence.Readability.dale_chall()
   end
+
+  def dalle_chall_reading_difficulty(topic), do: %Metric{
+    name: :dale_chall_reading_difficulty,
+    analyzer: {Libu.Analysis.Readability, :dale_chall_difficulty},
+    type: :stateless,
+    topic: topic,
+  }
+
+  # def dalle_chall_reading_difficulty_over_time(topic, duration), do: %Metric{
+  #   name: :dale_chall_reading_difficulty,
+  #   analyzer: {Libu.Analysis.Readability, :dale_chall_difficulty},
+  #   type: %SlidingWindow{duration: },
+  #   topic: topic,
+  # }
 end

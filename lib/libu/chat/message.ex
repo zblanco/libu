@@ -2,32 +2,25 @@ defmodule Libu.Chat.Message do
   @moduledoc """
   A message published as part of a conversation.
   """
-  use Ecto.Schema
-  import Ecto.Changeset
+  defstruct [
+    :publisher_id,
+    :body,
+    :published_on,
+  ]
 
-  @primary_key {:id, :binary_id, autogenerate: false}
-  embedded_schema do
-    field :publisher_id, :string
-    field :body, :string
-    field :published_on, :utc_datetime
-    field :parent_id, :string
-  end
+  alias Libu.Chat.Events.{
+    ConversationStarted,
+    MessageAddedToConversation,
+  }
 
-  def new(attrs) do
-    message_changeset = changeset(attrs)
-    case message_changeset.valid? do
-      true  -> {:ok, apply_changes(message_changeset)}
-      false -> message_changeset
-    end
-  end
-
-  def new(attrs, form: true), do: changeset(attrs)
-
-  defp changeset(attrs) do
-    %__MODULE__{}
-    |> cast(attrs, [:parent_id, :publisher_id, :body])
-    |> validate_required([:publisher_id, :body])
-    |> put_change(:published_on, DateTime.utc_now())
-    |> put_change(:id, UUID.uuid4())
+  def new(%ConversationStarted{
+    initiated_by: publisher_id,
+    initial_message: body,
+  }) do
+    %__MODULE__{
+      publisher_id: publisher_id,
+      body: body,
+      published_on: DateTime.utc_now(),
+    }
   end
 end

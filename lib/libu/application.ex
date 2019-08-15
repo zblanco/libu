@@ -7,13 +7,15 @@ defmodule Libu.Application do
     children = [
       Libu.Repo,
       LibuWeb.Endpoint,
-      {Registry, name: Libu.Chat.ConversationRegistry, keys: :unique},
-      {Registry, name: Libu.Analysis.SessionRegistry,  keys: :unique},
-      {DynamicSupervisor, name: Libu.Chat.ConversationSupervisor, strategy: :one_for_one},
+
+      {Registry, name: Libu.Analysis.SessionRegistry, keys: :unique},
       {DynamicSupervisor, name: Libu.Analysis.SessionSupervisor,  strategy: :one_for_one},
+      {Registry, name: Libu.Analysis.SubscriberSupervisorRegistry, keys: :unique},
+
+      {DynamicSupervisor, name: Libu.Chat.ProjectionSupervisor,  strategy: :one_for_one},
+      {Registry, name: Libu.Chat.ProjectionRegistry, keys: :unique},
     ]
 
-    # Libu.Analysis.setup_persistence()
     opts = [strategy: :one_for_one, name: Libu.Supervisor]
     Supervisor.start_link(children, opts)
   end

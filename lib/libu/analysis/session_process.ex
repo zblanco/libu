@@ -62,7 +62,7 @@ defmodule Libu.Analysis.SessionProcess do
   def init(session) do
     # Start Analyzer Subscriber Dynamic Supervisor
     # We should be able to find and communicate to the subscriber supervisor just from our Session Id and via/registry
-    {:ok, _pid} = AnalyzerSubscriberSupervisor.start(session.id)
+    {:ok, _pid} = AnalyzerSubscriberSupervisor.start_link(session.id)
     # Create the Session ETS table?
     {:ok, session, {:continue, :init}}
   end
@@ -90,15 +90,12 @@ defmodule Libu.Analysis.SessionProcess do
   end
 
   def handle_call({:toggle_analyzer, analyzer}, %Session{} = session) do
-
     # Terminate the subscriber processes toggled off
     session =
       if Session.available_analyzer?(analyzer) do
         Session.toggle_analyzer(session, analyzer)
       end
-
       # terminate_subscriber(session_id, analyzer)
-
     {:reply, :ok, session}
   end
 
@@ -110,7 +107,7 @@ defmodule Libu.Analysis.SessionProcess do
 
   defp setup_subscriptions(%Session{active_analyzers: analyzer_config, id: session_id}) do
     analyzer_config
-    |> Enum.map(&Session.analyzer_for_key(&1))
+    |> Enum.map(&Session.analyzer_for_key(&1)) # TO DO: fix
     |> Enum.each(fn analyzer ->
       AnalyzerSubscriber.setup(analyzer, session_id)
     end)
