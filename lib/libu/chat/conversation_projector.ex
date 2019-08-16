@@ -19,6 +19,7 @@ defmodule Libu.Chat.ConversationProjector do
 
   TODO:
 
+  - [ ] Working conversation appending
   - [ ] Cursor stream queries / write-through cache
   - [ ] Re-initialization of dead/timed-out conversations by streaming in from event-store
   - [ ] Implement per-message timeouts
@@ -36,37 +37,70 @@ defmodule Libu.Chat.ConversationProjector do
     {:via, Registry, {Libu.Chat.ProjectionRegistry, convo_id}}
   end
 
-  def child_spec(%ConversationStarted{conversation_id: convo_id} = event) do
+  # def child_spec(%ConversationStarted{conversation_id: convo_id} = event) do
+  #   %{
+  #     id: {__MODULE__, convo_id},
+  #     start: {__MODULE__, :start_link, [event]},
+  #     restart: :temporary,
+  #   }
+  # end
+
+  def child_spec(convo_id) do
     %{
       id: {__MODULE__, convo_id},
-      start: {__MODULE__, :start_link, [event]},
+      start: {__MODULE__, :start_link, [convo_id]},
       restart: :temporary,
     }
   end
 
-  def start_link(%ConversationStarted{conversation_id: convo_id} = event) do
+  # def start_link(%ConversationStarted{conversation_id: convo_id} = event) do
+  #   GenServer.start_link(
+  #     __MODULE__,
+  #     event,
+  #     name: via(convo_id)
+  #   )
+  # end
+
+  def start_link(convo_id) do
     GenServer.start_link(
       __MODULE__,
-      event,
+      convo_id,
       name: via(convo_id)
     )
   end
 
-  def start(convo_started) do
+  # def start(convo_started) do
+  #   DynamicSupervisor.start_child(
+  #     Libu.Chat.ProjectionSupervisor,
+  #     {__MODULE__, convo_started}
+  #   )
+  # end
+
+  def start(convo_id) do
     DynamicSupervisor.start_child(
       Libu.Chat.ProjectionSupervisor,
-      {__MODULE__, convo_started}
+      {__MODULE__, convo_id}
     )
   end
 
-  def init(convo_started) do
-    {:ok, convo_started, {:continue, :init}}
+  def init(convo_id) do
+    {:ok, convo_id, {:continue, :init}}
   end
 
-  def handle_continue(:init, %ConversationStarted{conversation_id: convo_id} = conv_started) do
+  # def init(convo_started) do
+  #   {:ok, convo_started, {:continue, :init}}
+  # end
+
+  # def handle_continue(:init, %ConversationStarted{conversation_id: convo_id} = conv_started) do
+  #   tid = :ets.new(:conversation_log, [:ordered_set])
+  #   first_msg = Message.new(conv_started)
+  #   add_message_to_projection(convo_id, first_msg)
+  #   {:noreply, %{tid: tid, conversation_id: convo_id}}
+  # end
+
+  def handle_continue(:init, convo_id) do
     tid = :ets.new(:conversation_log, [:ordered_set])
-    first_msg = Message.new(conv_started)
-    add_message_to_projection(convo_id, first_msg)
+
     {:noreply, %{tid: tid, conversation_id: convo_id}}
   end
 
@@ -76,7 +110,7 @@ defmodule Libu.Chat.ConversationProjector do
   end
 
   def get_messages(convo_id) when is_binary(convo_id) do
-    GenServer.call(via(convo_id), {:get_conversation, []})
+    GenServer.call(via(convo_id), {:get_messages, []})
   end
 
   def handle_call({:add_message_to_projection, message}, _from, state) do
@@ -84,7 +118,7 @@ defmodule Libu.Chat.ConversationProjector do
     %Message{published_on: timestamp_key} = message
 
     with true <- :ets.insert(tid, {timestamp_key, message}) do
-      {:ok, message}
+      {:reply, {:ok, message}, state}
     else
       _ -> {:error, :issue_building_conversation_read_model}
     end

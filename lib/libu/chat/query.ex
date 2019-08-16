@@ -4,16 +4,17 @@ defmodule Libu.Chat.Query do
 
   Things we'd like to do:
 
-  *
+  * Make sure we have a queryable list of active conversations
+  * Stream a conversation by cursor caching
   """
   import Ecto.Query, warn: false
   alias Libu.{
     Repo,
-    Libu.Chat.Conversation,
+    Chat.ConversationProjector,
   }
 
   def conversation(id) when is_binary(id) do
-    Repo.get!(Conversation, id)
+    ConversationProjector.get_messages(id)
   end
 
   # def message(id) when is_binary(id) do
@@ -21,7 +22,7 @@ defmodule Libu.Chat.Query do
   # end
 
   def active_conversations() do
-    # check
+    # we should keep a table of active conversations in ETS that just has convo ids
   end
 
   def stream_conversation(index_start, index_end) do

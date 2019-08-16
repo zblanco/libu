@@ -20,7 +20,13 @@ defmodule Libu.Chat.Commands.InitiateConversation do
     end
   end
 
-  def new(attrs, form: true), do: changeset(attrs)
+  def new(attrs, form: true), do: form_changeset(attrs)
+
+  defp form_changeset(attrs) do
+    %__MODULE__{}
+    |> cast(attrs, [:initiator_id, :initial_message])
+    |> validate_required([:initiator_id, :initial_message])
+  end
 
   defp changeset(attrs) do
     %__MODULE__{}

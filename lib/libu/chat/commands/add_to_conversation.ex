@@ -25,6 +25,6 @@ defmodule Libu.Chat.Commands.AddToConversation do
   defp changeset(attrs) do
     %__MODULE__{}
     |> cast(attrs, [:conversation_id, :message, :publisher_id])
-    |> validate_required([:initiator_id, :initial_message, :topic])
+    |> validate_required([:conversation_id, :message, :publisher_id])
   end
 end

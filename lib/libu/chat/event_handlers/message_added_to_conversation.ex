@@ -13,7 +13,7 @@ defmodule Libu.Chat.EventHandlers.MessageAddedToConversation do
   alias Libu.Chat
 
   def handle(%MessageAddedToConversation{conversation_id: convo_id} = event, _metadata) do
-    with :ok <- Projections.add_to_conversation(event) do
+    with :ok <- Projections.handle_event(event) do
       Messaging.publish(event, Chat.topic() <> convo_id)
       :ok
     else
