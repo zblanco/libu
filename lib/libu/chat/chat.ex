@@ -1,17 +1,31 @@
 defmodule Libu.Chat do
   @moduledoc """
-  Users can publish messages to conversations.
-  The first published message starts a conversation.
-  A conversation is a top level thread or channel for which more messages are posted.
-  Anyone else can reply to the conversation linking their message to the parent.
+  Chat supports basic chat-rooms called "conversations".
+
+  We can initiate a conversation, add more messages to the conversation, and end a conversation.
+
+  The plan is to compose some of the Text Analysis features by aggregating live metrics about a conversation based on the text content.
 
   We're currently using Commanded for CQRS event-sourcing runtime support.
 
-  What we're doing different is an in-memory read-model (projections).
+  Commanded and the Postgres EventStore adapter lets us stream together the state of a conversation at any point in time and/or react in soft-real-time.
+
+  This makes it a good candidate for projecting in-memory read models for both core chat features and live metrics.
+
+  Commanded is used for the core command routing and event aggregations to streams.
+
+  We're using Commanded Event Handlers to communicate with more custom OTP + ETS processes for the in-memory read models.
+
+  The event handlers will publish to our `Messaging` context using Pub Sub to let reactive UI like LiveView know when to fetch new state from our read-model.
+
   We're doing this by caching to ETS optimistically based on any given users view of a conversation.
-  We dynamically supervise a Conversation View Session which holds the scroll state of viewable messages to ensure
-    messages in a conversation are prepared in ETS with a time-out or memory maximum.
-  This means we need to stream from the eventstore but only if the message isn't cached.
+
+  The conversation Projector streams only messages it needs from the event-store with a Time To Live (TTL) on each message reset upon client-viewing.
+
+  We dynamically supervise a Conversation View Sessions which holds the scroll state of viewable messages.
+
+  This Conversation View Session maintains an index of currently viewed messages by the user to
+    communicate with the Conversation Projector which streams in messages ad-hoc.
   """
   alias Libu.Chat.{
     Commands.InitiateConversation,
@@ -55,6 +69,11 @@ defmodule Libu.Chat do
     end
   end
 
+  @doc """
+  Ends a conversation for whatever reason.
+
+  TODO: Authorization and/or rule-based conversation ends.
+  """
   def end_conversation(conversation_id, reason)
   when is_binary(conversation_id)
   and is_binary(reason) do

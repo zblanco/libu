@@ -8,6 +8,7 @@ defmodule LibuWeb.LiveAnalysis.EditingResults do
   alias Phoenix.LiveView.Socket
 
   def mount(_session, socket) do
+    # setup subscription to editing results
     {:ok, socket}
   end
 

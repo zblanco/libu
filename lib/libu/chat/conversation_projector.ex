@@ -19,10 +19,15 @@ defmodule Libu.Chat.ConversationProjector do
 
   TODO:
 
-  - [ ] Working conversation appending
+  - [x] Working conversation appending
   - [ ] Cursor stream queries / write-through cache
   - [ ] Re-initialization of dead/timed-out conversations by streaming in from event-store
-  - [ ] Implement per-message timeouts
+  - [ ] Implement per-message timeouts/TTLs reset upon access
+
+  State of the conversation projection in ETS ordered set:
+
+  key: {message_number, expiration_time}
+  value: %Message{...}
   """
   use GenServer, restart: :transient
 
@@ -37,14 +42,6 @@ defmodule Libu.Chat.ConversationProjector do
     {:via, Registry, {Libu.Chat.ProjectionRegistry, convo_id}}
   end
 
-  # def child_spec(%ConversationStarted{conversation_id: convo_id} = event) do
-  #   %{
-  #     id: {__MODULE__, convo_id},
-  #     start: {__MODULE__, :start_link, [event]},
-  #     restart: :temporary,
-  #   }
-  # end
-
   def child_spec(convo_id) do
     %{
       id: {__MODULE__, convo_id},
@@ -53,14 +50,6 @@ defmodule Libu.Chat.ConversationProjector do
     }
   end
 
-  # def start_link(%ConversationStarted{conversation_id: convo_id} = event) do
-  #   GenServer.start_link(
-  #     __MODULE__,
-  #     event,
-  #     name: via(convo_id)
-  #   )
-  # end
-
   def start_link(convo_id) do
     GenServer.start_link(
       __MODULE__,
@@ -68,13 +57,6 @@ defmodule Libu.Chat.ConversationProjector do
       name: via(convo_id)
     )
   end
-
-  # def start(convo_started) do
-  #   DynamicSupervisor.start_child(
-  #     Libu.Chat.ProjectionSupervisor,
-  #     {__MODULE__, convo_started}
-  #   )
-  # end
 
   def start(convo_id) do
     DynamicSupervisor.start_child(
@@ -87,21 +69,10 @@ defmodule Libu.Chat.ConversationProjector do
     {:ok, convo_id, {:continue, :init}}
   end
 
-  # def init(convo_started) do
-  #   {:ok, convo_started, {:continue, :init}}
-  # end
-
-  # def handle_continue(:init, %ConversationStarted{conversation_id: convo_id} = conv_started) do
-  #   tid = :ets.new(:conversation_log, [:ordered_set])
-  #   first_msg = Message.new(conv_started)
-  #   add_message_to_projection(convo_id, first_msg)
-  #   {:noreply, %{tid: tid, conversation_id: convo_id}}
-  # end
-
   def handle_continue(:init, convo_id) do
     tid = :ets.new(:conversation_log, [:ordered_set])
 
-    {:noreply, %{tid: tid, conversation_id: convo_id}}
+    {:noreply, %{tid: tid, conversation_id: convo_id, cached_messages: %{}}}
   end
 
   def add_message_to_projection(convo_id, %Message{} = message) do
@@ -111,14 +82,17 @@ defmodule Libu.Chat.ConversationProjector do
 
   def get_messages(convo_id) when is_binary(convo_id) do
     GenServer.call(via(convo_id), {:get_messages, []})
+    # Consider moving this responsibility from the Projector to the Query context
+    # Instead make the projector only responsible for preparing messages in ETS
   end
 
-  def handle_call({:add_message_to_projection, message}, _from, state) do
+  def handle_call({:add_message_to_projection, message}, _from, %{cached_messages: %{} = cached_messages} = state) do
     %{tid: tid} = state
     %Message{published_on: timestamp_key} = message
-
+    # check if message isn't already cached (we'll need the index in the conversation stream in our Message struct)
     with true <- :ets.insert(tid, {timestamp_key, message}) do
-      {:reply, {:ok, message}, state}
+      new_state = %{state | cached_messages: %{cached_messages | message.index => DateTime.utc_now}}
+      {:reply, {:ok, message}, new_state}
     else
       _ -> {:error, :issue_building_conversation_read_model}
     end
@@ -132,12 +106,29 @@ defmodule Libu.Chat.ConversationProjector do
     {:reply, results, state}
   end
 
+  def handle_call(
+    {:get_messages, [start_index: start_index, end_index: end_index]},
+    from,
+    %{tid: tid, cached_messages: cache_state} = state
+  ) do
+    # check against the cached message state within the projector
+    # maintain a count of messages of a conversation within the projector so we know not to try and stream messages that don't exist
+    # for each index value between start and end, does our cache_state have it ready?
+    # if not, stream that message in from the store, set the index in our cache with the ttl
+    # once all messages in the index are ready in the read model, notify as such
+    results =
+      :ets.match(tid, {:""}) # match keys within an index bound equal to or within the start
+
+      |> Enum.map(fn [{_msg_timestamp, msg}] -> msg end)
+    {:reply, results, state}
+  end
+
   def handle_call({:get_messages, [start_time: _start, end_time: _end] = args}, _from, %{tid: tid} = state) do
     results = do_get_messages(tid, args)
     {:reply, results, state}
   end
 
-  # TODO: Change to cursor based instead of time based
+  # TODO: Change to index keys instead of timestamp keys
   def do_get_messages(tid, [start_time: start_time, end_time: end_time]) do
     messages = []
     {next_key, messages} =

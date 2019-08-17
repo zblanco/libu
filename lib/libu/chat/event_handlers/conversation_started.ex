@@ -1,6 +1,12 @@
 defmodule Libu.Chat.EventHandlers.ConversationStarted do
   @moduledoc """
   Handles events from Commanded internals and republishes them to our Messaging context.
+
+  For our projections we could do one of the following:
+
+  * Subscribe to the messaging context where messages are potentially un-ordered
+  * Directly coordinate from this global event handler (may bottle-neck)
+  * Start from `:origin` in this global event handler to then spawn a conversation-specific event-handler for every started conversation
   """
   use Commanded.Event.Handler,
     name: __MODULE__,

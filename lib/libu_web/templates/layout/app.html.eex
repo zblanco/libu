@@ -9,7 +9,7 @@
   </head>
   <body>
     <div class="min-h-screen font-sans antialiased leading-tight " 
-         style="background-image: url('<%= Routes.static_url(@conn, "/images/swirl_pattern.png") %>')">
+         style="background-image: url('<%= Routes.static_url(@conn, "/images/seigaiha.png") %>')">
       <main role="main">
         <div class="font-sans">
           <div class="flex flex-col min-h-screen">
