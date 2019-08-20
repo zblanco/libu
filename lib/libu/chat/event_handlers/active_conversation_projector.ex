@@ -1,4 +1,4 @@
-defmodule Libu.Chat.EventHandlers.ConversationStarted do
+defmodule Libu.Chat.EventHandlers.ActiveConversationProjector do
   @moduledoc """
   Handles events from Commanded internals and republishes them to our Messaging context.
 
@@ -12,16 +12,26 @@ defmodule Libu.Chat.EventHandlers.ConversationStarted do
   """
   use Commanded.Event.Handler,
     name: __MODULE__,
-    consistency: :eventual,
-    start_from: :current
+    consistency: :strong,
+    start_from: :origin
 
-  alias Libu.Chat.Events.ConversationStarted
-  alias Libu.Messaging
-  alias Libu.Chat
-  alias Libu.Chat.Projections
+  alias Libu.Chat.{
+    Events.ConversationStarted,
+    Message,
+  }
+
+  def init do
+    :ets.new(:active_conversations, [:set, :protected, :named_table])
+    :ok
+  end
 
   def handle(%ConversationStarted{conversation_id: convo_id} = event, _metadata) do
-    Messaging.publish(event, Chat.topic() <> ":" <> convo_id)
-    :ok
+    with initial_message <- Message.new(event),
+         true            <- :ets.insert_new(:active_conversations, {convo_id, initial_message})
+    do
+      :ok
+    else
+      _ -> :error
+    end
   end
 end

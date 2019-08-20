@@ -2,6 +2,8 @@ defmodule Libu.Chat.Query do
   @moduledoc """
   Query responsibilities for our Chat context.
 
+  Interface in front of the Chat interface that hides the :ets/Process details.
+
   Things we'd like to do:
 
   * Make sure we have a queryable list of active conversations

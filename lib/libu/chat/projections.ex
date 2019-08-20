@@ -13,7 +13,11 @@ defmodule Libu.Chat.Projections do
     MessageAddedToConversation,
     ConversationEnded,
   }
-  alias Libu.Chat.{ConversationProjector, Message}
+  alias Libu.Chat.{
+    ConversationProjector,
+    Message,
+    ConversationManager,
+  }
 
   def handle_event(%ConversationStarted{conversation_id: convo_id} = convo_started) do
     # Initiate a transient genserver that for a given conversation caches the conversation in ets

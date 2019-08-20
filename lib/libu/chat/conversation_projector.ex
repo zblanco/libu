@@ -39,7 +39,7 @@ defmodule Libu.Chat.ConversationProjector do
   alias Libu.Chat.Message
 
   def via(convo_id) when is_binary(convo_id) do
-    {:via, Registry, {Libu.Chat.ProjectionRegistry, convo_id}}
+    {:via, Registry, {Libu.Chat.ConversationProjectionRegistry, convo_id}}
   end
 
   def child_spec(convo_id) do
@@ -60,7 +60,7 @@ defmodule Libu.Chat.ConversationProjector do
 
   def start(convo_id) do
     DynamicSupervisor.start_child(
-      Libu.Chat.ProjectionSupervisor,
+      Libu.Chat.ConversationProjectorSupervisor,
       {__MODULE__, convo_id}
     )
   end
