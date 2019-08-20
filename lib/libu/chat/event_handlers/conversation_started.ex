@@ -1,14 +1,6 @@
 defmodule Libu.Chat.EventHandlers.ConversationStarted do
   @moduledoc """
   Handles events from Commanded internals and republishes them to our Messaging context.
-
-  Here we start from `:origin` in this global event handler to then spawn a conversation-specific event-handler to maintain a projection.
-
-  We spawn the event_handlers under a dynamic supervisor.
-
-  TODO: Create an active_conversation_projection event_handler with a custom init for ets
-  TODO: Create a ConversationProjectionManager that spawns an event_handler for each conversation
-    - Spawn under a DynamicSupervisor with start_child
   """
   use Commanded.Event.Handler,
     name: __MODULE__,

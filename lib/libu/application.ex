@@ -13,7 +13,7 @@ defmodule Libu.Application do
       {Registry, name: Libu.Analysis.SubscriberSupervisorRegistry, keys: :unique},
 
       {Libu.Chat.ProjectionSupervisor, name: Libu.Chat.ProjectionSupervisor},
-      {DynamicSupervisor, name: Libu.Chat.ConversationProjectorSupervisor, strategy: :one_for_one},
+      {DynamicSupervisor, name: Libu.Chat.ConversationProjectorSupervisor, strategy: :one_for_one}, # should we put these under the projection super?
       {Registry, name: Libu.Chat.ConversationProjectionRegistry, keys: :unique},
     ]
 

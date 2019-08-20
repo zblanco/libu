@@ -24,7 +24,7 @@ defmodule Libu.Chat.Query do
   # end
 
   def active_conversations() do
-    # we should keep a table of active conversations in ETS that just has convo ids
+    :ets.match_object(:active_conversations, {:"$0", :"$1"})
   end
 
   def stream_conversation(index_start, index_end) do
