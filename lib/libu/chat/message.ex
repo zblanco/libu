@@ -3,6 +3,7 @@ defmodule Libu.Chat.Message do
   A message published as part of a conversation.
   """
   defstruct [
+    :conversation_id,
     :publisher_id,
     :body,
     :published_on,
@@ -14,10 +15,12 @@ defmodule Libu.Chat.Message do
   }
 
   def new(%ConversationStarted{
+    conversation_id: convo_id,
     initiated_by: publisher_id,
     initial_message: body,
   }) do
     %__MODULE__{
+      conversation_id: convo_id,
       publisher_id: publisher_id,
       body: body,
       published_on: DateTime.utc_now(),
@@ -25,10 +28,12 @@ defmodule Libu.Chat.Message do
   end
 
   def new(%MessageAddedToConversation{
+    conversation_id: convo_id,
     publisher_id: publisher_id,
     message: body,
   }) do
     %__MODULE__{
+      conversation_id: convo_id,
       publisher_id: publisher_id,
       body: body,
       published_on: DateTime.utc_now(),

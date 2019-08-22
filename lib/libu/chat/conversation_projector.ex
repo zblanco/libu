@@ -1,21 +1,17 @@
 defmodule Libu.Chat.ConversationProjector do
   @moduledoc """
-  Process responsible for maintaining an ordered set ETS table of a conversation.
+  Transient Process with a TTL responsible for maintaining an ordered set ETS table of a conversation.
 
   We put new messages to the top of the stack deprecating old messages at a timeout since last queried.
 
+  When all messages time-out the process shuts down.
+
   We re-cache from the event-store when messages that have been timed-out are requeried placing them back in their ordered location.
 
-  We can either: maintain in-memory projections of all active conversations (cleaning up old conversations and recreating only if needed)
-    or
-  Try and be clever and only maintain the actual messages that have been read recently, responding to queries by streaming in events
-   from the eventstore and rebuilding the state to persist to ets on demand.
+  Within the Projector we keep a cache_state that maintains a map of message_number => {message_id, ttl}
+    - we use this cache_state to know when to re-stream old messages
 
-  We can be clever here with the querying by keying the messages with a tuple: {message_id, timestamp}
-    - we might need to keep a different table with message timeouts by id so we know the full picture without loading message bodies in memory
-    - we use the message availability state to re-stream old messages as needed
-
-  A separate Chat Session process can keep
+  A separate Chat Session process communicates with a conversation_projector regarding it's query start/end indexes.
 
   TODO:
 
@@ -38,9 +34,12 @@ defmodule Libu.Chat.ConversationProjector do
   }
   alias Libu.Chat.Message
 
+  # @default_timeout :timer.minutes(60)
+
   def via(convo_id) when is_binary(convo_id) do
     {:via, Registry, {Libu.Chat.ConversationProjectionRegistry, convo_id}}
   end
+  def via(_convo_id), do: :non_binary_id
 
   def child_spec(convo_id) do
     %{
@@ -71,13 +70,14 @@ defmodule Libu.Chat.ConversationProjector do
 
   def handle_continue(:init, convo_id) do
     tid = :ets.new(:conversation_log, [:ordered_set])
-
+    # Should we automatically stream in the last 10 or so messages?
     {:noreply, %{tid: tid, conversation_id: convo_id, cached_messages: %{}}}
   end
 
   def add_message_to_projection(convo_id, %Message{} = message) do
     # TODO: If not alive, restart and refresh with last 20 messages or so
-    GenServer.call(via(convo_id), {:add_message_to_projection, message})
+    # GenServer.call(via(convo_id), {:add_message_to_projection, message})
+    call(convo_id, {:add_message_to_projection, message})
   end
 
   def get_messages(convo_id) when is_binary(convo_id) do
@@ -154,5 +154,20 @@ defmodule Libu.Chat.ConversationProjector do
       next_key = :ets.next(tid, key)
       fetch_messages_from_table(tid, [key: next_key, end_key: end_key], messages)
     end
+  end
+
+  # we
+  defp call(convo_id, action) do
+    via = via(convo_id)
+
+    pid =
+      case GenServer.whereis(via) do
+        nil ->
+          {:ok, pid} = __MODULE__.start(via)
+          pid
+        pid ->
+          pid
+      end
+    GenServer.call(pid, action)
   end
 end
