@@ -156,7 +156,6 @@ defmodule Libu.Chat.ConversationProjector do
     end
   end
 
-  # we
   defp call(convo_id, action) do
     via = via(convo_id)
 

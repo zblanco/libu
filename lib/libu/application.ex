@@ -14,6 +14,8 @@ defmodule Libu.Application do
 
       {Libu.Chat.ProjectionSupervisor, name: Libu.Chat.ProjectionSupervisor},
       {Registry, name: Libu.Chat.ConversationProjectionRegistry, keys: :unique},
+      {Registry, name: Libu.Chat.ConversationSessionRegistry, keys: :unique},
+      {DynamicSupervisor, name: Libu.Chat.ConversationSessionSupervisor,  strategy: :one_for_one},
     ]
 
     opts = [strategy: :one_for_one, name: Libu.Supervisor]
