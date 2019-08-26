@@ -71,8 +71,36 @@ defmodule Libu.Chat.ConversationProjector do
   def handle_continue(:init, convo_id) do
     tid = :ets.new(:conversation_log, [:ordered_set])
     # Should we automatically stream in the last 10 or so messages?
-    {:noreply, %{tid: tid, conversation_id: convo_id, cached_messages: %{}}}
+    latest_messages = stream_in_latest_messages(convo_id, tid, 20)
+    :ok = subscribe_to_eventstore(convo_id) # subscribe to ensure new messages are appended
+    {:noreply, %{
+      tid: tid,
+      conversation_id: convo_id,
+      cached_messages: MapSet.new()
+    }}
   end
+
+  def stream_in_latest_messages(conversation_id, tid, max_no_of_messages) do
+    # conversation_id
+    # |> conversation_stream_uuid()
+    # |> EventStore.stream_backward(:stream_end, max_no_of_messages) # We'll need a stream_backward capability in EventStore to do what we want!
+    # |> Stream.filter(&is_start_or_added_event?(&1))
+    # |> Stream.map(&build_message(&1))
+    # |> Stream.each(&persist_messages_from_stream(tid, &1))
+    # |> Enum.to_list()
+    []
+  end
+
+  def stream_in_messages(conversation_id, tid, start_index, end_index) do
+    # stream in messages from the
+  end
+
+  # Definitely break out into a projection utilities module of some kind
+  defp build_message(%EventStore.RecordedEvent{data: event}) do
+    Message.new(event)
+  end
+
+  defp conversation_stream_uuid(conversation_id), do: "conversation-#{conversation_id}"
 
   def add_message_to_projection(convo_id, %Message{} = message) do
     # TODO: If not alive, restart and refresh with last 20 messages or so
