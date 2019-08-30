@@ -3,6 +3,7 @@ defmodule Libu.Chat.ProjectionSupervisor do
 
   alias Libu.Chat.EventHandlers.{
     ConversationProjectionManager,
+    ConversationStarted,
   }
   alias Libu.Chat.ActiveConversationProjector
 
@@ -13,7 +14,7 @@ defmodule Libu.Chat.ProjectionSupervisor do
   def init(_arg) do
     Supervisor.init([
       {ActiveConversationProjector, [name: ActiveConversationProjector]},
-      ConversationProjectionManager,
+      ConversationStarted,
       {DynamicSupervisor, [
         name: Libu.Chat.ConversationProjectorSupervisor,
         strategy: :one_for_one

@@ -53,7 +53,7 @@ defmodule Libu.MixProject do
       {:oauth2, "~> 1.0"},
       {:commanded, "~> 0.19"},
       {:eventstore, "~> 0.17"},
-      # {:commanded_ecto_projections, "~> 0.8"},
+      {:commanded_ecto_projections, "~> 0.8"},
       {:commanded_eventstore_adapter, "~> 0.6"},
     ]
   end

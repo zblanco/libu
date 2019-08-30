@@ -9,13 +9,14 @@ defmodule Libu.Chat.ActiveConversationProjector do
   alias Libu.Chat.{
     Events.ConversationStarted,
     Events.ConversationEnded,
+    Events.ActiveConversationAdded,
     Message,
   }
-  alias Libu.Messaging
+  alias Libu.{Chat, Messaging}
 
   def init(_opts) do
     :ets.new(:active_conversations, [:set, :protected, :named_table])
-    # Messaging.subscribe(Libu.Chat.topic())
+    Chat.subscribe()
     IO.puts(":active_conversations table created")
     {:ok, [], {:continue, :init}}
   end
@@ -44,6 +45,23 @@ defmodule Libu.Chat.ActiveConversationProjector do
     else
       error -> {:reply, error}
     end
+  end
+
+  def handle_info(%ConversationStarted{} = event, state) do
+    with :ok                <- insert_message_from_event(event),
+         active_convo_added <- ActiveConversationAdded.new(event),
+         :ok                <- Messaging.publish(active_convo_added, Chat.topic())
+    do
+      IO.puts "Publishing ActiveConversationAdded"
+      {:noreply, state}
+    else
+      _error -> {:noreply, state}
+    end
+  end
+
+  def handle_info(message, state) do
+    IO.inspect(message, label: "ActiveConversationProjector")
+    {:noreply, state}
   end
 
   defp rebuild_state() do
@@ -77,19 +95,23 @@ defmodule Libu.Chat.ActiveConversationProjector do
       || "Elixir.Libu.Chat.Events.ConversationEnded"
   end
 
-  defp persist_message_from_stream(%Message{conversation_id: convo_id} = msg) do
-    :ets.insert_new(:active_conversations, {convo_id, msg})
+  defp persist_message_from_stream(%Message{} = msg) do
+    insert_message(msg)
     msg
   end
 
   defp insert_message_from_event(event) do
-    with %Message{conversation_id: convo_id} = message <- Message.new(event),
-         true <- :ets.insert_new(:active_conversations, {convo_id, message})
+    with msg  <- Message.new(event),
+         true <- insert_message(msg)
     do
-      {:ok, :message_projected}
+      :ok
     else
-      _ -> {:error, :message_projection_failed}
+      error -> {:error, error}
     end
+  end
+
+  defp insert_message(%Message{conversation_id: convo_id} = msg) do
+    :ets.insert_new(:active_conversations, {convo_id, msg})
   end
 
   defp delete_conversation(convo_id),

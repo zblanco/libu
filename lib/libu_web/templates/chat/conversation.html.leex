@@ -1,5 +1,5 @@
 <div class="flex flex-col justify-center w-screen px-4">
-    <h2 class="flex justify-center font-serif text-2xl font-medium"><%= first_message_body(@conversation) %></h2></br>
+    <h2 class="flex justify-center font-serif text-2xl font-medium"><%= @conversation %></h2></br>
 
     <div class="mt-2">
         <%= for message <- @conversation.messages do %>

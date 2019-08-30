@@ -25,6 +25,7 @@ defmodule Libu.Chat.Query do
 
   def active_conversations() do
     :ets.match_object(:active_conversations, {:"$0", :"$1"})
+    |> Enum.map(fn {_, msg} -> msg end)
   end
 
   def stream_conversation(index_start, index_end) do

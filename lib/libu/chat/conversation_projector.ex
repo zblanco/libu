@@ -72,7 +72,7 @@ defmodule Libu.Chat.ConversationProjector do
     tid = :ets.new(:conversation_log, [:ordered_set])
     # Should we automatically stream in the last 10 or so messages?
     latest_messages = stream_in_latest_messages(convo_id, tid, 20)
-    :ok = subscribe_to_eventstore(convo_id) # subscribe to ensure new messages are appended
+    # :ok = subscribe_to_eventstore(convo_id) # subscribe to ensure new messages are appended
     {:noreply, %{
       tid: tid,
       conversation_id: convo_id,
