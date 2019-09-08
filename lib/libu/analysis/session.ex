@@ -71,7 +71,7 @@ defmodule Libu.Analysis.Session do
     toggle = Map.get(active_analyzers, analyzer)
     case toggle do
         nil -> session
-        _ -> %__MODULE__{
+        _ -> %__MODULE__{ session |
           active_analyzers: %{active_analyzers | analyzer => !toggle}
         }
     end

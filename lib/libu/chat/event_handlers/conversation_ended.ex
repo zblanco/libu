@@ -10,12 +10,12 @@ defmodule Libu.Chat.EventHandlers.ConversationEnded do
   use Commanded.Event.Handler,
     name: __MODULE__,
     consistency: :eventual,
-    start_from: :current
+    start_from: :current,
+    application: :libu
 
   alias Libu.{
     Messaging,
     Chat,
-    Chat.Projections,
     Chat.Events.ConversationEnded
   }
 

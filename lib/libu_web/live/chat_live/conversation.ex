@@ -1,4 +1,4 @@
-defmodule LibuWeb.Conversation do
+defmodule LibuWeb.ChatLive.Conversation do
   use Phoenix.LiveView
   alias LibuWeb.ChatView
   alias Libu.Chat

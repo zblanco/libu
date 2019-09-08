@@ -19,20 +19,23 @@ defmodule Libu.Analysis.Sentiment do
     end
   end
 
-  def basic_sentiment(tokenized_text) when is_list(tokenized_text) do
+  def basic_sentiment(tokenized_text)
+  when is_list(tokenized_text) do
     Veritaserum.analyze(tokenized_text)
   end
-  def basic_sentiment(text), do: Veritaserum.analyze(text)
+  def basic_sentiment(text),
+    do: Veritaserum.analyze(text)
 
-
-  def average_sentiment_per_word(text) when is_binary(text) do
+  def average_sentiment_per_word(text)
+  when is_binary(text) do
     average_sentiment_per_word(
       basic_sentiment(text),
       Text.count_of_words(text)
     )
   end
   def average_sentiment_per_word(score, total_word_count)
-  when is_integer(score) and is_integer(total_word_count) do
+  when is_integer(score)
+  and is_integer(total_word_count) do
     score / total_word_count
   end
 end

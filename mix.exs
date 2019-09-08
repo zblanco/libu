@@ -51,10 +51,10 @@ defmodule Libu.MixProject do
       {:flow, "~> 0.14.3"},
       {:essence, "~> 0.2.0"},
       {:oauth2, "~> 1.0"},
-      {:commanded, "~> 0.19"},
-      {:eventstore, "~> 0.17"},
-      {:commanded_ecto_projections, "~> 0.8"},
-      {:commanded_eventstore_adapter, "~> 0.6"},
+      {:commanded, github: "commanded/commanded", branch: "feature/multi-app"},
+      {:eventstore, github: "zblanco/eventstore", branch: "backward-streaming"},
+      # {:commanded_ecto_projections, "~> 0.8"},
+      {:commanded_eventstore_adapter, github: "zblanco/commanded-eventstore-adapter", branch: "backward-streaming-compat"},
     ]
   end
 

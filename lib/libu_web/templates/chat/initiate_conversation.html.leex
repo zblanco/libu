@@ -1,0 +1,38 @@
+<div class="p-5">
+
+    <div class="flex rounded-lg bg-white">
+
+        <div class="mx-auto overflow-hidden shadow-lg bg-gray-100">
+            <div class="p-3 pb-0 ">
+                <h2 class="flex text-xl text-purple-800 font-medium justify-center">Initiate a Conversation</h2></br>
+            </div>
+        </div>
+        
+        <div class="w-full mx-auto overflow-hidden shadow-lg box rounded-l-lg">
+            <div class="p-4">
+                <%= f = form_for @changeset, "#", [phx_change: :validate, phx_submit: :save] %>
+
+                <%= label( f, :initial_message,
+                    class: "block mb-2 text-gray-700"
+                )%>
+                <%= textarea( f, :initial_message, 
+                    class: "appearance-none text-input py-2 px-3 mb-3 leading-tight "
+                )%>
+                <%= error_tag( f, :initial_message )%>
+
+                <div>
+                    <%= submit("Submit", phx_disable_with: "Saving...", 
+                    class: "btn-gray" 
+                    )%>
+                </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <%= button( "Back", to: Routes.live_path(@socket, ChatLive.Index), method: :get,
+        class: "btn-quiet mt-4"
+    )%>
+    
+</div>

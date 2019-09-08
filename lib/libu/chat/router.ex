@@ -2,7 +2,7 @@ defmodule Libu.Chat.Router do
   @moduledoc """
   Commanded router to direct commands to the right aggregates.
   """
-  use Commanded.Commands.Router
+  use Commanded.Commands.Router, otp_app: :libu
   alias Libu.Chat.{
     Commands.InitiateConversation,
     Commands.AddToConversation,

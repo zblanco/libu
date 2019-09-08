@@ -31,8 +31,18 @@ config :phoenix,
 config :commanded,
   event_store_adapter: Commanded.EventStore.Adapters.EventStore
 
-config :commanded_ecto_projections,
-  repo: Libu.Repo
+# config :commanded_ecto_projections,
+#   repo: Libu.Repo
+
+config :libu, event_stores: [Libu.EventStore]
+
+config :libu, Libu.Chat.Commanded,
+  event_store: [
+    adapter: Commanded.EventStore.Adapters.EventStore,
+    event_store: Libu.Chat.EventStore
+  ],
+  pub_sub: :local,
+  registry: :local
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

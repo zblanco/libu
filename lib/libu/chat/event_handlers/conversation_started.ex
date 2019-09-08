@@ -5,12 +5,12 @@ defmodule Libu.Chat.EventHandlers.ConversationStarted do
   use Commanded.Event.Handler,
     name: __MODULE__,
     consistency: :eventual,
-    start_from: :current
+    start_from: :current,
+    application: :libu
 
   alias Libu.Chat.Events.ConversationStarted
   alias Libu.Messaging
   alias Libu.Chat
-  alias Libu.Chat.Projections
 
   def handle(%ConversationStarted{conversation_id: convo_id} = event, _metadata) do
     Messaging.publish(event, Chat.topic() <> ":" <> convo_id)

@@ -1,4 +1,4 @@
-defmodule Libu.Analysis.Readability do
+defmodule Libu.Analysis.Methods.Readability do
   @moduledoc """
   Metrics we want to collect:
 
@@ -13,12 +13,12 @@ defmodule Libu.Analysis.Readability do
     |> Essence.Readability.dale_chall()
   end
 
-  def dalle_chall_reading_difficulty(topic), do: %Metric{
-    name: :dale_chall_reading_difficulty,
-    analyzer: {Libu.Analysis.Readability, :dale_chall_difficulty},
-    type: :stateless,
-    topic: topic,
-  }
+  # def dalle_chall_reading_difficulty(topic), do: %Metric{
+  #   name: :dale_chall_reading_difficulty,
+  #   analyzer: {Libu.Analysis.Readability, :dale_chall_difficulty},
+  #   type: :stateless,
+  #   topic: topic,
+  # }
 
   # def dalle_chall_reading_difficulty_over_time(topic, duration), do: %Metric{
   #   name: :dale_chall_reading_difficulty,

@@ -8,6 +8,8 @@ defmodule Libu.Application do
       Libu.Repo,
       LibuWeb.Endpoint,
 
+      {Libu.Chat.EventStore, []},
+
       {Registry, name: Libu.Analysis.SessionRegistry, keys: :unique},
       {DynamicSupervisor, name: Libu.Analysis.SessionSupervisor,  strategy: :one_for_one},
       {Registry, name: Libu.Analysis.SubscriberSupervisorRegistry, keys: :unique},

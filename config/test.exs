@@ -17,7 +17,7 @@ config :libu, Libu.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
-config :eventstore, EventStore.Storage,
+config :libu, Libu.Chat.EventStore,
   serializer: EventStore.TermSerializer,
   username: "postgres",
   password: "postgres",

@@ -1,6 +1,12 @@
-defmodule LibuWeb.LiveChat do
+defmodule LibuWeb.ChatLive.Index do
   @moduledoc """
   Shows a list of active conversations.
+
+  Todo:
+
+  * Add pagination
+  * Convert to table
+
   """
   use Phoenix.LiveView
   alias LibuWeb.ChatView
@@ -17,7 +23,7 @@ defmodule LibuWeb.LiveChat do
   end
 
   def render(assigns) do
-    ChatView.render("live_chat.html", assigns)
+    ChatView.render("index.html", assigns)
   end
 
   def handle_info(%ActiveConversationAdded{} = event, socket) do

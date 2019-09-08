@@ -5,7 +5,8 @@ defmodule Libu.Chat.EventHandlers.ConversationProjectionManager do
   use Commanded.Event.Handler,
     name: __MODULE__,
     consistency: :eventual,
-    start_from: :current
+    start_from: :current,
+    application: :libu
 
   alias Libu.Chat.{
     Events.ConversationStarted,

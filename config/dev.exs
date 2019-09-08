@@ -75,7 +75,7 @@ config :libu, Libu.Repo,
   hostname: "localhost",
   pool_size: 10
 
-config :eventstore, EventStore.Storage,
+config :libu, Libu.Chat.EventStore,
   serializer: EventStore.TermSerializer,
   username: "postgres",
   password: "postgres",

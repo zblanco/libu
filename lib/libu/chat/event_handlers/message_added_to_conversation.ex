@@ -5,11 +5,11 @@ defmodule Libu.Chat.EventHandlers.MessageAddedToConversation do
   use Commanded.Event.Handler,
     name: __MODULE__,
     consistency: :eventual,
-    start_from: :current
+    start_from: :current,
+    application: :libu
 
   alias Libu.Chat.Events.MessageAddedToConversation
   alias Libu.Messaging
-  alias Libu.Chat.Projections
   alias Libu.Chat
 
   def handle(%MessageAddedToConversation{conversation_id: convo_id} = event, _metadata) do

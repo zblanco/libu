@@ -30,8 +30,9 @@ defmodule LibuWeb.Router do
 
     live "/clock", LiveClock
 
-    live "/chat", LiveChat
-    live "/chat/conversations/:id", Conversation
+    live "/chat", ChatLive.Index
+    live "/chat/conversations/new", ChatLive.InitiateConversation
+    live "/chat/conversations/:id", ChatLive.Conversation
 
     live "/analysis", AnalysisSession, session: [:uuid]
 

@@ -33,6 +33,7 @@ defmodule Libu.Chat.ConversationProjector do
     ConversationEnded,
   }
   alias Libu.Chat.Message
+  alias Libu.Chat.EventStore, as: EventStreaming
 
   # @default_timeout :timer.minutes(60)
 
@@ -83,7 +84,7 @@ defmodule Libu.Chat.ConversationProjector do
   def stream_in_latest_messages(conversation_id, tid, max_no_of_messages) do
     # conversation_id
     # |> conversation_stream_uuid()
-    # |> EventStore.stream_backward(:stream_end, max_no_of_messages) # We'll need a stream_backward capability in EventStore to do what we want!
+    # |> EventStreaming.stream_backward(:end, max_no_of_messages) # We'll need a stream_backward capability in EventStore to do what we want!
     # |> Stream.filter(&is_start_or_added_event?(&1))
     # |> Stream.map(&build_message(&1))
     # |> Stream.each(&persist_messages_from_stream(tid, &1))

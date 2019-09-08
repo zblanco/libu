@@ -2,7 +2,10 @@ defmodule Libu.Chat.ActiveConversationProjector do
   @moduledoc """
   Manages the ETS table of Active Conversations for the Active Conversation read-model.
 
-  TODO: Consider moving the ETS concerns to a separate module.
+  TODO:
+    * Consider moving the ETS concerns to a separate module.
+    * Add pagination
+    * Consider using Etso for Ecto based queries
   """
   use GenServer
 
@@ -13,6 +16,7 @@ defmodule Libu.Chat.ActiveConversationProjector do
     Message,
   }
   alias Libu.{Chat, Messaging}
+  alias Libu.Chat.EventStore, as: EventStreaming
 
   def init(_opts) do
     :ets.new(:active_conversations, [:set, :protected, :named_table])
@@ -40,7 +44,7 @@ defmodule Libu.Chat.ActiveConversationProjector do
   end
 
   def handle_call({:project, %ConversationStarted{} = event}, _from, state) do
-    with {:ok, :message_projected} <- insert_message_from_event(event) do
+    with :ok <- insert_message_from_event(event) do
       {:reply, :ok, state}
     else
       error -> {:reply, error}
@@ -59,13 +63,12 @@ defmodule Libu.Chat.ActiveConversationProjector do
     end
   end
 
-  def handle_info(message, state) do
-    IO.inspect(message, label: "ActiveConversationProjector")
+  def handle_info(_, state) do
     {:noreply, state}
   end
 
   defp rebuild_state() do
-    EventStore.stream_all_forward()
+    EventStreaming.stream_all_forward()
     |> Stream.filter(&is_start_or_end_event?(&1)) # remove unrelated events from $all
     |> Stream.uniq_by(&stream_uuid_of_recorded_event(&1)) # cancel out starts with ends
     |> Stream.filter(&is_start_event?(&1)) # remove ended events

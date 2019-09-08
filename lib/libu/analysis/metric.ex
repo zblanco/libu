@@ -10,7 +10,15 @@ defmodule Libu.Analysis.Metric do
   defstruct [
     :name, # what we call the result
     :analyzer, # the anonymous function module/function pair to call to get a result
-    :type, # the kind of metric we're gathering
-    :topic, # the messaging topic our analysis_result_produced event will be found on
+    :collector, # the kind of metric we're gathering
+    :topic, # the messaging topic our analysis_result_produced/prepared events will be found on
   ]
+
+  def new(params) do
+    struct!(__MODULE__, params)
+  end
+
+  def subscribe_to(metric) do
+
+  end
 end

@@ -12,12 +12,12 @@
             phx_change: "search",
         )%>
       </form>
-      <%= link to: Routes.live_path(@socket, ProjectLive.New), class: "btn-quiet" do %>
+      <%= link to: Routes.live_path(@socket, ProjectLive.New), class: "btn-quiet border-b-2" do %>
         New
       <% end %>
-      <%= link to: Routes.live_path(@socket, ProjectLive.KanBan),  class: "btn-quiet items-center inline-flex p-1 pb-0" do %>
+      <%= link to: Routes.live_path(@socket, ProjectLive.KanBan), class: "btn-quiet items-center inline-flex p-1 pb-0 ml-1 border-b-2" do %>
         <div class="">
-          <img class="fill-current h-10" src="<%= Routes.static_path(@socket, "/images/kanban.svg") %>" alt="Kanban"/>
+          <img class="fill-current p-1 w-8 h-8" src="<%= Routes.static_path(@socket, "/images/kanban.svg") %>" alt="Kanban"/>
         </div>
       <% end %>
     </div>
