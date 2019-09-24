@@ -49,12 +49,15 @@ defmodule Libu.MixProject do
       {:uuid, "~> 1.1"},
       {:veritaserum, "~> 0.2.1"},
       {:flow, "~> 0.14.3"},
+      {:broadway, "~> 0.4.0"},
       {:essence, "~> 0.2.0"},
       {:oauth2, "~> 1.0"},
-      {:commanded, github: "commanded/commanded", branch: "feature/multi-app"},
-      {:eventstore, github: "zblanco/eventstore", branch: "backward-streaming"},
-      # {:commanded_ecto_projections, "~> 0.8"},
-      {:commanded_eventstore_adapter, github: "zblanco/commanded-eventstore-adapter", branch: "backward-streaming-compat"},
+      {:commanded, github: "commanded/commanded"},
+      {:eventstore, github: "zblanco/eventstore", branch: "backward-streaming", override: true},
+      {:commanded_eventstore_adapter, github: "commanded/commanded-eventstore-adapter"},
+      {:telemetry, "~> 0.4.0"},
+      {:telemetry_metrics, "~> 0.3.0"},
+      {:ex2ms, "~> 1.0"},
     ]
   end
 

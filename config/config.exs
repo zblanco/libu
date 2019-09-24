@@ -28,9 +28,6 @@ config :phoenix,
   json_library: Jason,
   template_engines: [leex: Phoenix.LiveView.Engine]
 
-config :commanded,
-  event_store_adapter: Commanded.EventStore.Adapters.EventStore
-
 # config :commanded_ecto_projections,
 #   repo: Libu.Repo
 

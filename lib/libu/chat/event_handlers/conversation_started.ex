@@ -6,7 +6,7 @@ defmodule Libu.Chat.EventHandlers.ConversationStarted do
     name: __MODULE__,
     consistency: :eventual,
     start_from: :current,
-    application: :libu
+    application: Libu.Chat.Commanded
 
   alias Libu.Chat.Events.ConversationStarted
   alias Libu.Messaging

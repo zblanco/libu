@@ -14,22 +14,20 @@ defmodule LibuWeb.AnalysisSession do
   use Phoenix.LiveView
   alias LibuWeb.AnalysisView
   alias Libu.Analysis
+  alias Libu.Analysis.Events.{TextChanged, AnalysisResultPrepared, AnalysisResultProduced}
   alias Phoenix.LiveView.Socket
 
-  def mount(session, %Socket{} = socket) do
+  def mount(_session, %Socket{} = socket) do
       if connected?(socket) do
-        id = UUID.uuid4()
-        Analysis.setup_session(id)
-        Analysis.subscribe(id)
-
-       {:ok, assign(socket,
-            session_id: id,
-            analyzer_config: default_analyzer_config(),
-            results: %{})}
+        {:ok, session_id} = Analysis.setup_session()
+        Analysis.subscribe(session_id)
+        IO.puts "connected! #{session_id}"
+        {:ok, assign(socket,
+            session_id: session_id,
+            event_log: [])}
+      else
+        {:ok, assign(socket, event_log: [])}
       end
-    IO.inspect(session, label: "session: ")
-    IO.inspect(socket, label: "socket: ")
-    {:ok, socket}
   end
 
   def default_analyzer_config do
@@ -41,27 +39,37 @@ defmodule LibuWeb.AnalysisSession do
     }
   end
 
-  defp fetch_results(%Socket{assigns: %{analysis_session: session}} = socket) do
-    %{id: session_id} = session
-    {:ok, results} = Analysis.fetch_analysis_results(session_id)
-    assign(socket, results: results)
-  end
+  # defp fetch_results(%Socket{assigns: %{session_id: session_id}} = socket, metric_name) do
+  #   {:ok, results} = Analysis.fetch_analysis_results(session_id)
+  #   assign(socket, results: results)
+  # end
 
   # To Do, change to Analysis Result Produced event
-  def handle_info({Analysis, [:analysis_results | _], _}, socket) do
-    {:noreply, fetch_results(socket)}
+  def handle_info(%TextChanged{} = event, socket) do
+    IO.inspect(event)
+    {:noreply, assign(socket, event_log: [ event | socket.assigns.event_log ])}
+  end
+
+  def handle_info(%AnalysisResultProduced{} = event, socket) do
+    IO.inspect(event)
+    {:noreply, assign(socket, event_log: [ event | socket.assigns.event_log ])}
   end
 
   def render(assigns) do
     AnalysisView.render("analysis_session.html", assigns)
   end
 
-  def handle_event("say", %{"msg" => msg}, %{assigns: %{session_id: session}}) do
-    Analysis.analyze(session, msg)
+  def handle_event("say", %{"msg" => msg}, %Socket{assigns: %{session_id: session_id}} = socket) do
+    Analysis.notify_text_changed(session_id, msg)
+    {:noreply, socket}
   end
 
-  def handle_event("toggle_analyzer", analyzer, %{assigns: %{session_id: session}}) do
-    Analysis.toggle_analyzer(session, analyzer)
+  # def handle_event("toggle_analyzer", analyzer, %{assigns: %{session_id: session}}) do
+  #   Analysis.toggle_analyzer(session, analyzer)
+  # end
+
+  def terminate(_, %Socket{assigns: %{session_id: session_id}}) do
+    Analysis.end_session(session_id)
   end
 
 end

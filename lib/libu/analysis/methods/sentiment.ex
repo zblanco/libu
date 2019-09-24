@@ -1,4 +1,4 @@
-defmodule Libu.Analysis.Sentiment do
+defmodule Libu.Analysis.Methods.Sentiment do
   @moduledoc """
   Utilities and Analyzer Behaviour implementation for [Sentiment](https://web.stanford.edu/class/cs124/lec/sentiment.pdf) analysis.
 
@@ -9,20 +9,13 @@ defmodule Libu.Analysis.Sentiment do
   * Average Sentiment score per word
   * Average Sentiment score per word over time
   """
-  alias Libu.Analysis.Text
-  @behaviour Libu.Analysis.Analyzer
+  alias Libu.Analysis.Methods.Text
 
-  # TODO, build an eex/html table and/or svg representation of these results
-  def analyze(text) when is_binary(text) do
-    with basic_sentiment <- basic_sentiment(text) do
-      {:ok, %{afinn_165_sentiment: basic_sentiment}}
-    end
-  end
 
   def basic_sentiment(tokenized_text)
-  when is_list(tokenized_text) do
-    Veritaserum.analyze(tokenized_text)
-  end
+  when is_list(tokenized_text),
+  do: Veritaserum.analyze(tokenized_text)
+
   def basic_sentiment(text),
     do: Veritaserum.analyze(text)
 

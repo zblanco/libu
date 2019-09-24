@@ -52,8 +52,8 @@ config :libu, LibuWeb.Endpoint,
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/libu_web/views/.*(ex)$},
-      ~r{lib/libu_web/templates/.*(eex)$},
-      ~r{lib/demo_web/live/.*(ex)$}
+      ~r{lib/libu_web/templates/.*(eex|leex)$},
+      ~r{lib/libu_web/live/.*(ex)$}
     ]
   ]
 

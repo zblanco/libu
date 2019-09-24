@@ -13,7 +13,7 @@ defmodule Libu.Analysis.Events.TextChanged do
   def new(%Session{} = session) do
     %__MODULE__{
       session_id: session.id,
-      text_version: session.version,
+      text_version: session.changes,
       text_changed_on: session.last_edited_on,
       text: session.text,
     }

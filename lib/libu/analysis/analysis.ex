@@ -16,7 +16,6 @@ defmodule Libu.Analysis do
     SessionProcess,
     Session,
     Query,
-    Persistence,
   }
   alias Libu.Messaging
 
@@ -25,18 +24,19 @@ defmodule Libu.Analysis do
   def subscribe(session_id), do: Messaging.subscribe(topic() <> ":#{session_id}")
   def subscribe(),           do: Messaging.subscribe(topic())
 
-  def setup_session(session_id) do
-    with session  <- Session.new(session_id),
+  def setup_session() do
+    with session  <- Session.new(),
          {:ok, _} <- SessionProcess.start(session) do
-      :ok
+      {:ok, session.id}
     else
       _ -> :error
     end
   end
 
-  defdelegate analyze(session_id, text),                    to: SessionProcess
-  defdelegate toggle_analyzer(session_id, analyzer),        to: SessionProcess
-  defdelegate fetch_analysis_results(session_id),           to: Query,       as: :fetch
-  defdelegate fetch_analysis_results(session_id, analyzer), to: Query,       as: :fetch
-  defdelegate setup_persistence,                            to: Persistence, as: :setup
+  defdelegate notify_text_changed(session_id, text),           to: SessionProcess
+  defdelegate end_session(session_id),                         to: SessionProcess
+  # defdelegate activate_metric(session_id, metric_name),        to: SessionProcess
+  # defdelegate active_analyzers(session_id),                    to: Query, as: :fetch
+  defdelegate fetch_analysis_results(session_id, metric_name), to: Query, as: :fetch
+  defdelegate available_metrics,                               to: Query
 end

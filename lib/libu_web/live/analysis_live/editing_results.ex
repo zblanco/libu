@@ -1,6 +1,8 @@
 defmodule LibuWeb.LiveAnalysis.EditingResults do
   @moduledoc """
   Renders results from an Analysis Session about text editing.
+
+
   """
   use Phoenix.LiveView
   alias LibuWeb.AnalysisView

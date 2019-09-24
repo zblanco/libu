@@ -1,4 +1,4 @@
-defmodule Libu.Analysis.Text do
+defmodule Libu.Analysis.Methods.Text do
   @moduledoc """
   Standard sets of text analysis.
 
@@ -9,19 +9,17 @@ defmodule Libu.Analysis.Text do
   * # of characters
   * Tokenized text?
   """
-  @behaviour Libu.Analysis.Analyzer
 
-  def analyze(text) when is_binary(text) do
-    with total_word_count  <- word_counts(text, :eager),
-         words_count       <- count_of_words(text)
-    do
-      {:ok, %{
-        total_word_count: total_word_count,
-        words_count:      words_count,
-      }}
-    end
+  def sentences(text) do
+    Essence.Chunker.sentences(text)
   end
 
+  def tokenize(text) do
+    Essence.Tokenizer.tokenize(text)
+  end
+
+  # TODO, return a map instead of tuple list
+  def word_counts(text, variation \\ :eager)
   def word_counts(text, :eager) when is_binary(text) do
     text
     |> String.downcase
@@ -31,7 +29,6 @@ defmodule Libu.Analysis.Text do
     end)
   end
 
-  # TODO, return a map instead of tuple list
   def word_counts(text, :lazy) when is_binary(text) do
     {:ok, stream_text} = StringIO.open(text)
 

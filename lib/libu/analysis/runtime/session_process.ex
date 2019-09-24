@@ -14,9 +14,7 @@ defmodule Libu.Analysis.SessionProcess do
   Basic Lifecycle:
 
   * @first live view mount: start an analysis session under a Dynamic Supervisor with the initial state.
-    * Prepare the ETS tables keyed under our session_id
-      - Results
-      - Session/Text Versions (last minute?)
+    * Build jobs and metrics
   * @liveview de-mount: kill the analysis session (temporary)
     * or keep hot for a period of time (transient) - worthwhile only if we have Identity Sessions.
   * @text change: queue analysis jobs to the configured analyzers in the session,
@@ -27,9 +25,7 @@ defmodule Libu.Analysis.SessionProcess do
   alias Libu.Analysis.{
     Session,
     Events.TextChanged,
-    AnalyzerSubscriber,
-    Query,
-    AnalyzerSubscriberSupervisor,
+    Job,
   }
 
   def via(session_id) when is_binary(session_id) do
@@ -59,57 +55,67 @@ defmodule Libu.Analysis.SessionProcess do
     )
   end
 
+  def end_session(session_id) do
+    GenServer.stop(via(session_id))
+  end
+
   def init(session) do
-    # Start Analyzer Subscriber Dynamic Supervisor
-    # We should be able to find and communicate to the subscriber supervisor just from our Session Id and via/registry
-    {:ok, _pid} = AnalyzerSubscriberSupervisor.start_link(session.id)
+    # {:ok, _pid} = SessionWorkSupervisor.start_link(session.id)
     # Create the Session ETS table?
     {:ok, session, {:continue, :init}}
   end
 
   def handle_continue(:init, session) do
     # tid = :ets.new()
-    setup_subscriptions(session)
+    # setup_metrics(session)
     {:noreply, session}
   end
 
-  def analyze(_session_id, text) when is_nil(text), do: {:error, :nothing_to_analyze}
-  def analyze(session_id, text) when is_binary(text) do
-    GenServer.call(via(session_id), {:analyze, text})
+  def notify_text_changed(_session_id, text) when is_nil(text), do: {:error, :nothing_to_analyze}
+  def notify_text_changed(session_id, text) when is_binary(text) do
+    GenServer.call(via(session_id), {:handle_text_change, text})
   end
 
-  def toggle_analyzer(session_id, analyzer) when is_atom(analyzer) do
-    GenServer.call(via(session_id), {:toggle_analyzer, analyzer})
+  def toggle_metric(session_id, metric_name) when is_atom(metric_name) do
+    GenServer.call(via(session_id), {:toggle_metric, metric_name})
   end
 
-  def handle_call({:analyze, text}, _from, session) do
-    session = Session.set_text(session, text)
-    event = TextChanged.new(session)
-    call_analyzers(session, event)
-    {:reply, :ok, session}
-  end
-
-  def handle_call({:toggle_analyzer, analyzer}, %Session{} = session) do
-    # Terminate the subscriber processes toggled off
+  def handle_call({:handle_text_change, text}, _from, session) do
     session =
-      if Session.available_analyzer?(analyzer) do
-        Session.toggle_analyzer(session, analyzer)
-      end
-      # terminate_subscriber(session_id, analyzer)
+      session
+      |> Session.set_text(text)
+      |> Session.increment_changes()
+
+    event = TextChanged.new(session)
+    Libu.Messaging.publish(event, Libu.Analysis.topic() <> ":#{session.id}")
+    dispatch_jobs(session, event)
+
     {:reply, :ok, session}
   end
 
-  defp call_analyzers(%Session{active_analyzers: analyzer_config}, %TextChanged{} = event) do
-    analyzer_config
-    |> Enum.map(&Session.analyzer_for_key(&1))
-    |> Enum.each(fn analyzer -> analyzer.analyze(event) end)
+  # def handle_call({:toggle_metric, metric_name}, %Session{} = session) do
+  #   # Terminate the subscriber processes toggled off
+  #   session =
+  #     if Session.available_metric?(metric_name) do
+  #       Session.toggle_metric(session, metric_name)
+  #     end
+
+  #     # pause_if_deactivated(session)
+  #   {:reply, :ok, session}
+  # end
+
+  def dispatch_jobs(%Session{} = session, %TextChanged{} = event) do
+    session.job_pipeline
+    |> Enum.map(fn {_name, %Job{} = job} ->
+      %Job{job | input: event}
+    end)
+    |> Enum.map(&Job.evaluate_runnability(&1))
+    |> Enum.filter(fn %Job{runnable?: runnability} -> runnability end)
+    |> IO.inspect(label: "jobs to enqueue being dispatched...")
+    |> Enum.each(&Libu.Analysis.Queue.enqueue(&1))
   end
 
-  defp setup_subscriptions(%Session{active_analyzers: analyzer_config, id: session_id}) do
-    analyzer_config
-    |> Enum.map(&Session.analyzer_for_key(&1)) # TO DO: fix
-    |> Enum.each(fn analyzer ->
-      AnalyzerSubscriber.setup(analyzer, session_id)
-    end)
-  end
+  # defp setup_metrics(%Session{metrics: metrics, id: session_id}) do
+  #  # start collector processes under the Session metrics Supervisor?
+  # end
 end
