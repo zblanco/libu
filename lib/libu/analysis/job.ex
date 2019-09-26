@@ -93,13 +93,13 @@ defmodule Libu.Analysis.Job do
   def can_run?(%__MODULE__{}), do: :error
 
   def set_queue(%__MODULE__{} = job, queue),
-    do: %__MODULE__{job | queue: queue}
+    do: %__MODULE__{job | queue: queue} |> evaluate_runnability()
 
   def set_result(%__MODULE__{} = job, result),
-    do: %__MODULE__{job | result: result}
+    do: %__MODULE__{job | result: result} |> evaluate_runnability()
 
   def set_input(%__MODULE__{} = job, input),
-    do: %__MODULE__{job | runnable?: true, input: input}
+    do: %__MODULE__{job | runnable?: true, input: input} |> evaluate_runnability()
 
   def evaluate_runnability(%__MODULE__{
     name: name,
@@ -155,6 +155,6 @@ defmodule Libu.Analysis.Job do
 
     @callback ack(job :: Job.t) :: :ok | :error
 
-    @callback remove_jobs(job_ids :: list(String.t())) :: :ok | any()
+    # @callback remove_jobs(job_ids :: list(String.t())) :: :ok | any()
   end
 end

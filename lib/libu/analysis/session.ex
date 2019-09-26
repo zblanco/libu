@@ -36,6 +36,7 @@ defmodule Libu.Analysis.Session do
   end
 
   def default_collectors() do
+    # TODO: Like default_jobs/1 we build the collector specifications we want so our runtime layers can utilize
     []
   end
 

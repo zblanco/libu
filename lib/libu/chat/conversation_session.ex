@@ -11,17 +11,16 @@ defmodule Libu.Chat.ConversationSession do
 
   ## How we implement this:
 
-  * Dynamically Supervised and started when a /chat/:conversation_id route is accessed
+  * Dynamically Supervised and started when a `/chat/:conversation_id` route is accessed
   * Receive messages from the Liveview about what the user is doing (we may need JS client-side to get scroll state)
   * Handle "start typing" message
-  * Add To Conversation
+  * Add To Conversation (Submit)
   * Scroll State is communicated to the Conversation Projector processes so it can cache/stream as needed
 
   ## TODO:
 
-  * Integrate into interface
-  *
-  * Get Message Editing worked out
+  * Integrate with LiveView
+  * Get Message Editing worked out (either start an analysis session or control the )
   * Publish a ConversationAttendeeAdded event so we can build a conversation attendee projection
   * Initiate a Text Analysis session while editing messages (lower priority)
   """
@@ -99,7 +98,7 @@ defmodule Libu.Chat.ConversationSession do
 
     new_session_state = %{session_state | current_message_body: nil}
 
-    Libu.Chat.add_to_conversation(%{ # Adding to a conversation might should require a Conversation session instead
+    Libu.Chat.add_to_conversation(%{
       conversation_id: conversation_id,
       publisher_id: user_id,
       message: msg_body
