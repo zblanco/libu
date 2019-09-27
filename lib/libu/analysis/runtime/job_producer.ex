@@ -3,6 +3,8 @@ defmodule Libu.Analysis.JobProducer do
   Genstage producer for Analysis Jobs.
 
   Reads from the `Libu.Analysis.Queue` in response to demand to feed Broadway jobs to process.
+
+  The Job Queue configured here returns a list of `%Job{}` structs so a Broadway pipeline should transform each `Job` into a `Message`.
   """
   use GenStage
 
@@ -11,13 +13,21 @@ defmodule Libu.Analysis.JobProducer do
   @behaviour Broadway.Producer
 
   def init(_) do
-    {:producer, 0}
+    {:producer, %{demand: 0}}
   end
 
-  def handle_demand(demand, pending_demand) when demand > 0 do
-    {_count, jobs} = fetch_jobs(demand) # how should we handle pending demand?
-    IO.puts "handling demand"
-    {:noreply, jobs, pending_demand}
+  def handle_demand(incoming_demand, %{demand: demand} = state) do
+    handle_receive_messages(%{state | demand: demand + incoming_demand})
+  end
+
+  defp handle_receive_messages(%{demand: demand} = state) when demand > 0 do
+    jobs = fetch_jobs(demand)
+    new_demand = demand - length(jobs)
+    {:noreply, jobs, %{state | demand: new_demand}}
+  end
+
+  defp handle_receive_messages(state) do
+    {:noreply, [], state}
   end
 
   defp fetch_jobs(demand) do
@@ -27,7 +37,6 @@ defmodule Libu.Analysis.JobProducer do
         queued_jobs      -> queued_jobs
       end
 
-    count = length(jobs)
-    {count, jobs}
+    jobs
   end
 end
