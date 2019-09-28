@@ -9,14 +9,25 @@ defmodule Libu.Analysis.JobProducer do
   use GenStage
 
   alias Libu.Analysis.{Job, Queue}
+  alias Libu.Messaging
+  alias Broadway.Message
 
   @behaviour Broadway.Producer
 
+  @impl true
   def init(_) do
+    Messaging.subscribe(Libu.Analysis.topic() <> ":jobs")
     {:producer, %{demand: 0}}
   end
 
+  @impl true
+  def handle_info(:job_enqueued, state) do
+    handle_receive_messages(state)
+  end
+
+  @impl true
   def handle_demand(incoming_demand, %{demand: demand} = state) do
+    IO.puts "handling demand... in producer"
     handle_receive_messages(%{state | demand: demand + incoming_demand})
   end
 
@@ -33,10 +44,17 @@ defmodule Libu.Analysis.JobProducer do
   defp fetch_jobs(demand) do
     jobs =
       case Queue.fetch_jobs(demand) do
-        {:error, _error} -> []
-        queued_jobs      -> queued_jobs
+        {:error, _error}   -> []
+        {:ok, queued_jobs} -> queued_jobs
       end
 
-    jobs
+    jobs |> Enum.map(&to_message(&1))
+  end
+
+  defp to_message(%Job{} = job) do
+    %Message{
+      data: job,
+      acknowledger: nil,
+    }
   end
 end

@@ -93,14 +93,29 @@ defmodule Libu.Analysis.Job do
   def can_run?(%__MODULE__{}), do: :error
 
   def set_queue(%__MODULE__{} = job, queue),
-    do: %__MODULE__{job | queue: queue} |> evaluate_runnability()
+    do: set_job_value(job, :queue, queue)
+
+  def set_work(%__MODULE__{} = job, work)
+  when is_function(work), do: set_job_value(job, :work, work)
 
   def set_result(%__MODULE__{} = job, result),
-    do: %__MODULE__{job | result: result} |> evaluate_runnability()
+    do: set_job_value(job, :result, result)
 
   def set_input(%__MODULE__{} = job, input),
-    do: %__MODULE__{job | runnable?: true, input: input} |> evaluate_runnability()
+    do: set_job_value(job, :input, input)
 
+  defp set_job_value(%__MODULE__{} = job, key, value)
+  when key in [:work, :input, :result, :queue] do
+    Map.put(job, key, value) |> evaluate_runnability()
+  end
+
+  @doc """
+  Recursively checks a job and dependent jobs for runnability toggling the job's `runnable?` key accordingly.
+
+  This is chained automatically within `set_queue/2`, `set_result/2`, `set_input/2`, and `new/1`.
+
+  `can_run?/1` can be used at run time to ensure a job is runnable before allocating resources and executing side effects.
+  """
   def evaluate_runnability(%__MODULE__{
     name: name,
     work: work,
@@ -118,6 +133,17 @@ defmodule Libu.Analysis.Job do
   def evaluate_runnability(%__MODULE__{} = job), do:
     %__MODULE__{job | runnable?: false}
 
+  @doc """
+  Adds a child job to be enqueued with the result of the previous upon running.
+
+  ### Usage
+
+  ```elixir
+  parent_job = %Job{name: "parent job"}
+  child_job = %Job{name: "child job"}
+  parent_with_child = Job.add_dependent_job(parent_job, child_job)
+  ```
+  """
   def add_dependent_job(%__MODULE__{jobs: nil} = parent_job, child_job) do
     add_dependent_job(%__MODULE__{parent_job | jobs: %{}}, child_job)
   end
@@ -128,6 +154,10 @@ defmodule Libu.Analysis.Job do
     %__MODULE__{parent_job | jobs: Map.put_new(jobs, name, child_job)}
   end
 
+  @doc """
+  Assuming a runnable job, `run/1` executes the function contained in `work`,
+    sets the `result` with the return and enqueues dependent jobs with the result as the input for the children.
+  """
   def run(%__MODULE__{runnable?: false}), do: {:error, "Job not runnable"}
   def run(%__MODULE__{work: work, input: input} = job) # consider mfa
   when is_function(work) do
@@ -135,6 +165,7 @@ defmodule Libu.Analysis.Job do
       updated_job =
         job
         |> set_result(result)
+        |> set_input_for_children()
         |> enqueue_next_jobs()
 
       {:ok, updated_job}
@@ -144,13 +175,23 @@ defmodule Libu.Analysis.Job do
     end
   end
 
+  def set_input_for_children(%__MODULE__{jobs: nil} = parent_job), do: parent_job
+  def set_input_for_children(%__MODULE__{jobs: jobs, result: result} = parent_job) do
+    child_jobs = Enum.map(jobs, fn {name, job} -> {name, set_input(job, result)} end)
+    %__MODULE__{parent_job | jobs: child_jobs}
+  end
+
   def enqueue_next_jobs(%__MODULE__{jobs: nil} = job),
-    do: %__MODULE__{job | runnable?: false}
-  def enqueue_next_jobs(%__MODULE__{jobs: jobs, runnable?: true, queue: queue}) do
-    Enum.each(jobs, fn {_name, job} -> queue.enqueue(job) end)
+    do: evaluate_runnability(job)
+  def enqueue_next_jobs(%__MODULE__{jobs: jobs, queue: queue} = job) do
+    Enum.each(jobs, fn {_name, job} -> queue.enqueue(job) end) # consider how to handle errors
+    job
   end
 
   defmodule Queue do
+    @moduledoc """
+    Behaviour definition that a valid Job Queue set in a Job's `:queue` key must implement to prevent runtime issues.
+    """
     @callback enqueue(jobs :: map()) :: :ok | :error
 
     @callback ack(job :: Job.t) :: :ok | :error

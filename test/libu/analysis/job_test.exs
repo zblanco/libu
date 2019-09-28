@@ -94,6 +94,10 @@ defmodule Libu.JobTest do
       assert match?(%Job{result: 4}, ran_job)
     end
 
+    test "dependent jobs are evaluated when parent is ran" do
+      assert false
+    end
+
     test "dependent jobs are enqueued with the result of the parent job" do
       # modify the test queue to hold state
     end

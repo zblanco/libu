@@ -13,6 +13,7 @@ defmodule Libu.Analysis.Queue do
   use GenServer
 
   alias Libu.Analysis.{Job, EtsQueue}
+  alias Libu.Messaging
 
   def start_link(_) do
     GenServer.start_link(
@@ -35,6 +36,8 @@ defmodule Libu.Analysis.Queue do
     GenServer.call(__MODULE__, {:fetch, amount})
   end
 
+  def show_all_jobs(), do: GenServer.call(__MODULE__, :show_all)
+
   def handle_call({:fetch, amount}, _from, %EtsQueue{} = queue) do
     return =
       case EtsQueue.get(queue, amount) do
@@ -45,8 +48,14 @@ defmodule Libu.Analysis.Queue do
     {:reply, return, queue}
   end
 
+  def handle_call(:show_all, _from, %EtsQueue{} = queue) do
+    queue_contents = EtsQueue.get_all(queue)
+    {:reply, {:ok, queue_contents}, queue}
+  end
+
   def handle_call({:enqueue, %Job{} = job}, _from, %EtsQueue{} = queue) do
     :ok = EtsQueue.put(queue, job)
+    Messaging.publish(:job_enqueued, Libu.Analysis.topic() <> ":jobs")
     {:reply, :ok, queue}
   end
 

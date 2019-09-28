@@ -69,11 +69,11 @@ defmodule Libu.Chat.ActiveConversationProjector do
 
   defp rebuild_state() do
     EventStreaming.stream_all_forward()
-    |> Stream.filter(&is_start_or_end_event?(&1)) # remove unrelated events from $all
-    |> Stream.uniq_by(&stream_uuid_of_recorded_event(&1)) # cancel out starts with ends
-    |> Stream.filter(&is_start_event?(&1)) # remove ended events
-    |> Stream.map(&build_message(&1)) # convert to message
-    |> Stream.each(&persist_message_from_stream(&1)) # push into ets
+    |> Stream.filter(&is_start_or_end_event?(&1))
+    |> Stream.uniq_by(&stream_uuid_of_recorded_event(&1))
+    |> Stream.filter(&is_start_event?(&1))
+    |> Stream.map(&build_message(&1))
+    |> Stream.each(&persist_message_from_stream(&1))
     |> Enum.to_list()
   end
 
