@@ -63,7 +63,7 @@ defmodule Libu.Analysis.EtsQueue do
 
   def length(%__MODULE__{tid: tid}), do: :ets.info(tid, :size)
 
-  def get_all(%__MODULE__{tid: tid}), do: :ets.tab2list(tid)
+  def show_all(%__MODULE__{tid: tid}), do: :ets.tab2list(tid)
 
   def terminate(%__MODULE__{tid: tid}) do
     true = :ets.delete(tid)

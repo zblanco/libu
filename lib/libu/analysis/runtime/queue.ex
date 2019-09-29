@@ -9,6 +9,9 @@ defmodule Libu.Analysis.Queue do
     (we'll need to monitor sessions and handle exits to remove unecessary jobs)
   * remove jobs that are currently processing (place them somewhere else until ack'd for restart?)
   * implement ack behaviour of Broadway to remove references to active jobs
+
+  ATM our EtsQueue access is bottlenecked through GenServer callbacks
+    - we only need ownership of the Ets table managed in a supervision tree
   """
   use GenServer
 
@@ -49,7 +52,7 @@ defmodule Libu.Analysis.Queue do
   end
 
   def handle_call(:show_all, _from, %EtsQueue{} = queue) do
-    queue_contents = EtsQueue.get_all(queue)
+    queue_contents = EtsQueue.show_all(queue)
     {:reply, {:ok, queue_contents}, queue}
   end
 

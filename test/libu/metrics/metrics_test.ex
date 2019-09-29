@@ -3,9 +3,6 @@ defmodule Libu.MetricsTest do
   alias Libu.Metrics
   alias Libu.Metrics.{Metric}
 
-  def squareaplier(num), do: num * num
-
-
 
   describe "metric building" do
     test "we can build a valid last_value collector" do

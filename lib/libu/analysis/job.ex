@@ -2,16 +2,30 @@ defmodule Libu.Analysis.Job do
   @moduledoc """
   A job represents a recipe of nested calculations to make for a given input.
 
-  A notification to follow up with results can be published in another job or in the work function.
+  A top level job can be run when given the required parameters such as a `queue`, an `input`, a `name`, and a `work` function.
+
+  Once a job has been run, dependent jobs under the `jobs` key are enqueued to be run with the parent job as input.
+
+  The `Job` was modeled to support run-time modification of these dependent calculations.
+
+  A datastructure of these nested jobs can be constructed without root inputs, injected with inputs at runtime,
+    then dispatched to a queue for processing. The job processor only has to execute `Job.run/1` to start the pipeline of dependent jobs.
+
+  Assuming the Queue passed into the job is valid and feeds into more job processors the whole pipeline will run.
+
+  For example once a job to run a calculation has been run,
+    a notification to follow up with results can be published via a dependent job.
+
+  However in most cases you would use this module when you want both `concurrent` execution along side step-by-step dependent execution.
 
   Dependent jobs can be added using the `add_dependent_job/2` function.
 
   ```elixir
-    jobs: %{
+    example_job_pipeline = %{
       tokenization: %Job{
         name: :tokenization,
         work: &TextProcessing.tokenize/1,
-        jobs: %{ # child/dependent jobs are run upon completion of parent
+        jobs: %{ # jobs here will be enqueued to run upon `:tokenization`'s completion
           down_case: %Job{
             name: :down_case,
             work: &TextProcessing.downcase/1,
@@ -43,38 +57,6 @@ defmodule Libu.Analysis.Job do
       },
     }
   ```
-  Say the above `pipeline_example` is only one of many pipelines to run on a given stream of data.
-
-  Any given job unrelated to the pipeline can be run concurrently, however dependent jobs within a pipline must consume the result of another.
-
-  For example say we have some text like follows:
-
-  ```elixir
-  raw_text_1 = "hey this is some text to process"
-
-  raw_text_2 = "some more text"
-  ```
-
-  We want to process and gain insights to the text as it changes over time.
-
-  At any given moment a session of some kind will be streaming in new versions of text. The session will want to maintain a `%Pipeline{}` so it can invoke
-    a concurrent job processor that knows how to run the pipeline recipe on the raw text.
-
-  The processing might get `raw_text_1` and `raw_text_2` in the demand batch.
-
-  {"some text" = initial_input, %Pipeline{stages: 3}}
-
-  When running a pipeline for a given input we need to maintain the state of stages processed, then enqueue the next stage of jobs.
-
-  We could either maintain state, or in job processing pass in the next state and enqueue the next job with the results in the processing.
-
-  So for each pass of running a job it should have an input (provided from parent job or root input) and it's job map/spec
-    - first it runs the `work/1`
-    - then it runs the callback with the result
-    - then it enqueues any additional dependent jobs with the result as the input
-      - if this is the default behaviour than maybe the callback function can just be another job?
-    > how does a job know how to enqueue back into the infrastructure?
-      - we'd need a behaviour or an enqueuer passed into the job.
   """
   defstruct name: nil,
             work: nil,
@@ -103,6 +85,10 @@ defmodule Libu.Analysis.Job do
 
   def set_input(%__MODULE__{} = job, input),
     do: set_job_value(job, :input, input)
+
+  def add_context(%__MODULE__{context: existing_context} = job, key, context) do
+    %__MODULE__{job | context: Map.put(existing_context, key, context)}
+  end
 
   defp set_job_value(%__MODULE__{} = job, key, value)
   when key in [:work, :input, :result, :queue] do
@@ -161,11 +147,13 @@ defmodule Libu.Analysis.Job do
   def run(%__MODULE__{runnable?: false}), do: {:error, "Job not runnable"}
   def run(%__MODULE__{work: work, input: input} = job) # consider mfa
   when is_function(work) do
-    with {:ok, result} <- work.(input) do
+    with {:ok, result} <- work.(input) do # we're assuming that the work function follows {:ok, _} | {:error, _} conventions - better way?
       updated_job =
         job
         |> set_result(result)
-        |> set_input_for_children()
+        |> set_parent_as_result_for_children()
+        # |> set_input_for_children() # we actually just want the parent/completed job piped in as the input to the child jobs
+        # |> set_parent_as_context_for_children() # the context here that we want isn't necessary - just parent jobs -> child jobs
         |> enqueue_next_jobs()
 
       {:ok, updated_job}
@@ -175,11 +163,28 @@ defmodule Libu.Analysis.Job do
     end
   end
 
-  def set_input_for_children(%__MODULE__{jobs: nil} = parent_job), do: parent_job
-  def set_input_for_children(%__MODULE__{jobs: jobs, result: result} = parent_job) do
-    child_jobs = Enum.map(jobs, fn {name, job} -> {name, set_input(job, result)} end)
+  def set_parent_as_result_for_children(%__MODULE__{jobs: nil} = parent_job),   do: parent_job
+  def set_parent_as_result_for_children(%__MODULE__{result: nil} = parent_job), do: parent_job
+  def set_parent_as_result_for_children(%__MODULE__{jobs: jobs} = parent_job) do
+    child_jobs = Enum.map(jobs, fn {name, job} ->
+      {name, set_input(job, parent_job)}
+    end)
     %__MODULE__{parent_job | jobs: child_jobs}
   end
+
+  # def set_input_for_children(%__MODULE__{jobs: nil} = parent_job), do: parent_job
+  # def set_input_for_children(%__MODULE__{jobs: jobs, result: result} = parent_job) do
+  #   child_jobs = Enum.map(jobs, fn {name, job} -> {name, set_input(job, result)} end)
+  #   %__MODULE__{parent_job | jobs: child_jobs}
+  # end
+
+  # def set_parent_as_context_for_children(%__MODULE__{jobs: nil} = parent_job), do: parent_job
+  # def set_parent_as_context_for_children(%__MODULE__{jobs: jobs} = parent_job) do
+  #   child_jobs = Enum.map(jobs, fn {name, job} ->
+  #     {name, add_context(job, :parent_job, parent_job)}
+  #   end)
+  #   %__MODULE__{parent_job | jobs: child_jobs}
+  # end
 
   def enqueue_next_jobs(%__MODULE__{jobs: nil} = job),
     do: evaluate_runnability(job)

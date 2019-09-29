@@ -26,8 +26,7 @@
 
             <%= for event <- @event_log do %>
                 <div class="p-2 border-b border-gray-200 bg-white mb-2 shadow-lg rounded">
-                    <%= event.__struct__ %>
-                    <%= event.text_version%>
+                    <%= event.__struct__ %> - Text Version: <%= event.text_version%>
                 </div>
             <% end %>
         </div>

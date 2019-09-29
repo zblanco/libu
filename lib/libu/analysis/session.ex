@@ -9,6 +9,8 @@ defmodule Libu.Analysis.Session do
   alias Libu.Analysis.{
     SessionMetrics,
     Job,
+    Events.TextChanged,
+    Events.AnalysisResultProduced,
   }
   alias Libu.Messaging
 
@@ -64,18 +66,28 @@ defmodule Libu.Analysis.Session do
     Job.new(Keyword.merge([name: name, work: work], params))
   end
 
-  def notify_as_produced(%Job{
+  def notify_as_produced(%Job{context: %{session_id: session_id}} = job) do
+    publish_about(result_produced_from_job(job), session_id)
+    {:ok, job}
+  end
+
+  def publish_about(event, session_id) do
+    Messaging.publish(event, Libu.Analysis.topic() <> ":" <> session_id)
+  end
+
+  defp result_produced_from_job(%Job{
+    input: %TextChanged{text_version: version},
     name: job_name,
     result: result,
-    context: %{session: %__MODULE__{} = session}}
-  ) do
-    Libu.Analysis.Events.AnalysisResultProduced.new(
-      session_id: session.id,
-      text_version: session.changes,
+    context: %{session_id: session_id}
+  }) do
+    AnalysisResultProduced.new(
+      session_id: session_id,
+      text_version: version,
       produced_on: DateTime.utc_now(),
       metric_name: job_name,
       result: result
-    ) |> Messaging.publish(Libu.Analysis.topic() <> ":" <> session.id)
+    )
   end
 
   def set_text(%__MODULE__{} = session, text)
