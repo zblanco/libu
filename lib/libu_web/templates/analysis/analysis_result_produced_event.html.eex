@@ -1,0 +1,6 @@
+<li class="border-b border-gray-200 flex" id="analysis_result_produced_<%= @event.session_id %>_<%= @event.produced_on %>" >
+    <div class="w-auto p-1">Analysis Result Produced</div>
+    <div class="w-auto p-1"><%= @event.text_version %></div>
+    <div class="w-auto p-1"><%= @event.metric_name %></div>
+    <div class="w-auto p-1"><%= time(@event.produced_on) %></div>
+</li>

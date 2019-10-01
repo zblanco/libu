@@ -12,4 +12,11 @@ defmodule Libu.Analysis.Events.AnalysisResultsPrepared do
     session_id: String.t(),
     metric_name: String.t(),
   }
+
+  def new(session_id, metric_name) do
+    %__MODULE__{
+      session_id: session_id,
+      metric_name: metric_name,
+    }
+  end
 end

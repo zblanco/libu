@@ -1,4 +1,8 @@
 defmodule Libu.Analysis.Query do
+  alias Libu.Analysis.{
+    SessionEventLog,
+  }
+
 
   def available_metrics() do
     []
@@ -11,8 +15,10 @@ defmodule Libu.Analysis.Query do
     end
   end
 
-  def fetch(session_id, analyzer_key)
-  when is_binary(session_id) and is_atom(analyzer_key) do
+  def fetch(session_id, "session_event_log") do
+    SessionEventLog.fetch(session_id)
+  end
+  def fetch(session_id, metric_name) do
     # The query formats of some analysis strategies may be different.
     # Some analysis strategy results will want a windowed time-series set of events
     # Others will just want to store terms with key-values.

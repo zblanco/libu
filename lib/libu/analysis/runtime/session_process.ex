@@ -1,35 +1,31 @@
 defmodule Libu.Analysis.SessionProcess do
   @moduledoc """
-  Holds a set of Analyzer modules that are enqueued analysis jobs when a TextChanged event occurs.
+  Holds on to the Analysis Session State that dictates which jobs are run with new versions of text and how to collect results.
 
-  Using a Dynamic Supervisor we maintain a 1:1 Analysis Session with a LiveView.
-
-  In an ideal world the LiveView connects and agrees to a send us Operational Transform events based on edits.
-  From there we rebuild the text into it's latest version stored in ets.
-  Each configured analyzer is queued analysis jobs based on the full text state.
-  When the analyzer is done, the result is resolved back to the session state then stored in ETS.
-    - Late results that have been preceded by another job of the same analyzer with fresher state are discarded.
-  Whenever an analysis change is made, we publish to a pub sub where our LiveView client can be notified to refetch the analysis results from ETS.
+  Dynamically Supervised to maintain a 1:1 relationship with a LiveView.
 
   Basic Lifecycle:
 
   * @first live view mount: start an analysis session under a Dynamic Supervisor with the initial state.
-    * Build jobs and metrics
+    * We build up a set of Jobs and Collector processes to run and collect metrics with
   * @liveview de-mount: kill the analysis session (temporary)
-    * or keep hot for a period of time (transient) - worthwhile only if we have Identity Sessions.
-  * @text change: queue analysis jobs to the configured analyzers in the session,
-  * @job completion: update and return the result in the `analysis` map.
-  * @analyzer configuration change: update the set of Analyzer modules to queue jobs to, cancel all jobs to removed Analyzers for a session
+    * we may eventually keep around on a timeout with some integration with the `Identity` context.
+  * @text change: Inject jobs with new text and enqueue for processing.
+  * @metric_toggle off: For a given metric we terminate collectors and the job for that metric.
+  * @metric_toggle on: Start the collector then build and add the job to the pipeline. Dispatch just that job for the current text.
   """
   use GenServer
   alias Libu.Analysis.{
     Session,
     Events.TextChanged,
     Job,
+    CollectorSupervisor,
+    Queue,
+    Messaging,
   }
 
   def via(session_id) when is_binary(session_id) do
-    {:via, Registry, {Libu.Analysis.SessionRegistry, session_id}}
+    {:via, Registry, {Libu.Analysis.SessionRegistry, {__MODULE__, session_id}}}
   end
 
   def child_spec(%Session{id: session_id} = session) do
@@ -60,14 +56,12 @@ defmodule Libu.Analysis.SessionProcess do
   end
 
   def init(session) do
-    # {:ok, _pid} = SessionWorkSupervisor.start_link(session.id)
-    # Create the Session ETS table?
+    {:ok, _pid} = CollectorSupervisor.start_link(session.id)
     {:ok, session, {:continue, :init}}
   end
 
   def handle_continue(:init, session) do
-    # tid = :ets.new()
-    # setup_metrics(session)
+    setup_metrics(session)
     {:noreply, session}
   end
 
@@ -87,7 +81,7 @@ defmodule Libu.Analysis.SessionProcess do
       |> Session.increment_changes()
 
     event = TextChanged.new(session)
-    Libu.Messaging.publish(event, Libu.Analysis.topic() <> ":#{session.id}")
+    Session.publish_about(event, session.id)
     dispatch_jobs(session, event)
 
     {:reply, :ok, session}
@@ -111,11 +105,12 @@ defmodule Libu.Analysis.SessionProcess do
     end)
     |> Enum.map(&Job.evaluate_runnability(&1))
     |> Enum.filter(fn %Job{runnable?: runnability} -> runnability end)
-    |> IO.inspect(label: "jobs to enqueue being dispatched...")
-    |> Enum.each(&Libu.Analysis.Queue.enqueue(&1))
+    |> Enum.each(&Queue.enqueue(&1))
   end
 
-  # defp setup_metrics(%Session{metrics: metrics, id: session_id}) do
-  #  # start collector processes under the Session metrics Supervisor?
-  # end
+  defp setup_metrics(%Session{collectors: collectors, id: session_id}) do
+    Enum.each(collectors, fn {_name, module} ->
+      CollectorSupervisor.start_collector(module, session_id)
+    end)
+  end
 end

@@ -5,6 +5,15 @@ defmodule Libu.Analysis.JobProducer do
   Reads from the `Libu.Analysis.Queue` in response to demand to feed Broadway jobs to process.
 
   The Job Queue configured here returns a list of `%Job{}` structs so a Broadway pipeline should transform each `Job` into a `Message`.
+
+  TODO:
+
+  * Implement Broadway Ack behaviours
+    * Consider creating two ETS queues:
+      * One for fresh jobs
+      * One for working jobs (acknowledge from here to remove)
+        - Retries & removals?
+    * Handle messages from session ends to cancel running jobs and remove from queues
   """
   use GenStage
 
@@ -27,7 +36,6 @@ defmodule Libu.Analysis.JobProducer do
 
   @impl true
   def handle_demand(incoming_demand, %{demand: demand} = state) do
-    IO.puts "handling demand... in producer"
     handle_receive_messages(%{state | demand: demand + incoming_demand})
   end
 

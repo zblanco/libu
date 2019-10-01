@@ -11,6 +11,7 @@ defmodule Libu.Analysis.Session do
     Job,
     Events.TextChanged,
     Events.AnalysisResultProduced,
+    SessionEventLog,
   }
   alias Libu.Messaging
 
@@ -39,7 +40,9 @@ defmodule Libu.Analysis.Session do
 
   def default_collectors() do
     # TODO: Like default_jobs/1 we build the collector specifications we want so our runtime layers can utilize
-    []
+    %{
+      event_log: SessionEventLog
+    }
   end
 
   def default_jobs(%__MODULE__{} = session) do
@@ -72,7 +75,7 @@ defmodule Libu.Analysis.Session do
   end
 
   def publish_about(event, session_id) do
-    Messaging.publish(event, Libu.Analysis.topic() <> ":" <> session_id)
+    Messaging.publish(event, Libu.Analysis.topic() <> ":#{session_id}")
   end
 
   defp result_produced_from_job(%Job{

@@ -1,0 +1,5 @@
+<li class="border-b border-gray-200 flex items-stretch" id="<%= @event.session_id %>_<%= @event.published_on %>" >
+    <div class="w-auto p-1"><%= @event.event_type %></div>
+    <div class="w-auto p-1"><%= @event.session_text_version %></div>
+    <div class="w-auto p-1"><%= time(@event.published_on) %></div>
+</li>

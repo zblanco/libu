@@ -19,29 +19,30 @@
         <div class="box w-auto mx-auto overflow-hidden shadow-lg border-gray-200">
             <div class="shadow rounded-sm">
                 <table class="table table-auto">
-                <thead>
-                    <tr class="tr-head">
-                    <th class="th">Initial Message</th>
-                    <th class="th">Initiator</th>
-                    <th class="th">Start</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <%= for initial_message <- @conversations do %>
-                        <tr class="tr" id="<%= initial_message.conversation_id %>" >
-                            
-                        <td class="td">
-                            <%= link to: "/chat/conversations/#{initial_message.conversation_id}", class: "hover:underline" do %> 
-                            <%= initial_message.body %>
-                            <% end %>
-                        </td>
-                            
-                        <td class="td"><%= initial_message.publisher_id %></td>
-                        <td class="td"><%= time(initial_message.published_on) %></td>
+                    <thead>
+                        <tr class="tr-head">
+                        <th class="th">Initial Message</th>
+                        <th class="th">Initiator</th>
+                        <th class="th">Start</th>
                         </tr>
-                    <% end %>
-                </tbody>
+                    </thead>
+
+                    <tbody>
+                        <%= for initial_message <- @conversations do %>
+                            <tr class="tr" id="<%= initial_message.conversation_id %>" >
+                                
+                            <td class="td">
+                                <%= link to: "/chat/conversations/#{initial_message.conversation_id}", class: "hover:underline" do %> 
+                                <%= initial_message.body %>
+                                <% end %>
+                            </td>
+                                
+                            <td class="td"><%= initial_message.publisher_id %></td>
+                            <td class="td"><%= time(initial_message.published_on) %></td>
+                            </tr>
+                        <% end %>
+                    </tbody>
+                </table>
             </div>
         </div>
 

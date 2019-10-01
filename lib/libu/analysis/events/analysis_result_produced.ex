@@ -1,8 +1,8 @@
 defmodule Libu.Analysis.Events.AnalysisResultProduced do
   @moduledoc """
-  The result produced by an Analyzer once a job is complete.
+  Published with the results of a completed analysis job.
 
-  This just contains a result so dependent Analysis Strategies can subscribe and utilize results for their own calculations.
+  Meant to be consumed by some projector/collector process.
   """
   defstruct [
     :session_id,

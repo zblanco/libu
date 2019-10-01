@@ -1,0 +1,6 @@
+<li class="border-b border-gray-200 flex" id="text_changed_<%= @event.session_id %>_<%= @event.text_changed_on %>" >
+    <div class="w-auto p-1">Text Changed</div>
+    <div class="w-auto p-1"><%= @event.text_version %></div>
+    <div class="w-auto p-1"><%= @event.text %></div>
+    <div class="w-auto p-1"><%= time(@event.text_changed_on) %></div>
+</li>
