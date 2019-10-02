@@ -16,7 +16,7 @@ defmodule LibuWeb.AnalysisSession do
   alias Libu.Analysis
   alias Libu.Analysis.Events.{
     TextChanged,
-    AnalysisResultPrepared,
+    AnalysisResultProduced,
     AnalysisResultsPrepared,
   }
   alias Phoenix.LiveView.Socket
@@ -25,35 +25,58 @@ defmodule LibuWeb.AnalysisSession do
       if connected?(socket) do
         {:ok, session_id} = Analysis.setup_session()
         Analysis.subscribe(session_id)
-        IO.puts "connected! #{session_id}"
-        {:ok, assign(socket,
-            session_id: session_id,
-            event_log: [])}
+
+        IO.puts "== New Session Connected: #{session_id}"
+
+        {:ok,
+          assign(socket, session_id: session_id)
+          |> assign_defaults()
+        }
       else
-        {:ok, assign(socket, event_log: [])}
+        {:ok, assign_defaults(socket)}
       end
   end
 
-  # defp fetch_results(%Socket{assigns: %{session_id: session_id}} = socket, metric_name) do
-  #   {:ok, results} = Analysis.fetch_analysis_results(session_id)
-  #   assign(socket, results: results)
-  # end
+  def assign_defaults(socket) do
+    assign(socket,
+      event_log: [],
+      sentiment_score: 0,
+      readability: 0,
+      total_count_of_words: 0,
+      average_sentiment_per_word: 0,
+      word_counts: %{},
+    )
+  end
 
-  # To Do, change to Analysis Result Produced event & fetch to prepared read model
-  # def handle_info(%TextChanged{} = event, socket) do
-  #   IO.inspect(event, label: "liveview_handling")
-  #   {:noreply, assign(socket, event_log: [ event | socket.assigns.event_log ])}
-  # end
+  def handle_info(
+    %AnalysisResultsPrepared{metric_name: "session_event_log"} = event,
+    %Socket{assigns: %{session_id: session_id}} = socket
+  ) do
+    with {:ok, results} <- Analysis.fetch_analysis_results(session_id, "session_event_log") do
+      {:noreply, assign(socket, event_log: results)}
+    end
+  end
 
-  # def handle_info(%AnalysisResultProduced{} = event, socket) do
-  #   IO.inspect(event, label: "liveview_handling")
-  #   {:noreply, assign(socket, event_log: [ event | socket.assigns.event_log ])}
-  # end
+  def handle_info(%AnalysisResultProduced{metric_name: metric_name, result: result,} = event, socket) do
+    IO.inspect(event, label: "analysis_session_liveview")
 
-  def handle_info(%AnalysisResultsPrepared{metric_name: metric_name} = event, %Socket{assigns: %{session_id: session_id}} = socket) do
-    IO.inspect(event, label: "liveview_handling")
-    {:ok, results} = Analysis.fetch_analysis_results(session_id, metric_name)
-    {:noreply, assign(socket, event_log: results)}
+    socket =
+      case metric_name do
+        :total_count_of_words ->
+          assign(socket, total_count_of_words: result)
+        :dale_chall_difficulty ->
+          assign(socket, readability: result |> :erlang.float_to_binary([decimals: 2]))
+        :word_counts ->
+          assign(socket, word_counts: result)
+        :basic_sentiment ->
+          assign(socket, sentiment_score: result)
+        :average_sentiment_per_word ->
+          assign(socket, average_sentiment_per_word: result |> :erlang.float_to_binary([decimals: 2]))
+      end
+
+      IO.inspect(socket.assigns, label: "new assigns")
+
+    {:noreply, socket}
   end
 
   def handle_info(_, state) do
@@ -69,12 +92,7 @@ defmodule LibuWeb.AnalysisSession do
     {:noreply, socket}
   end
 
-  # def handle_event("toggle_analyzer", analyzer, %{assigns: %{session_id: session}}) do
-  #   Analysis.toggle_analyzer(session, analyzer)
-  # end
-
   def terminate(_, %Socket{assigns: %{session_id: session_id}}) do
     Analysis.end_session(session_id)
   end
-
 end

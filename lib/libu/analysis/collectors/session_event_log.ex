@@ -33,8 +33,6 @@ defmodule Libu.Analysis.SessionEventLog do
     GenServer.call(via(session_id), :fetch)
   end
 
-
-
   def init(session_id) do
     tid = :ets.new(__MODULE__, [:set, :public])
     Libu.Analysis.subscribe(session_id)

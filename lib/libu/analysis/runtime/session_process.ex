@@ -98,7 +98,7 @@ defmodule Libu.Analysis.SessionProcess do
   #   {:reply, :ok, session}
   # end
 
-  def dispatch_jobs(%Session{} = session, %TextChanged{} = event) do
+  defp dispatch_jobs(%Session{} = session, %TextChanged{} = event) do
     session.job_pipeline
     |> Enum.map(fn {_name, %Job{} = job} ->
       %Job{job | input: event}
