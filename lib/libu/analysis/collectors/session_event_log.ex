@@ -5,6 +5,11 @@ defmodule Libu.Analysis.SessionEventLog do
   Consumes TextChanged and AnalysisResultProduced events, converts them to a generic "event" struct then stores the events in ETS.
 
   Publishes AnalysisResultPrepared event once state is ready in ETS for queries.
+
+  TODO:
+
+  * Only show last 50 or so messages (Sliding Window)
+  * Sort by {version #, timestamp}
   """
   use GenServer
 
@@ -56,6 +61,10 @@ defmodule Libu.Analysis.SessionEventLog do
   def handle_call(:fetch, _from, %{tid: tid} = state) do
     results = :ets.tab2list(tid)
     |> Enum.map(fn {_key, logged_event} -> logged_event end)
+    |> Enum.sort(fn event1, event2 ->
+      event1.session_text_version < event2.session_text_version
+      || event1.published_on < event2.published_on
+    end)
     {:reply, {:ok, results}, state}
   end
 
@@ -78,7 +87,11 @@ defmodule Libu.Analysis.SessionEventLog do
     end
   end
 
-  defp insert_event(%LoggedEvent{published_on: published_on} = event, tid) do
-    :ets.insert_new(tid, {published_on, event})
+  defp insert_event(%LoggedEvent{published_on: published_on, session_text_version: version} = event, tid) do
+    if :ets.info(tid, :size) == 40 do
+      oldest_item = :ets.first(tid)
+      :ets.delete(tid, oldest_item)
+    end
+    :ets.insert_new(tid, {{published_on, version}, event})
   end
 end

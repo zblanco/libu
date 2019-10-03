@@ -96,7 +96,7 @@ defmodule Libu.Analysis.Job do
   end
 
   @doc """
-  Recursively checks a job and dependent jobs for runnability toggling the job's `runnable?` key accordingly.
+  Checks if a given job is runnable.
 
   This is chained automatically within `set_queue/2`, `set_result/2`, `set_input/2`, and `new/1`.
 
@@ -197,7 +197,7 @@ defmodule Libu.Analysis.Job do
     @moduledoc """
     Behaviour definition that a valid Job Queue set in a Job's `:queue` key must implement to prevent runtime issues.
     """
-    @callback enqueue(jobs :: map()) :: :ok | :error
+    @callback enqueue(job_pipeline :: map() | Job.t) :: :ok | :error
 
     @callback ack(job :: Job.t) :: :ok | :error
 

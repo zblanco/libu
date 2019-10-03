@@ -5,6 +5,7 @@ defmodule Libu.Chat.Message do
   defstruct [
     :conversation_id,
     :publisher_id,
+    :publisher,
     :body,
     :published_on,
   ]

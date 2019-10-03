@@ -31,7 +31,7 @@ config :phoenix,
 # config :commanded_ecto_projections,
 #   repo: Libu.Repo
 
-config :libu, event_stores: [Libu.EventStore]
+config :libu, event_stores: [Libu.Chat.EventStore]
 
 config :libu, Libu.Chat.Commanded,
   event_store: [
