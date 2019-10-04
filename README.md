@@ -8,14 +8,10 @@ Styled with [Tailwind CSS](https://github.com/tailwindcss/tailwindcss).
 
 TODO:
 
-## Overall:
-- [x] Liveview "sanity check" clock
-- [x] Styling
-
 ## Text Analysis
-- [ ] Text Analysis Job processing
-- [ ] Live Text Analysis Sessions
-- [ ] Toggled Analyzer Strategies
+- [x] Text Analysis Job processing
+- [x] Live Text Analysis Sessions
+- [ ] Toggled Metrics
 
 ## Projects
 - [x] Live CRUD with FSM Changeset validation
@@ -26,15 +22,17 @@ TODO:
 - [ ] Github Repo Integration
 
 ## Chat
-- [ ] Live Chat
-- [ ] Event Sourced Persistence
+- [ ] Conversation LiveView
+  - [x] Initial styling
+- [x] Event Sourced Persistence
+- [x] Conversation Projection/Stream-Querying
 - [ ] Identity Integration
 - [ ] Project Chats
 
 ## Identity
-- [ ] Github OAuth Identity
+- [x] Github OAuth Identity
 - [ ] Auth required routes
-- [ ] Avatar stuff
+- [x] Avatar stuff
 
 Take it for a spin:
 
@@ -57,21 +55,17 @@ The plan is to use this to try out pagination, search, list-views, and other bas
 
 ### Analysis
 
-The goal was to render a live analysis of the text you type. I initially just used stateless functions for basic Sentiment analysis and word counting as a proof of concept. Stateless functions like this allow us to just call in from the LiveView which is about as easy as it gets. However the interesting features emerge when we enable stateful capabilities and start chaining text analysis strategies together.
+The goal was to render a rich analysis of whatever text you type.
 
-The plan to tackle these stateful features is to start a 1:1 Analysis Session process upon the LiveView mount (`DynamicSupervisor` FTW). Next we need the LiveView state to be sent to this Session state where it can notify and enqueue Text Analysis jobs. Some of these Analyzers might be long-running or expensive, so we want each Analyzer strategy to have control over work it does. Once an Analysis job is completed we can persist the results to ETS and notify over pub sub where our LiveView can fetch the latest results from ETS via the Session Id. 
+We maintain a 1:1 Analysis Session with the LiveView using `DynamicSupervisor`. This session process receives text changes from the Live View and enqueues text processing jobs. Some of these jobs might be long-running or expensive, so we leave this interaction synchronous. Once an Analysis job is completed we can collect the results, build a read model and notify over pub sub where our LiveView can fetch the latest results.
 
-Maintaining a 1:1 session with a given LiveView allows us to decouple the LiveView process of concerns that should be owned by our `Analysis` context. This session is implemented via a GenServer spawned under a DynamicSupervisor, then killed upon notification of the sister LiveView termination. There is sufficient complexity in managing the ETS tables, enqueueing analysis jobs, and holding analyzer configuration to warrant hiding this from our LiveView state. All our LiveView knows is that it can send text over with a Session key and it will be notified when to fetch new results.
-
-*A further optimization is to only send Operational Transform events to our Analyis Session to minimize copying the whole contents each edit. Pushing around OT messages like this is also a good way to lead into collaborative features. We can do OT from the LiveView -> Session, but we'd rather do that from the Client -> LiveView && Session to really minimizing payload sizes. I'm waiting until the Liveview project has a better story for Javascript interop before doing these OT related features*
+*A further optimization is to only send Operational Transform events to our Analyis Session to minimize copying the whole contents each edit. Pushing around OT messages like this is also a good way to lead into collaborative features. We can do OT from the LiveView -> Session, but we'd rather do that from the Client -> LiveView && Session to really minimizing payload sizes.*
 
 ### Chat
 
-Chat is a more classic feature for Elixir/Phoenix applications. I wanted to deviate from the typical implementation using Ecto and Postgres in a classic "append message to chat room" and implement the features in-memory with OTP and ETS. The plan was to layer on the Text Analysis features to provide live insight to the aggregate metrics of a conversation. The naive implementation was to run a GenServer for each Conversation (i.e. Chat Room) thus serializing the messages, but didn't want a GenServer bottle-necking a very active Conversation.
+Chat features are a classic for Elixir/Phoenix demos. I wanted to deviate from the typical Phoenix Chat implementation that uses Ecto and Postgres for persistence and implement the query layer entirely in-memory. We can do this by event-sourcing our chat features and projecting our query state into ETS. We can easily layer on Text Analysis features to provide live insight into a conversation.
 
-Instead I'm working on a more event-sourced solution with a similar Session Process approach as `Text Analysis` but with a per-user Session that knows where the User is in the Conversation so we can stream down only the visible messages of the Conversation. The plan is to use ETS as a dynamic projection to recently queried messages from our Sessions. We can still use a GenServer as an Aggregate for each conversation, but we'll have more control over the Command side to rate-limit or slow-down as necessary.
-
-*Once the Liveview project has some more established patterns for getting and maintaining the View/Scroll position/state of the client, these Live Chat type features should be straight-forward.*
+For viewing a conversation/chat-room we can use a similar Liveview 1:1 Session approach as `Text Analysis` but keeping tabs on where the User is in the Conversation so we can stream down only the visible messages of the Conversation. As needed we stream messages from the Event Store into ETS.
 
 ### Identity
 
