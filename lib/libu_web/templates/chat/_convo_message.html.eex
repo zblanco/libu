@@ -1,4 +1,4 @@
-<div class="px-4 py-4 flex items-start text-sm hover:bg-gray-200">
+<div class="px-4 py-2 flex items-start text-sm hover:shadow-inner">
     <img src="https://avatars3.githubusercontent.com/u/20269183?s=460&v=4.jpg" class="w-10 h-10 rounded mr-3">
     <div class="flex-1 overflow-hidden">
         <div>

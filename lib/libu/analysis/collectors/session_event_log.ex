@@ -39,7 +39,7 @@ defmodule Libu.Analysis.SessionEventLog do
   end
 
   def init(session_id) do
-    tid = :ets.new(__MODULE__, [:set, :public])
+    tid = :ets.new(__MODULE__, [:ordered_set, :public])
     Libu.Analysis.subscribe(session_id)
     {:ok, %{session_id: session_id, tid: tid}}
   end

@@ -50,7 +50,7 @@ defmodule Libu.Chat do
   def add_to_conversation(params \\ %{}) do
     with {:ok, cmd} <- AddToConversation.new(params),
          :ok        <- Router.dispatch(cmd, consistency: :strong) do
-      Query.conversation(cmd.conversation_id)
+      :ok
     else
       error -> error
     end

@@ -46,7 +46,7 @@ defmodule Libu.Analysis.Session do
   end
 
   def default_jobs(%__MODULE__{} = session) do
-    job_params = [queue: Libu.Analysis.Queue, context: %{session_id: session.id}]
+    job_params = [queue: Libu.Analysis.QueueManager, context: %{session_id: session.id}]
 
     %{}
     |> add_job(build_job_with_params(:total_count_of_words, &SessionMetrics.count_of_words/1, job_params)) # we might have to make names unique

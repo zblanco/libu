@@ -14,9 +14,9 @@ defmodule Libu.Chat.ActiveConversationProjector do
     Events.ConversationEnded,
     Events.ActiveConversationAdded,
     Message,
+    Query.Streaming,
   }
   alias Libu.{Chat, Messaging}
-  alias Libu.Chat.EventStore, as: EventStreaming
 
   def init(_opts) do
     :ets.new(:active_conversations, [:set, :protected, :named_table])
@@ -68,34 +68,13 @@ defmodule Libu.Chat.ActiveConversationProjector do
   end
 
   defp rebuild_state() do
-    EventStreaming.stream_all_forward()
-    |> Stream.filter(&is_start_or_end_event?(&1))
-    |> Stream.uniq_by(&stream_uuid_of_recorded_event(&1))
-    |> Stream.filter(&is_start_event?(&1))
-    |> Stream.map(&build_message(&1))
+    Streaming.stream_chat_log_forward()
+    |> Stream.filter(&Streaming.is_start_or_end_event?(&1))
+    |> Stream.uniq_by(&Streaming.stream_uuid_of_recorded_event(&1))
+    |> Stream.filter(&Streaming.is_start_event?(&1))
+    |> Stream.map(&Streaming.build_message(&1))
     |> Stream.each(&persist_message_from_stream(&1))
     |> Enum.to_list()
-  end
-
-  defp build_message(%EventStore.RecordedEvent{data: event}) do
-    Message.new(event)
-  end
-
-  defp is_start_event?(
-    %EventStore.RecordedEvent{event_type: event_type}) do
-    event_type == "Elixir.Libu.Chat.Events.ConversationStarted"
-  end
-
-  defp stream_uuid_of_recorded_event(
-    %EventStore.RecordedEvent{stream_uuid: stream_uuid}) do
-      stream_uuid
-  end
-
-  defp is_start_or_end_event?(
-    %EventStore.RecordedEvent{event_type: event_type}) do
-    event_type ==
-      "Elixir.Libu.Chat.Events.ConversationStarted"
-      || "Elixir.Libu.Chat.Events.ConversationEnded"
   end
 
   defp persist_message_from_stream(%Message{} = msg) do
@@ -117,6 +96,7 @@ defmodule Libu.Chat.ActiveConversationProjector do
     :ets.insert_new(:active_conversations, {convo_id, msg})
   end
 
-  defp delete_conversation(convo_id),
-    do: :ets.delete(:active_conversations, convo_id)
+  defp delete_conversation(convo_id) do
+    :ets.delete(:active_conversations, convo_id)
+  end
 end

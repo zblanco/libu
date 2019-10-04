@@ -41,11 +41,36 @@ defmodule LibuWeb.ChatLive.Conversation do
       convo_id: id,
       conversation: demo_conversation(),
       current_user: demo_user(),
-      new_message: Chat.add_to_conversation(%{}, form: true)
+      message_changeset: Chat.add_to_conversation(%{}, form: true)
     )}
   end
 
-  def handle_event("keydown", %{"code" => "Enter"}, socket) do
+  def handle_event("keydown", %{"code" => "Enter"} = keydown_msg, socket) do
+    IO.puts "Enter key pressed!"
+    IO.inspect(keydown_msg, label: "keydown_msg")
+    {:noreply, socket}
+  end
+
+  def handle_event("new_message", %{"new_message" => msg_params}, socket) do
+    IO.puts "handling submit!"
+    IO.inspect msg_params
+
+    socket =
+      case Chat.add_to_conversation(msg_params) do
+        :ok ->
+          assign(socket, message_changeset: Chat.add_to_conversation(%{}, form: true))
+
+        error_changeset ->
+          assign(socket, message_changeset: error_changeset)
+      end
+
+    {:noreply, assign(socket, message_changeset: Chat.add_to_conversation(%{}, form: true))}
+  end
+
+
+  def handle_event("keydown", keydown_msg, socket) do
+    IO.puts "Some other key was pressed!"
+    IO.inspect(keydown_msg, label: "keydown_msg")
     {:noreply, socket}
   end
 

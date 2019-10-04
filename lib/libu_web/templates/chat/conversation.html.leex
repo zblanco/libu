@@ -1,9 +1,9 @@
 <div class="flex flex-col justify-center w-screen px-4">
 
     <div class="mt-2">
-        <div class="bg-gray-100 rounded hover:shadow-xl shadow-lg flex-1 flex flex-col overflow-hidden focus:shadow-2xl border-l-2 border-purple-700">
+        <div class="rounded shadow-lg flex-1 flex flex-col overflow-hidden focus:shadow-2xl border-l-2 border-purple-700">
 
-            <div class="flex px-4 py-4 items-center flex-none">
+            <div class="flex px-4 py-4 items-center flex-none bg-gray-100">
                 <div class="flex flex-col">
                     <h3 class="text-gray-900 mb-1 font-extrabold">Convo Title</h3>
                     <div class="text-gray-700 text-sm truncate">
@@ -25,33 +25,30 @@
                 </div>
             </div>
             <!-- Message Container -->
-            <div class="flex-1 overflow-y-scroll bg-white shadow-inner">
+            <div class="flex-1 overflow-y-scroll bg-white">
                 <!-- Messages -->
                 <%= for message <- @conversation.messages do
                     render("_convo_message.html", message: message)
                 end %>
             </div>
 
-            <%= f = form_for @new_message, "#", [
+            <%= f = form_for @message_changeset, "#", [
                 phx_change: :validate, 
-                phx_submit: :new_message
+                phx_submit: :new_message,
             ]%>
                 <%= text_input(:new_message, :message,
                     class: "text-input bg-gray-200 focus:bg-gray-300 shadow-inner 
-                            hover:bg-gray-300 rounded-t-none p-4 focus:border-b",
-                    name: "new_msg",
-                    value: @new_message.data.message,
+                            hover:bg-gray-300 rounded-t-none p-4 focus:border-b text-gray-600 focus:text-gray-800",
+                    value: @message_changeset.data.message,
                     phx_blur: "typing_stopped",
-                    placeholder: "Add to the conversation...",
+                    placeholder: "  Add to the conversation...",
                     phx_throttle: 1000,
                 )%>
 
                 <%= hidden_input :new_message, :publisher_id, value: @current_user.id  %>
 	            <%= hidden_input :new_message, :conversation_id, value: @conversation.id %>
+                <%= submit "submit", class: "hidden" %>
             </form>
-
-            
-
         </div>
     </div>
 </div>

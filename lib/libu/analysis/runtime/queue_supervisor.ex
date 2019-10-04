@@ -10,7 +10,7 @@ defmodule Libu.Analysis.QueueSupervisor do
 
   def init(_arg) do
     children = [
-      {Libu.Analysis.Queue, []}
+      {Libu.Analysis.QueueManager, []}
     ]
 
     Supervisor.init(children, strategy: :rest_for_one)

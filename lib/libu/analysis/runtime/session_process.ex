@@ -20,7 +20,7 @@ defmodule Libu.Analysis.SessionProcess do
     Events.TextChanged,
     Job,
     CollectorSupervisor,
-    Queue,
+    QueueManager,
     Messaging,
   }
 
@@ -105,7 +105,7 @@ defmodule Libu.Analysis.SessionProcess do
     end)
     |> Enum.map(&Job.evaluate_runnability(&1))
     |> Enum.filter(fn %Job{runnable?: runnability} -> runnability end)
-    |> Enum.each(&Queue.enqueue(&1))
+    |> Enum.each(&QueueManager.enqueue(&1))
   end
 
   defp setup_metrics(%Session{collectors: collectors, id: session_id}) do

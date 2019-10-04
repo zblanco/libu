@@ -33,7 +33,7 @@ defmodule Libu.Analysis.EtsQueue do
     :ok
   end
 
-  def get(%__MODULE__{tid: tid}) do
+  def take(%__MODULE__{tid: tid}) do
     case :ets.first(tid) do
       :"$end_of_table" -> {:error, :empty_queue}
       first ->
@@ -43,10 +43,10 @@ defmodule Libu.Analysis.EtsQueue do
     end
   end
 
-  def get(queue, amount) when is_integer(amount) do
+  def take(queue, amount) when is_integer(amount) do
     items =
       1..amount
-      |> Enum.map(fn _count -> get(queue) end)
+      |> Enum.map(fn _count -> take(queue) end)
       |> Enum.map(fn item ->
         case item do
           {:error, _} -> nil

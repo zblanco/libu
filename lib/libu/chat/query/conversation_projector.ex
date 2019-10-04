@@ -31,9 +31,10 @@ defmodule Libu.Chat.ConversationProjector do
     ConversationStarted,
     MessageAddedToConversation,
     ConversationEnded,
+    Query.Streaming,
   }
   alias Libu.Chat.Message
-  alias Libu.Chat.EventStore, as: EventStreaming
+  # alias Libu.Chat.EventStore, as: EventStreaming
 
   # @default_timeout :timer.minutes(60)
 
@@ -72,25 +73,30 @@ defmodule Libu.Chat.ConversationProjector do
   def handle_continue(:init, convo_id) do
     tid = :ets.new(:conversation_log, [:ordered_set])
     # Should we automatically stream in the last 10 or so messages?
-    latest_messages = stream_in_latest_messages(convo_id, tid, 20)
-    # :ok = subscribe_to_eventstore(convo_id) # subscribe to ensure new messages are appended
+    # stream_in_latest_messages(convo_id, tid)
+    Libu.Chat.subscribe(convo_id)
     {:noreply, %{
       tid: tid,
       conversation_id: convo_id,
-      cached_messages: MapSet.new()
+      cached_messages: MapSet.new(), # tuples of {convo_id, ttl}
+      cached_message_count: 0,
     }}
   end
 
-  def stream_in_latest_messages(conversation_id, tid, max_no_of_messages) do
-    # conversation_id
-    # |> conversation_stream_uuid()
-    # |> EventStreaming.stream_backward(:end, max_no_of_messages) # We'll need a stream_backward capability in EventStore to do what we want!
-    # |> Stream.filter(&is_start_or_added_event?(&1))
-    # |> Stream.map(&build_message(&1))
-    # |> Stream.each(&persist_messages_from_stream(tid, &1))
-    # |> Enum.to_list()
-    []
-  end
+  # def stream_in_latest_messages(conversation_id, tid, max_no_of_messages \\ 20) do
+  #   conversation_id
+  #   |> conversation_stream_uuid()
+  #   |> Streaming.stream_conversation_backward(max_no_of_messages)
+  #   |> Stream.filter(&Streaming.is_start_or_added_event?(&1))
+  #   |> Stream.map(&Streaming.build_message(&1))
+  #   |> Stream.each(&persist_messages_from_stream(tid, &1))
+  #   |> Enum.to_list()
+  # end
+
+  # defp persist_message_from_stream(tid, %Message{} = msg) do
+  #   insert_message(tid, msg)
+  #   msg
+  # end
 
   def stream_in_messages(conversation_id, tid, start_index, end_index) do
     # stream in messages from the
@@ -135,11 +141,9 @@ defmodule Libu.Chat.ConversationProjector do
     {:reply, results, state}
   end
 
-  def handle_call(
-    {:get_messages, [start_index: start_index, end_index: end_index]},
-    from,
-    %{tid: tid, cached_messages: cache_state} = state
-  ) do
+  def handle_call({:get_messages, [start_index: start_index, end_index: end_index]}, _from,
+    %{tid: tid, cached_messages: cache_state} = state)
+  do
     # check against the cached message state within the projector
     # maintain a count of messages of a conversation within the projector so we know not to try and stream messages that don't exist
     # for each index value between start and end, does our cache_state have it ready?

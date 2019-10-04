@@ -62,7 +62,7 @@
 }
 
 .nav-item {
-    @apply font-serif font-extrabold px-4 text-xl relative py-2 px-4 leading-normal text-purple-700 italic no-underline items-center;
+    @apply font-bold px-4 text-xl relative py-2 px-4 leading-normal text-purple-700 no-underline items-center;
 }
 
 .nav-item:hover {

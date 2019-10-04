@@ -17,7 +17,7 @@ defmodule Libu.Analysis.JobProducer do
   """
   use GenStage
 
-  alias Libu.Analysis.{Job, Queue}
+  alias Libu.Analysis.{Job, QueueManager}
   alias Libu.Messaging
   alias Broadway.Message
 
@@ -29,9 +29,18 @@ defmodule Libu.Analysis.JobProducer do
     {:producer, %{demand: 0}}
   end
 
+  def notify_of_job_enqueuing() do
+    GenStage.cast(__MODULE__, :job_enqueued)
+  end
+
+  @impl true
+  def handle_cast(:job_enqueued, state) do
+    handle_receive_messages(state)
+  end
+
   @impl true
   def handle_info(:job_enqueued, state) do
-    handle_receive_messages(state)
+    handle_receive_messages(state) # todo replace with a cast to self
   end
 
   @impl true
@@ -40,6 +49,7 @@ defmodule Libu.Analysis.JobProducer do
   end
 
   defp handle_receive_messages(%{demand: demand} = state) when demand > 0 do
+    IO.puts "producer fetching from the queue... "
     jobs = fetch_jobs(demand)
     new_demand = demand - length(jobs)
     {:noreply, jobs, %{state | demand: new_demand}}
@@ -51,7 +61,7 @@ defmodule Libu.Analysis.JobProducer do
 
   defp fetch_jobs(demand) do
     jobs =
-      case Queue.fetch_jobs(demand) do
+      case QueueManager.fetch_jobs(demand) do
         {:error, _error}   -> []
         {:ok, queued_jobs} -> queued_jobs
       end
