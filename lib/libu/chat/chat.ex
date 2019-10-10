@@ -33,15 +33,17 @@ defmodule Libu.Chat do
     Commands.EndConversation,
     Router,
     Query,
+    ConversationSession,
   }
   alias Libu.Messaging
 
   def topic(), do: inspect(__MODULE__)
+  def topic(conversation_id), do: "#{topic()}:#{conversation_id}"
 
   def subscribe, do: Messaging.subscribe(topic())
 
   def subscribe(conversation_id), do:
-    Messaging.subscribe("#{topic()}:#{conversation_id}")
+    Messaging.subscribe(topic(conversation_id))
 
   @doc """
   Appends your message to an existing conversation.
@@ -55,6 +57,13 @@ defmodule Libu.Chat do
       error -> error
     end
   end
+
+  # def setup_conversation_session(user_id, conversation_id) do
+  #   with :ok <- ConversationSession.start(user_id, conversation_id) do
+  #     # query from projector?
+  #     Query.fetch_latest
+  #   end
+  # end
 
   def initiate_test_convo, do: initiate_conversation(%{
     initiator_id: "Doops", initial_message: UUID.uuid4()

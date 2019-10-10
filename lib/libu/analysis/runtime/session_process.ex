@@ -103,7 +103,9 @@ defmodule Libu.Analysis.SessionProcess do
     |> Enum.map(fn {_name, %Job{} = job} ->
       %Job{job | input: event}
     end)
+    |> Enum.map(&Job.assign_run_id(&1))
     |> Enum.map(&Job.evaluate_runnability(&1))
+    |> IO.inspect(label: "jobs being dispatched")
     |> Enum.filter(fn %Job{runnable?: runnability} -> runnability end)
     |> Enum.each(&QueueManager.enqueue(&1))
   end

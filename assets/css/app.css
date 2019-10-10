@@ -62,11 +62,11 @@
 }
 
 .nav-item {
-    @apply font-bold px-4 text-xl relative py-2 px-4 leading-normal text-purple-700 no-underline items-center;
+    @apply font-bold px-4 text-lg relative py-2 px-4 leading-normal text-purple-700 no-underline items-center border-b-2 border-transparent;
 }
 
 .nav-item:hover {
-    @apply bg-gray-200 shadow-inner text-black;
+    @apply border-purple-700 text-black;
 }
 
 .text-input {

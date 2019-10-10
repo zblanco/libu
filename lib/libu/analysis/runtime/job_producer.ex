@@ -2,26 +2,22 @@ defmodule Libu.Analysis.JobProducer do
   @moduledoc """
   Genstage producer for Analysis Jobs.
 
-  Reads from the `Libu.Analysis.Queue` in response to demand to feed Broadway jobs to process.
+  Reads from a Queue when demanded to feed Broadway jobs to run.
 
   The Job Queue configured here returns a list of `%Job{}` structs so a Broadway pipeline should transform each `Job` into a `Message`.
 
   TODO:
 
-  * Implement Broadway Ack behaviours
-    * Consider creating two ETS queues:
-      * One for fresh jobs
-      * One for working jobs (acknowledge from here to remove)
-        - Retries & removals?
-    * Handle messages from session ends to cancel running jobs and remove from queues
+  * Handle messages from session ends to cancel running jobs and remove from queues
   """
   use GenStage
 
   alias Libu.Analysis.{Job, QueueManager}
   alias Libu.Messaging
-  alias Broadway.Message
+  alias Broadway.{Message, Producer, Acknowledger}
 
-  @behaviour Broadway.Producer
+  @behaviour Producer
+  @behaviour Acknowledger
 
   @impl true
   def init(_) do
@@ -44,13 +40,32 @@ defmodule Libu.Analysis.JobProducer do
   end
 
   @impl true
+  def handle_info(_, state) do
+    {:noreply, [], state}
+  end
+
+  @impl true
   def handle_demand(incoming_demand, %{demand: demand} = state) do
     handle_receive_messages(%{state | demand: demand + incoming_demand})
   end
 
+  @impl Acknowledger
+  def ack(_ack_ref, successful, _failed) do
+    IO.inspect(successful, label: "acknowledging job completion")
+    ack_jobs(successful)
+    :ok
+  end
+
+  defp ack_jobs(successful_messages) do
+    Enum.map(successful_messages, fn %Message{data: %Job{queue: queue} = job} ->
+      queue.ack(job)
+    end)
+  end
+
   defp handle_receive_messages(%{demand: demand} = state) when demand > 0 do
-    IO.puts "producer fetching from the queue... "
+    # IO.puts "producer fetching from the queue... "
     jobs = fetch_jobs(demand)
+    # IO.inspect(jobs, label: "jobs fetched by producer")
     new_demand = demand - length(jobs)
     {:noreply, jobs, %{state | demand: new_demand}}
   end
@@ -72,7 +87,7 @@ defmodule Libu.Analysis.JobProducer do
   defp to_message(%Job{} = job) do
     %Message{
       data: job,
-      acknowledger: nil,
+      acknowledger: __MODULE__,
     }
   end
 end

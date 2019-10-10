@@ -2,7 +2,6 @@ defmodule LibuWeb.ChatLive.Conversation do
   use Phoenix.LiveView
   alias LibuWeb.ChatView
   alias Libu.Chat
-  alias Phoenix.LiveView.Socket
 
   defp demo_conversation, do: %{
     id: UUID.uuid4(),
@@ -34,16 +33,34 @@ defmodule LibuWeb.ChatLive.Conversation do
     last_name: "White",
   }
 
-  def mount(%{path_params: %{"id" => id}}, socket) do
-    if connected?(socket), do: Chat.subscribe(id)
-
-    {:ok, assign(socket,
-      convo_id: id,
-      conversation: demo_conversation(),
-      current_user: demo_user(),
-      message_changeset: Chat.add_to_conversation(%{}, form: true)
-    )}
+  # def mount(%{path_params: %{"id" => convo_id}}, socket) do
+  def mount(%{}, socket) do
+    convo = demo_conversation()
+    if connected?(socket) do
+      # Chat.subscribe(convo_id)
+      # {:ok, convo} = Chat.setup_conversation_session("Doops", convo_id)
+      {:ok,
+        socket
+        |> assign(
+          convo_id: convo.id,
+          conversation: convo,
+          current_user: demo_user(),
+          message_changeset: Chat.add_to_conversation(%{}, form: true))
+        # |> fetch_active_conversation(convo_id)
+      }
+    else
+      {:ok, assign(socket,
+        convo_id: convo.id,
+        conversation: convo,
+        current_user: demo_user(),
+        message_changeset: Chat.add_to_conversation(%{}, form: true)
+      )}
+    end
   end
+
+  # defp fetch_active_conversation(socket, convo_id) do
+  #   Chat.fetch_active_conversation(convo_id)
+  # end
 
   def handle_event("keydown", %{"code" => "Enter"} = keydown_msg, socket) do
     IO.puts "Enter key pressed!"

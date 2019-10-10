@@ -2,11 +2,14 @@ defmodule Libu.Chat.ConversationSession do
   @moduledoc """
   Maintains state about what a user is doing within a given conversation.
 
+  ** Not necessary until we're integrating chat further with analysis and need live metrics **
+
   ## State we want to keep:
 
   * Which conversation id they're viewing
   * Which messages they're looking at currently (start and end indexes)
   * Whether or not they're currently typing
+  * What they're currently typing
   * The current text being edited prior to submission
 
   ## How we implement this:
@@ -78,14 +81,13 @@ defmodule Libu.Chat.ConversationSession do
   end
 
   def handle_call({:change_scroll_state, start_index, end_index}, _from, session_state) do
-    %{start_index: _previous_start_index, end_index: _previous_end_index} = session_state
+    %{start_index: _previous_start_index, end_index: _previous_end_index, conversation_id: convo_id} = session_state
 
     new_session_state = %{session_state |
       start_index: start_index,
       end_index: end_index
     }
-    Query.stream_conversation(start_index, end_index) # async notify of query stream request to conversation projection to re-cache convo msgs if necessary
-    # Should result in pubsub `conversation_stream_query_ready` message allowing Liveview to fetch
+    # Query.conversation(convo_id, start_index, end_index) # Con
     {:reply, :ok, new_session_state}
   end
 

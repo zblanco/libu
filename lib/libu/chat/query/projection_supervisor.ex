@@ -5,7 +5,10 @@ defmodule Libu.Chat.ProjectionSupervisor do
     ConversationProjectionManager,
     ConversationStarted,
   }
-  alias Libu.Chat.ActiveConversationProjector
+  alias Libu.Chat.{
+    ActiveConversationProjector,
+    Query.ConversationProjectionManager,
+  }
 
   def start_link(_) do
     Supervisor.start_link(__MODULE__, [], name: __MODULE__)
@@ -19,6 +22,7 @@ defmodule Libu.Chat.ProjectionSupervisor do
         name: Libu.Chat.ConversationProjectorSupervisor,
         strategy: :one_for_one
       ]},
+      {ConversationProjectionManager, [name: ConversationProjectionManager]},
     ], strategy: :one_for_one)
   end
 end

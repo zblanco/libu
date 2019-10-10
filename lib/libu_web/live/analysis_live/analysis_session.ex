@@ -44,12 +44,12 @@ defmodule LibuWeb.AnalysisSession do
       readability: 0,
       total_count_of_words: 0,
       average_sentiment_per_word: 0,
-      word_counts: %{},
+      word_counts: %{}
     )
   end
 
   def handle_info(
-    %AnalysisResultsPrepared{metric_name: "session_event_log"} = event,
+    %AnalysisResultsPrepared{metric_name: "session_event_log"},
     %Socket{assigns: %{session_id: session_id}} = socket
   ) do
     with {:ok, results} <- Analysis.fetch_analysis_results(session_id, "session_event_log") do
@@ -57,8 +57,8 @@ defmodule LibuWeb.AnalysisSession do
     end
   end
 
-  def handle_info(%AnalysisResultProduced{metric_name: metric_name, result: result,} = event, socket) do
-    IO.inspect(event, label: "analysis_session_liveview")
+  def handle_info(%AnalysisResultProduced{metric_name: metric_name, result: result}, socket) do
+    # IO.inspect(event, label: "analysis_session_liveview")
 
     socket =
       case metric_name do
@@ -74,7 +74,7 @@ defmodule LibuWeb.AnalysisSession do
           assign(socket, average_sentiment_per_word: result |> :erlang.float_to_binary([decimals: 2]))
       end
 
-      IO.inspect(socket.assigns, label: "new assigns")
+      # IO.inspect(socket.assigns, label: "new assigns")
 
     {:noreply, socket}
   end

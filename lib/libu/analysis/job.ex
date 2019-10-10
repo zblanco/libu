@@ -57,8 +57,15 @@ defmodule Libu.Analysis.Job do
       },
     }
   ```
+
+  TODO:
+
+  - [x] Implement `run_id` to keep track of active jobs this will let us handle retries and prune deactivated jobs from session terminations
+  - [] Job retry counts?
+  * Maybe context is an anti-pattern?
   """
   defstruct name: nil,
+            run_id: nil,
             work: nil,
             jobs: nil,
             input: nil,
@@ -86,12 +93,15 @@ defmodule Libu.Analysis.Job do
   def set_input(%__MODULE__{} = job, input),
     do: set_job_value(job, :input, input)
 
+  def assign_run_id(%__MODULE__{} = job),
+    do: set_job_value(job, :run_id, UUID.uuid4())
+
   def add_context(%__MODULE__{context: existing_context} = job, key, context) do
     %__MODULE__{job | context: Map.put(existing_context, key, context)}
   end
 
   defp set_job_value(%__MODULE__{} = job, key, value)
-  when key in [:work, :input, :result, :queue] do
+  when key in [:work, :input, :result, :queue, :run_id] do
     Map.put(job, key, value) |> evaluate_runnability()
   end
 
@@ -108,11 +118,13 @@ defmodule Libu.Analysis.Job do
     input: input,
     result: nil,
     queue: queue,
+    run_id: run_id,
   } = job)
     when is_function(work, 1)
     and not is_nil(name)
     and not is_nil(input)
     and not is_nil(queue)
+    and not is_nil(run_id)
   do
     %__MODULE__{job | runnable?: true}
   end
@@ -148,12 +160,12 @@ defmodule Libu.Analysis.Job do
   def run(%__MODULE__{work: work, input: input} = job) # consider mfa
   when is_function(work) do
     with {:ok, result} <- work.(input) do # we're assuming that the work function follows {:ok, _} | {:error, _} conventions - better way?
+      IO.puts "a job was successfully ran!"
       updated_job =
         job
         |> set_result(result)
         |> set_parent_as_result_for_children()
-        # |> set_input_for_children() # we actually just want the parent/completed job piped in as the input to the child jobs
-        # |> set_parent_as_context_for_children() # the context here that we want isn't necessary - just parent jobs -> child jobs
+        |> assign_run_id_for_children()
         |> enqueue_next_jobs()
 
       {:ok, updated_job}
@@ -172,19 +184,13 @@ defmodule Libu.Analysis.Job do
     %__MODULE__{parent_job | jobs: child_jobs}
   end
 
-  # def set_input_for_children(%__MODULE__{jobs: nil} = parent_job), do: parent_job
-  # def set_input_for_children(%__MODULE__{jobs: jobs, result: result} = parent_job) do
-  #   child_jobs = Enum.map(jobs, fn {name, job} -> {name, set_input(job, result)} end)
-  #   %__MODULE__{parent_job | jobs: child_jobs}
-  # end
-
-  # def set_parent_as_context_for_children(%__MODULE__{jobs: nil} = parent_job), do: parent_job
-  # def set_parent_as_context_for_children(%__MODULE__{jobs: jobs} = parent_job) do
-  #   child_jobs = Enum.map(jobs, fn {name, job} ->
-  #     {name, add_context(job, :parent_job, parent_job)}
-  #   end)
-  #   %__MODULE__{parent_job | jobs: child_jobs}
-  # end
+  def assign_run_id_for_children(%__MODULE__{jobs: nil} = parent_job), do: parent_job
+  def assign_run_id_for_children(%__MODULE__{jobs: jobs} = parent_job) do
+    child_jobs = Enum.map(jobs, fn {name, job} ->
+      {name, assign_run_id(job)}
+    end)
+    %__MODULE__{parent_job | jobs: child_jobs}
+  end
 
   def enqueue_next_jobs(%__MODULE__{jobs: nil} = job),
     do: evaluate_runnability(job)

@@ -14,11 +14,10 @@ defmodule Libu.Analysis.Broadway do
 
   def start_link(_opts) do
     Broadway.start_link(__MODULE__,
-      name: __MODULE__,
+      name: AnalysisBroadway,
       producers: [
         default: [
-          module: {JobProducer, []},
-          transformer: {__MODULE__, :transform, []}
+          module: {JobProducer, []}
         ],
       ],
       processors: [
@@ -28,20 +27,8 @@ defmodule Libu.Analysis.Broadway do
   end
 
   @impl true
-  def handle_message(_processor, message, _context) do
-    IO.puts "attempting to process #{message.data.__struct__}"
-    message |> Message.update_data(&run_job/1)
-  end
-
-  def run_job(%Message{data: %Job{} = job} = message) do
-    {:ok, ran_job} = Job.run(job)
+  def handle_message(_processor, %Message{} = message, _context) do
+    {:ok, ran_job} = Job.run(message.data)
     %Message{message | data: ran_job}
-  end
-
-  def transform(event, _opts) do
-    %Message{
-      data: event,
-      acknowledger: nil,
-    }
   end
 end

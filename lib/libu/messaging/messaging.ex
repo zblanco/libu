@@ -1,6 +1,6 @@
 defmodule Libu.Messaging do
   @moduledoc """
-  Wrapper/Facade around pub sub capabilities so our Context modules don't need to know about Phoenix Pub Sub.
+  Wrapper/Facade around pub sub capabilities so our Context and Web modules don't need to know about Phoenix Pub Sub.
   """
   def pub_sub, do: Libu.PubSub
 

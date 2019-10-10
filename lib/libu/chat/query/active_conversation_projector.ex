@@ -3,9 +3,8 @@ defmodule Libu.Chat.ActiveConversationProjector do
   Manages the ETS table of Active Conversations for the Active Conversation read-model.
 
   TODO:
-    * Consider moving the ETS concerns to a separate module.
-    * Add pagination
-    * Consider using Etso for Ecto based queries
+    * Subscribe to EventStore directly instead of using Pub Sub (so we access RecordedEvents for everything)
+    * Switch to build state with `%ActiveConversation{}` instead of Message.
   """
   use GenServer
 
@@ -15,13 +14,13 @@ defmodule Libu.Chat.ActiveConversationProjector do
     Events.ActiveConversationAdded,
     Message,
     Query.Streaming,
+    Query.ActiveConversation,
   }
   alias Libu.{Chat, Messaging}
 
   def init(_opts) do
     :ets.new(:active_conversations, [:set, :protected, :named_table])
     Chat.subscribe()
-    IO.puts(":active_conversations table created")
     {:ok, [], {:continue, :init}}
   end
 
@@ -56,7 +55,6 @@ defmodule Libu.Chat.ActiveConversationProjector do
          active_convo_added <- ActiveConversationAdded.new(event),
          :ok                <- Messaging.publish(active_convo_added, Chat.topic())
     do
-      IO.puts "Publishing ActiveConversationAdded"
       {:noreply, state}
     else
       _error -> {:noreply, state}
@@ -83,6 +81,16 @@ defmodule Libu.Chat.ActiveConversationProjector do
   end
 
   defp insert_message_from_event(event) do
+    with msg  <- Message.new(event),
+         true <- insert_message(msg)
+    do
+      :ok
+    else
+      error -> {:error, error}
+    end
+  end
+
+  defp insert_active_conversation_from_event(event) do
     with msg  <- Message.new(event),
          true <- insert_message(msg)
     do
