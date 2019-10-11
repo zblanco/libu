@@ -4,17 +4,34 @@ defmodule Libu.Chat.Query.Streaming do
     MessageAddedToConversation,
     ConversationEnded,
   }
-  alias Libu.Chat.Message
+  alias Libu.Chat.{Message, Query.ActiveConversation}
   alias Libu.Chat.EventStore, as: EventStreamer
 
   def build_message(%EventStore.RecordedEvent{} = event) do
     Message.new(event)
   end
 
-  def stream_chat_log_forward(), do: EventStreamer.stream_all_forward()
+  def build_active_conversation(%EventStore.RecordedEvent{} = event) do
+    ActiveConversation.new(event)
+  end
 
-  # def stream_conversation_backward(convo_id, amount),
-  #   do: EventStreamer.stream_backward(conversation_stream_uuid(convo_id), :end, amount)
+  def read_conversation_backward(convo_id, amount) do
+    EventStreamer.read_stream_backward(
+      conversation_stream_uuid(convo_id),
+      :end,
+      amount
+    )
+  end
+
+  def stream_conversation_forward(convo_id, amount) do
+    EventStreamer.stream_forward(conversation_stream_uuid(convo_id), 0, amount)
+  end
+
+  def stream_conversation_backward(convo_id, amount) do
+    EventStreamer.stream_backward(conversation_stream_uuid(convo_id), :end, amount)
+  end
+
+  def stream_chat_log_forward(), do: EventStreamer.stream_all_forward()
 
   defp conversation_stream_uuid(conversation_id), do: "conversation-#{conversation_id}"
 

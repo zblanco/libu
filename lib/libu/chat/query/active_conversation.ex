@@ -34,4 +34,11 @@ defmodule Libu.Chat.Query.ActiveConversation do
       latest_message: message,
     }
   end
+
+  def set_latest_message(%__MODULE__{} = active_convo, %Message{} = msg) do
+    %__MODULE__{active_convo |
+      latest_message: msg,
+      latest_activity: msg.published_on,
+    }
+  end
 end

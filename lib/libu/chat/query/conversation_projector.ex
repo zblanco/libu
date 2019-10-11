@@ -1,6 +1,6 @@
 defmodule Libu.Chat.ConversationProjector do
   @moduledoc """
-  Transient Process with a TTL responsible for maintaining an ordered set ETS table of a conversation.
+  Transient Process responsible for maintaining an ETS table of a conversation.
 
   We put new messages to the top of the stack deprecating old messages at a timeout since last queried.
 
@@ -22,7 +22,7 @@ defmodule Libu.Chat.ConversationProjector do
   TODO:
 
   - [x] Working conversation appending
-  - [ ] Cursor stream queries / write-through cache
+  - [x] Cursor stream queries / write-through cache
   - [ ] Re-initialization of dead/timed-out conversations by streaming in from event-store
   - [ ] Implement per-message timeouts/TTLs reset upon access
   - [ ] Utilize Projection Manager to remove read-bottlenecks that occur through Genserver callbacks

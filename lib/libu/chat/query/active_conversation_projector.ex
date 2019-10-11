@@ -10,8 +10,9 @@ defmodule Libu.Chat.ActiveConversationProjector do
 
   alias Libu.Chat.{
     Events.ConversationStarted,
-    Events.ConversationEnded,
+    # Events.ConversationEnded,
     Events.ActiveConversationAdded,
+    Events.MessageAddedToConversation,
     Message,
     Query.Streaming,
     Query.ActiveConversation,
@@ -33,32 +34,43 @@ defmodule Libu.Chat.ActiveConversationProjector do
     GenServer.start_link(__MODULE__, %{}, opts)
   end
 
-  def handle_event(event) do
-    GenServer.call(__MODULE__, {:project, event})
-  end
-
-  def handle_call({:project, %ConversationEnded{conversation_id: convo_id}}, _from, state) do
-    with true <- delete_conversation(convo_id),
-    do: {:reply, :ok, state}, else: (_ -> {:reply, :error})
-  end
-
-  def handle_call({:project, %ConversationStarted{} = event}, _from, state) do
-    with :ok <- insert_message_from_event(event) do
-      {:reply, :ok, state}
-    else
-      error -> {:reply, error}
+  def fetch_active_conversation(conversation_id) do
+    case :ets.lookup(:active_conversations, conversation_id) do
+      [{_convo_id, active_convo}] -> {:ok, active_convo}
+      _ -> {:error, :conversation_not_found}
     end
   end
 
-  def handle_info(%ConversationStarted{} = event, state) do
-    with :ok                <- insert_message_from_event(event),
-         active_convo_added <- ActiveConversationAdded.new(event),
-         :ok                <- Messaging.publish(active_convo_added, Chat.topic())
+  def fetch_active_conversations() do
+    :ets.tab2list(:active_conversations)
+    |> Enum.map(fn {_convo_id, convo} -> convo end)
+  end
+
+  def handle_info(%ConversationStarted{conversation_id: convo_id} = event, state) do
+    with active_convo <-
+      Streaming.stream_conversation_forward(convo_id, 1)
+      |> Enum.to_list()
+      |> List.first()
+      |> ActiveConversation.new()
     do
-      {:noreply, state}
-    else
-      _error -> {:noreply, state}
+      insert(active_convo)
+
+      ActiveConversationAdded.new(event)
+      |> Messaging.publish(Chat.topic())
     end
+
+    {:noreply, state}
+  end
+
+  def handle_info(%MessageAddedToConversation{conversation_id: convo_id} = event, state) do
+    with {:ok, active_convo} <- fetch_active_conversation(convo_id),
+         message             <- Message.new(event),
+         updated_convo       <- ActiveConversation.set_latest_message(active_convo, message)
+    do
+      insert(updated_convo)
+    end
+
+    {:noreply, state}
   end
 
   def handle_info(_, state) do
@@ -68,40 +80,28 @@ defmodule Libu.Chat.ActiveConversationProjector do
   defp rebuild_state() do
     Streaming.stream_chat_log_forward()
     |> Stream.filter(&Streaming.is_start_or_end_event?(&1))
-    |> Stream.uniq_by(&Streaming.stream_uuid_of_recorded_event(&1))
+    |> Stream.uniq_by(&Streaming.stream_uuid_of_recorded_event(&1)) # removes end events
     |> Stream.filter(&Streaming.is_start_event?(&1))
-    |> Stream.map(&Streaming.build_message(&1))
-    |> Stream.each(&persist_message_from_stream(&1))
+    |> Stream.map(&Streaming.build_active_conversation(&1))
     |> Enum.to_list()
+    |> Enum.map(fn %{conversation_id: convo_id} = active_convo ->
+      %{active_convo | latest_message: fetch_latest_message_of_conversation(convo_id)}
+    end)
+    |> Enum.each(&insert(&1))
   end
 
-  defp persist_message_from_stream(%Message{} = msg) do
-    insert_message(msg)
-    msg
+  defp fetch_latest_message_of_conversation(conversation_id) do
+    # While this works, it's not likely querying the event store once per conversation is the best option
+    # We should figure out a better way to accumulate an Active Conversation when streaming through the log.
+    Streaming.stream_conversation_backward(conversation_id, 1)
+    |> Stream.filter(&Streaming.is_message_event?(&1))
+    |> Stream.map(&Streaming.build_message(&1))
+    |> Enum.to_list()
+    |> List.first()
   end
 
-  defp insert_message_from_event(event) do
-    with msg  <- Message.new(event),
-         true <- insert_message(msg)
-    do
-      :ok
-    else
-      error -> {:error, error}
-    end
-  end
-
-  defp insert_active_conversation_from_event(event) do
-    with msg  <- Message.new(event),
-         true <- insert_message(msg)
-    do
-      :ok
-    else
-      error -> {:error, error}
-    end
-  end
-
-  defp insert_message(%Message{conversation_id: convo_id} = msg) do
-    :ets.insert_new(:active_conversations, {convo_id, msg})
+  defp insert(%ActiveConversation{conversation_id: convo_id} = convo) do
+    :ets.insert(:active_conversations, {convo_id, convo})
   end
 
   defp delete_conversation(convo_id) do

@@ -32,7 +32,7 @@
                 end %>
             </div>
 
-            <%= f = form_for @message_changeset, "#", [
+            <%= _f = form_for @message_changeset, "#", [
                 phx_change: :validate, 
                 phx_submit: :new_message,
             ]%>
@@ -42,7 +42,7 @@
                     value: @message_changeset.data.message,
                     phx_blur: "typing_stopped",
                     placeholder: "  Add to the conversation...",
-                    phx_throttle: 1000,
+                    phx_throttle: 1000
                 )%>
 
                 <%= hidden_input :new_message, :publisher_id, value: @current_user.id  %>

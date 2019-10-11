@@ -13,6 +13,7 @@ defmodule Libu.Chat.Query do
   alias Libu.{
     Repo,
     Chat.ConversationProjector,
+    Chat.ActiveConversationProjector,
   }
 
   def conversation(convo_id, start_index, end_index) when is_integer(start_index) and is_integer(end_index) do
@@ -20,11 +21,10 @@ defmodule Libu.Chat.Query do
   end
 
   def active_conversation(convo_id) do
-    # fetch ActiveConversation from Projector state
+    ActiveConversationProjector.fetch_active_conversation(convo_id)
   end
 
   def active_conversations() do
-    :ets.match_object(:active_conversations, {:"$0", :"$1"})
-    |> Enum.map(fn {_, msg} -> msg end)
+    ActiveConversationProjector.fetch_active_conversations()
   end
 end
