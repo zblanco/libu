@@ -22,19 +22,14 @@ defmodule LibuWeb.AnalysisSession do
   alias Phoenix.LiveView.Socket
 
   def mount(_session, %Socket{} = socket) do
-      if connected?(socket) do
-        {:ok, session_id} = Analysis.setup_session()
-        Analysis.subscribe(session_id)
+    if connected?(socket) do
+      {:ok, session_id} = Analysis.setup_session()
+      Analysis.subscribe(session_id)
 
-        IO.puts "== New Session Connected: #{session_id}"
-
-        {:ok,
-          assign(socket, session_id: session_id)
-          |> assign_defaults()
-        }
-      else
-        {:ok, assign_defaults(socket)}
-      end
+      {:ok, assign(socket, session_id: session_id) |> assign_defaults()}
+    else
+      {:ok, assign_defaults(socket)}
+    end
   end
 
   def assign_defaults(socket) do
@@ -58,8 +53,6 @@ defmodule LibuWeb.AnalysisSession do
   end
 
   def handle_info(%AnalysisResultProduced{metric_name: metric_name, result: result}, socket) do
-    # IO.inspect(event, label: "analysis_session_liveview")
-
     socket =
       case metric_name do
         :total_count_of_words ->
@@ -73,8 +66,6 @@ defmodule LibuWeb.AnalysisSession do
         :average_sentiment_per_word ->
           assign(socket, average_sentiment_per_word: result |> :erlang.float_to_binary([decimals: 2]))
       end
-
-      # IO.inspect(socket.assigns, label: "new assigns")
 
     {:noreply, socket}
   end

@@ -1,8 +1,6 @@
 defmodule Libu.Chat.Query.Streaming do
   alias Libu.Chat.Events.{
-    ConversationStarted,
     MessageAddedToConversation,
-    ConversationEnded,
   }
   alias Libu.Chat.{Message, Query.ActiveConversation}
   alias Libu.Chat.EventStore, as: EventStreamer

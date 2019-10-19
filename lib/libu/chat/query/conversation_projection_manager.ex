@@ -36,7 +36,7 @@ defmodule Libu.Chat.Query.ConversationProjectionManager do
   end
 
   def tables_of_projector(conversation_id) do
-    [{tables, _timestamp}] = :ets.lookup(:projecting_conversations, conversation_id)
+    [{_convo_id, {tables, _timestamp}}] = :ets.lookup(:projecting_conversations, conversation_id)
     tables
   end
 

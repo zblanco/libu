@@ -6,7 +6,6 @@ defmodule Libu.Chat.Query.ActiveConversation do
   """
   alias Libu.Chat.Events.{
     ConversationStarted,
-    ConversationEnded,
   }
   alias Libu.Chat.Message
   alias EventStore.RecordedEvent
@@ -39,6 +38,7 @@ defmodule Libu.Chat.Query.ActiveConversation do
     %__MODULE__{active_convo |
       latest_message: msg,
       latest_activity: msg.published_on,
+      message_count: active_convo.message_count + 1,
     }
   end
 end

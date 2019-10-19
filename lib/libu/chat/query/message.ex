@@ -7,7 +7,7 @@ defmodule Libu.Chat.Message do
   defstruct [
     :conversation_id,
     :event_id, # the unique event id that the message correlates with in the event store
-    :message_number, # the count in order from 0 to last of the conversation
+    :message_number, # the count of messages in a convo, index starting at 1
     :publisher_id, # publisher id (Github id)
     :publisher, # publisher public name
     :body,
@@ -29,6 +29,37 @@ defmodule Libu.Chat.Message do
     |> put_recorded_event_params(recorded_event)
   end
 
+  def new(%ConversationStarted{
+    conversation_id: convo_id,
+    initiated_by: publisher_id,
+    initial_message: body,
+    started_on: start_time,
+  }) do
+    %__MODULE__{
+      conversation_id: convo_id,
+      publisher_id: publisher_id,
+      body: body,
+      published_on: start_time,
+      message_number: 1,
+    }
+  end
+
+  def new(%MessageAddedToConversation{
+    conversation_id: convo_id,
+    publisher_id: publisher_id,
+    message: body,
+    message_number: msg_no,
+    added_on: added_on,
+  }) do
+    %__MODULE__{
+      conversation_id: convo_id,
+      publisher_id: publisher_id,
+      body: body,
+      published_on: added_on,
+      message_number: msg_no,
+    }
+  end
+
   defp put_recorded_event_params(%__MODULE__{} = message, recorded_event) do
     %EventStore.RecordedEvent{
       event_id: event_id,
@@ -38,32 +69,6 @@ defmodule Libu.Chat.Message do
     %__MODULE__{message |
       event_id: event_id,
       message_number: message_number,
-    }
-  end
-
-  def new(%ConversationStarted{
-    conversation_id: convo_id,
-    initiated_by: publisher_id,
-    initial_message: body,
-  }) do
-    %__MODULE__{
-      conversation_id: convo_id,
-      publisher_id: publisher_id,
-      body: body,
-      published_on: DateTime.utc_now(),
-    }
-  end
-
-  def new(%MessageAddedToConversation{
-    conversation_id: convo_id,
-    publisher_id: publisher_id,
-    message: body,
-  }) do
-    %__MODULE__{
-      conversation_id: convo_id,
-      publisher_id: publisher_id,
-      body: body,
-      published_on: DateTime.utc_now(),
     }
   end
 end

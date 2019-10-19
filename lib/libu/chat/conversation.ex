@@ -22,14 +22,17 @@ defmodule Libu.Chat.Conversation do
       conversation_id: cmd.conversation_id,
       initiated_by: cmd.initiator_id,
       initial_message: cmd.initial_message,
+      started_on: DateTime.utc_now(),
     }
   end
 
-  def execute(%Conversation{id: id}, %AddToConversation{} = cmd) when not is_nil(id) do
+  def execute(%Conversation{id: id, messages: messages}, %AddToConversation{} = cmd) when not is_nil(id) do
     %MessageAddedToConversation{
       conversation_id: cmd.conversation_id,
       publisher_id: cmd.publisher_id,
       message: cmd.message,
+      message_number: length(messages) + 1,
+      added_on: DateTime.utc_now(),
     }
   end
 
@@ -54,7 +57,7 @@ defmodule Libu.Chat.Conversation do
   do
     %Conversation{ conv |
       id: conv_id,
-      messages: [previous_messages | message],
+      messages: [message | previous_messages],
     }
   end
 end

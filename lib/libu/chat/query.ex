@@ -11,13 +11,18 @@ defmodule Libu.Chat.Query do
   """
   import Ecto.Query, warn: false
   alias Libu.{
-    Repo,
     Chat.ConversationProjector,
     Chat.ActiveConversationProjector,
   }
 
-  def conversation(convo_id, start_index, end_index) when is_integer(start_index) and is_integer(end_index) do
+  def fetch_messages(convo_id, start_index, end_index)
+  when is_integer(start_index)
+  and is_integer(end_index) do
     ConversationProjector.fetch_messages(convo_id, start_index, end_index)
+  end
+
+  def fetch_message(convo_id, message_number) do
+    ConversationProjector.fetch_message(convo_id, message_number)
   end
 
   def active_conversation(convo_id) do

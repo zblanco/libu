@@ -25,7 +25,8 @@ defmodule Libu.Chat.ConversationProjector do
   - [x] Cursor stream queries / write-through cache
   - [ ] Re-initialization of dead/timed-out conversations by streaming in from event-store
   - [ ] Implement per-message timeouts/TTLs reset upon access
-  - [ ] Utilize Projection Manager to remove read-bottlenecks that occur through Genserver callbacks
+  - [ ] Ensure the Projection Manager knows when a Projector's TTLs expire and it shuts down
+  - [x] Utilize Projection Manager to remove read-bottlenecks that occur through Genserver callbacks
 
   State of the conversation projection in ETS ordered set:
 
@@ -44,7 +45,7 @@ defmodule Libu.Chat.ConversationProjector do
     Message,
     Query.ConversationProjectionManager,
     Query.Streaming,
-    ConversationProjectionSupervisor,
+    ConversationProjectorSupervisor,
   }
   alias Libu.{Chat, Messaging}
   alias Libu.Chat.EventStore, as: EventStreaming
@@ -80,46 +81,55 @@ defmodule Libu.Chat.ConversationProjector do
   end
 
   def init(convo_id) do
-    tables = %{
+    init_state = %{
       log: :ets.new(:conversation_log, [:ordered_set, :public]),
-      registry: :ets.new(:cached_messages, [:set, :public])
+      registry: :ets.new(:cached_messages, [:set, :public]),
+      conversation_id: convo_id,
     }
 
-    ConversationProjectionManager.notify_of_active_conversation(convo_id, tables)
+    ConversationProjectionManager.notify_of_active_conversation(convo_id, init_state)
     Chat.subscribe(convo_id)
 
-    {:ok, %{tables | conversation_id: convo_id}, {:continue, :init}}
+    {:ok, init_state, {:continue, :init}}
   end
 
-  def handle_continue(:init, %{conversation_id: convo_id, log: log, registry: registry} = init_state) do
-    message_nos = stream_in_latest_messages(convo_id, log, 20)
-    current_time = DateTime.utc_now()
+  def handle_continue(:init, %{conversation_id: convo_id, log: _log, registry: registry} = init_state) do
+    message_nos = stream_in_latest_messages(convo_id, init_state)
+    # current_time = DateTime.utc_now()
     :ok = register_cache_ttls(message_nos, @default_timeout, registry)
-    schedule_purge(convo_id, @default_timeout)
+    Process.send_after(self(), :purge, @default_timeout)
 
     {:noreply, init_state}
   end
 
-  def schedule_purge(conversation_id, timeout) do
-    Process.send_after(via(conversation_id), :purge, timeout)
-  end
-
+  # This is a fat function that could use some cleanup and better error handling and optimizations for larger queries
   def fetch_messages(conversation_id, start_index, end_index) do
+    # TODO: ensure actively projecting first
+    with false <- ConversationProjectorSupervisor.is_conversation_projecting?(conversation_id) do
+      ConversationProjectorSupervisor.start_conversation_projector(conversation_id)
+    end
+    # fetch stream info, trim range that won't ever return?
 
     %{cached: cached_messages, uncached: uncached_message_numbers} =
       start_index..end_index
       |> Stream.map(&fetch_if_cached(&1, conversation_id))
-      |> Enum.group_by(fn
-        {:ok, _message} -> :cached
-        _msg_number     -> :uncached
+      |> Enum.to_list()
+      |> Enum.reduce(%{cached: [], uncached: []}, fn num_or_message, %{cached: cm, uncached: umn} = acc ->
+        case num_or_message do
+          {:ok, message} -> %{acc | cached: [message | cm]}
+          msg_number     -> %{acc | uncached: [msg_number | umn]}
+        end
       end)
 
-    first_uncached   = List.first(uncached_message_numbers)
-    last_uncached    = List.last(uncached_message_numbers)
+    uncached_message_numbers = Enum.reverse(uncached_message_numbers)
+
+    first_uncached = List.first(uncached_message_numbers)
+    last_uncached = List.last(uncached_message_numbers)
+
     %{log: _log, registry: registry} = tables = ConversationProjectionManager.tables_of_projector(conversation_id)
 
     messages_from_storage =
-      stream_in_messages(conversation_id, tables, first_uncached..last_uncached)
+      stream_in_messages(conversation_id, tables, first_uncached..last_uncached |> Enum.to_list)
 
     cached_message_map =
       cached_messages
@@ -134,9 +144,32 @@ defmodule Libu.Chat.ConversationProjector do
     {:ok, Map.values(messages)}
   end
 
-  defp fetch_if_cached(message_number, conversation_id)
-  when is_binary(conversation_id) do
+  def fetch_message(conversation_id, message_number) do
+    # also ensure it's a real conversation...
+    with false <- ConversationProjectorSupervisor.is_conversation_projecting?(conversation_id) do
+      ConversationProjectorSupervisor.start_conversation_projector(conversation_id)
+    end
 
+    case fetch_if_cached(message_number, conversation_id) do
+      {:ok, _cached_message} = return ->
+        return
+
+      _message_number ->
+        %{log: _log, registry: registry} = tables = ConversationProjectionManager.tables_of_projector(conversation_id)
+
+        message =
+          case stream_in_messages(conversation_id, tables, [message_number]) do
+            [%Message{} = message] -> message
+            [] = messages          -> List.first(messages)
+          end
+
+        _msg_no = register_as_cached(message_number, @default_timeout, registry)
+
+        {:ok, message}
+    end
+  end
+
+  defp fetch_if_cached(message_number, conversation_id) do
     %{registry: registry, log: log} =
       ConversationProjectionManager.tables_of_projector(conversation_id)
 
@@ -156,7 +189,7 @@ defmodule Libu.Chat.ConversationProjector do
     end
   end
 
-  def stream_in_messages(conversation_id, %{log: log, registry: registry}, message_numbers) do
+  defp stream_in_messages(conversation_id, %{log: log, registry: registry}, message_numbers) do
     conversation_id
     |> conversation_stream_uuid
     |> EventStreaming.stream_forward(List.first(message_numbers), Kernel.length(message_numbers))
@@ -167,7 +200,7 @@ defmodule Libu.Chat.ConversationProjector do
     |> Enum.to_list()
   end
 
-  def stream_in_latest_messages(conversation_id, %{log: log, registry: registry}, max_no_of_messages \\ 20) do
+  defp stream_in_latest_messages(conversation_id, %{log: log, registry: registry}, max_no_of_messages \\ 20) do
     conversation_id
     |> conversation_stream_uuid()
     |> EventStreaming.stream_backward(:end, max_no_of_messages)
@@ -183,7 +216,7 @@ defmodule Libu.Chat.ConversationProjector do
     with  message                         <- Message.new(event),
           %{log: log, registry: registry} <- ConversationProjectionManager.tables_of_projector(convo_id),
           _msg                            <- persist_message_from_stream(log, message),
-          true                            <- register_as_cached(message.message_number, @default_timeout, registry),
+          _                               <- register_as_cached(message.message_number, @default_timeout, registry),
           query_ready_event               <- MessageReadyForQuery.new(message),
          :ok                              <- Messaging.publish(query_ready_event, Chat.topic(convo_id))
     do
@@ -200,6 +233,10 @@ defmodule Libu.Chat.ConversationProjector do
     {:noreply, tables}
   end
 
+  def handle_info(_, state) do
+    {:noreply, state}
+  end
+
   defp register_as_cached(%Message{message_number: message_no} = message, timeout, cache_registry) do
     register_as_cached(message_no, timeout, cache_registry)
     message
@@ -207,10 +244,12 @@ defmodule Libu.Chat.ConversationProjector do
 
   defp register_as_cached(message_no, timeout, cache_registry) when is_integer(message_no) do
     :ets.insert(cache_registry, {message_no, timeout})
+    message_no
   end
 
-  defp register_cache_ttls([] = message_nos, timeout, cache_registry) do
+  defp register_cache_ttls(message_nos, timeout, cache_registry) do
     Enum.map(message_nos, &register_as_cached(&1, timeout, cache_registry))
+    :ok
   end
 
   defp persist_message_from_stream(tid, %Message{} = msg) do

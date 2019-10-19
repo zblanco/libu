@@ -54,7 +54,7 @@
 }
 
 .td {
-    @apply py-2 px-4 font-thin text-gray-900;
+    @apply py-2 px-4 font-normal text-gray-900;
 }
 
 .td:hover {

@@ -7,5 +7,7 @@ defmodule Libu.Chat.Events.MessageAddedToConversation do
     :publisher_id,
     :message,
     :parent_message_id,
+    :message_number,
+    :added_on,
   ]
 end

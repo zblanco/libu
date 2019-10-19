@@ -8,7 +8,7 @@ defmodule Libu.Chat do
 
   We're currently using Commanded for CQRS event-sourcing runtime support.
 
-  Commanded and the Postgres EventStore adapter lets us stream together the state of a conversation at any point in time and/or react in soft-real-time.
+  Commanded with the Postgres EventStore adapter lets us stream together the state of a conversation at any point in time and/or react in soft-real-time.
 
   This makes it a good candidate for projecting in-memory read models for both core chat features and live metrics.
 
@@ -16,9 +16,9 @@ defmodule Libu.Chat do
 
   We're using Commanded Event Handlers to communicate with more custom OTP + ETS processes for the in-memory read models.
 
-  The event handlers will publish to our `Messaging` context using Pub Sub to let reactive UI like LiveView know when to fetch new state from our read-model.
+  The event handlers and projections will publish to our `Messaging` context using Pub Sub to let reactive UI like LiveView know when to fetch new state from our read-model.
 
-  We're doing this by caching to ETS optimistically based on any given users view of a conversation.
+  The Projectors build state into ETS optimistically based on any given users view of a conversation.
 
   The conversation Projector streams only messages it needs from the event-store with a Time To Live (TTL) on each message reset upon client-viewing.
 
@@ -42,8 +42,7 @@ defmodule Libu.Chat do
 
   def subscribe, do: Messaging.subscribe(topic())
 
-  def subscribe(conversation_id), do:
-    Messaging.subscribe(topic(conversation_id))
+  def subscribe(conversation_id), do: Messaging.subscribe(topic(conversation_id))
 
   @doc """
   Appends your message to an existing conversation.
@@ -99,4 +98,7 @@ defmodule Libu.Chat do
   end
 
   defdelegate active_conversations, to: Query
+  defdelegate fetch_active_conversation(conversation_id), to: Query, as: :active_conversation
+  defdelegate fetch_messages(conversation_id, start_index, end_index), to: Query
+  defdelegate fetch_message(conversation_id, message_number), to: Query
 end

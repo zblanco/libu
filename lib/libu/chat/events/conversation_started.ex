@@ -3,5 +3,6 @@ defmodule Libu.Chat.Events.ConversationStarted do
     :conversation_id,
     :initiated_by,
     :initial_message,
+    :started_on,
   ]
 end

@@ -20,7 +20,7 @@ defmodule Libu.Chat.EventHandlers.ConversationEnded do
   }
 
   def handle(%ConversationEnded{conversation_id: convo_id} = event, _metadata) do
-    Messaging.publish(event, Chat.topic() <> convo_id)
+    Messaging.publish(event, Chat.topic(convo_id))
     :ok
   end
 end
