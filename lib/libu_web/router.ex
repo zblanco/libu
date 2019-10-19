@@ -22,6 +22,8 @@ defmodule LibuWeb.Router do
 
     get "/", PageController, :index
 
+    get "/chat/conversations/:id", ChatController, :conversation
+
     live "/projects", ProjectLive.Index
     live "/projects/kanban", ProjectLive.KanBan
     live "/projects/new", ProjectLive.New
@@ -32,7 +34,6 @@ defmodule LibuWeb.Router do
 
     live "/chat", ChatLive.Index
     live "/chat/conversations/new", ChatLive.InitiateConversation
-    live "/chat/conversations/:id", ChatLive.Conversation
 
     live "/analysis", AnalysisSession, session: [:uuid]
 

@@ -14,38 +14,32 @@
     <header>
       <nav id="site-navigation" class="relative select-none flex items-stretch w-full items-center">
         <div class="flex flex-no-shrink items-stretch">
-            <a href="/" class="no-underline">
-                <div class="px-4 p-4 w-20">
-                <img src="<%= Routes.static_path(@conn, "/images/darkphoenix.png") %>" alt="Phoenix Framework Logo"/>
-                </div>
-            </a>
-        </div>
-        <div class="flex items-stretch flex-no-shrink flex-grow" id="right-menu-options">
+          <a href="/" class="no-underline">
+              <div class="px-4 p-4 w-20">
+              <img src="<%= Routes.static_path(@conn, "/images/darkphoenix.png") %>" alt="Phoenix Framework Logo"/>
+              </div>
+          </a>
           <div class="flex items-stretch ml-auto">
-              <%= link("Chat", to: "/chat", 
-                  class: "nav-item flex flex-no-grow flex-no-shrink"
-              ) %>
-              <%= link("Analysis", to: "/analysis", 
-                  class: "nav-item flex flex-no-grow flex-no-shrink"
-              ) %>
-              <%= link("Projects", to: "/projects", 
-                  class: "nav-item flex flex-no-grow flex-no-shrink"
-              ) %>
+            <%= link("Chat", to: "/chat", 
+                class: "nav-item flex flex-no-grow flex-no-shrink"
+            ) %>
+            <%= link("Analysis", to: "/analysis", 
+                class: "nav-item flex flex-no-grow flex-no-shrink"
+            ) %>
+            <%= link("Projects", to: "/projects", 
+                class: "nav-item flex flex-no-grow flex-no-shrink"
+            ) %>
           </div>
         </div>
       </nav>
     </header>
+
     <main role="main">
-
-        <div class="font-sans flex flex-col">
-
-          <div id="content" class="container mx-auto pt-4 pb-4 flex justify-center max-h-full">
-              <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>
-          </div>
-          
-        </div>
-
+      <div id="content" class="container mx-auto flex justify-center max-h-full">
+          <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>
+      </div>
     </main>
+    
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>

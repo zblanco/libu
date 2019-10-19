@@ -1,0 +1,13 @@
+<%# The overall layout of the chat containing views of active conversations, 
+the current chat-log of convo_id, and the conversation's metrics %>
+<div class="flex flex-row items-stretch">
+    <div class="p-2">
+        <%= live_render(@conn, LibuWeb.ChatLive.ActiveConversations)%>
+    </div>
+    <div class="p-2">
+        <%= live_render(@conn, LibuWeb.ChatLive.Conversation, 
+            id: "conversation-#{@conversation_id}",
+            session: %{conversation_id: @conversation_id},
+        ) %>
+    </div>
+</div>

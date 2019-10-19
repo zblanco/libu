@@ -8,7 +8,9 @@ defmodule LibuWeb.ChatLive.Conversation do
     MessageReadyForQuery
   }
 
-  def mount(%{path_params: %{"id" => convo_id}}, socket) do
+  def mount(%{path_params: %{"id" => convo_id}}, %Socket{} = socket),
+    do: mount(%{conversation_id: convo_id}, socket)
+  def mount(%{conversation_id: convo_id}, socket) do
     if connected?(socket) do
       Chat.subscribe(convo_id)
 

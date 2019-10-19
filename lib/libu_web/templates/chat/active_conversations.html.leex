@@ -1,0 +1,21 @@
+<div class="box w-auto mx-auto overflow-hidden shadow-lg border-gray-200">
+    <div class="shadow rounded-sm">
+        <div class="p-4 bg-gray-100 border-b"> Active Conversations: </div>
+        <table class="table table-auto">
+            <tbody>
+                <%= for active_convo <- @conversations do %>
+                    <tr class="tr" id="<%= active_convo.conversation_id %>" >
+                        
+                    <td class="td">
+                        <%= link to: "/chat/conversations/#{active_convo.conversation_id}", class: "hover:underline" do %> 
+                        <%= active_convo.initial_message.body %>
+                        <% end %>
+                    </td>
+
+                    <td class="td"><%= time(active_convo.latest_activity) %></td>
+                    </tr>
+                <% end %>
+            </tbody>
+        </table>
+    </div>
+</div>
