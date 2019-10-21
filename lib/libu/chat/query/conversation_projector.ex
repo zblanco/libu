@@ -17,7 +17,6 @@ defmodule Libu.Chat.ConversationProjector do
 
   * Stream in messages from the EventStore
     * For every message's event_id
-  *
 
   TODO:
 
@@ -36,9 +35,7 @@ defmodule Libu.Chat.ConversationProjector do
   use GenServer, restart: :transient
 
   alias Libu.Chat.Events.{
-    ConversationStarted,
     MessageAddedToConversation,
-    ConversationEnded,
     MessageReadyForQuery,
   }
   alias Libu.Chat.{
@@ -220,18 +217,17 @@ defmodule Libu.Chat.ConversationProjector do
           query_ready_event               <- MessageReadyForQuery.new(message),
          :ok                              <- Messaging.publish(query_ready_event, Chat.topic(convo_id))
     do
-      IO.puts "Conversation Projection Updated with new message"
       {:noreply, state}
     else
       _error -> {:noreply, state}
     end
   end
 
-  def handle_info(:purge, %{log: log, registry: registry} = tables) do
-    # go through cache registry to find expired
-    # remove from log & registry
-    {:noreply, tables}
-  end
+  # def handle_info(:purge, %{log: log, registry: registry} = tables) do
+  #   # go through cache registry to find expired
+  #   # remove from log & registry
+  #   {:noreply, tables}
+  # end
 
   def handle_info(_, state) do
     {:noreply, state}
@@ -269,98 +265,4 @@ defmodule Libu.Chat.ConversationProjector do
   end
 
   defp conversation_stream_uuid(conversation_id), do: "conversation-#{conversation_id}"
-
-  # def add_message_to_projection(convo_id, %Message{} = message) do
-  #   # TODO: If not alive, restart and refresh with last 20 messages or so
-  #   # GenServer.call(via(convo_id), {:add_message_to_projection, message})
-  #   call(convo_id, {:add_message_to_projection, message})
-  # end
-
-  # def get_messages(convo_id) when is_binary(convo_id) do
-  #   GenServer.call(via(convo_id), {:get_messages, []})
-  #   # Consider moving this responsibility from the Projector to the Query context
-  #   # Instead make the projector only responsible for preparing messages in ETS
-  # end
-
-  # def handle_call({:add_message_to_projection, message}, _from, %{cached_messages: %{} = cached_messages} = state) do
-  #   %{tid: tid} = state
-  #   %Message{published_on: timestamp_key} = message
-  #   # check if message isn't already cached (we'll need the index in the conversation stream in our Message struct)
-  #   with true <- :ets.insert(tid, {timestamp_key, message}) do
-  #     new_state = %{state | cached_messages: %{cached_messages | message.index => DateTime.utc_now}}
-  #     {:reply, {:ok, message}, new_state}
-  #   else
-  #     _ -> {:error, :issue_building_conversation_read_model}
-  #   end
-  # end
-
-  # # TODO: Cursor based conversation to re-fetch deprecated messages as needed
-  # def handle_call({:get_messages, []}, _from, %{tid: tid} = state) do
-  #   results =
-  #     :ets.match(tid, :"$1") # Just get it all
-  #     |> Enum.map(fn [{_msg_timestamp, msg}] -> msg end)
-  #   {:reply, results, state}
-  # end
-
-  # def handle_call({:get_messages, [start_index: start_index, end_index: end_index]}, _from,
-  #   %{tid: tid, cached_messages: cache_state} = state)
-  # do
-  #   # check against the cached message state within the projector
-  #   # maintain a count of messages of a conversation within the projector so we know not to try and stream messages that don't exist
-  #   # for each index value between start and end, does our cache_state have it ready?
-  #   # if not, stream that message in from the store, set the index in our cache with the ttl
-  #   # once all messages in the index are ready in the read model, notify as such
-  #   results =
-  #     :ets.match(tid, {:""}) # match keys within an index bound equal to or within the start
-
-  #     |> Enum.map(fn [{_msg_timestamp, msg}] -> msg end)
-  #   {:reply, results, state}
-  # end
-
-  # def handle_call({:get_messages, [start_time: _start, end_time: _end] = args}, _from, %{tid: tid} = state) do
-  #   results = do_get_messages(tid, args)
-  #   {:reply, results, state}
-  # end
-
-  # # TODO: Change to index keys instead of timestamp keys
-  # def do_get_messages(tid, [start_time: start_time, end_time: end_time]) do
-  #   messages = []
-  #   {next_key, messages} =
-  #     case :ets.lookup(tid, start_time) do
-  #       [{_msg_timestamp, message}] ->
-  #         {:ets.next(tid, start_time), List.insert_at(messages, -1, message)}
-  #       [] ->
-  #         {:ets.next(tid, start_time), messages}
-  #     end
-  #   fetch_messages_from_table(tid, [key: next_key, end_key: end_time], messages)
-  # end
-
-  # defp fetch_messages_from_table(_tid, [key: :"$end_of_table", end_key: _end_key], messages) do
-  #   messages
-  # end
-
-  # defp fetch_messages_from_table(tid, [key: key, end_key: end_key], messages) do
-  #   if key >= end_key do
-  #     messages
-  #   else
-  #     [{_msg_timestamp, msg}] = :ets.lookup(tid, key)
-  #     messages = List.insert_at(messages, -1, msg)
-  #     next_key = :ets.next(tid, key)
-  #     fetch_messages_from_table(tid, [key: next_key, end_key: end_key], messages)
-  #   end
-  # end
-
-  # defp call(convo_id, action) do
-  #   via = via(convo_id)
-
-  #   pid =
-  #     case GenServer.whereis(via) do
-  #       nil ->
-  #         {:ok, pid} = __MODULE__.start(via)
-  #         pid
-  #       pid ->
-  #         pid
-  #     end
-  #   GenServer.call(pid, action)
-  # end
 end

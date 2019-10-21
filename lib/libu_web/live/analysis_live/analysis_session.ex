@@ -15,7 +15,6 @@ defmodule LibuWeb.AnalysisSession do
   alias LibuWeb.AnalysisView
   alias Libu.Analysis
   alias Libu.Analysis.Events.{
-    TextChanged,
     AnalysisResultProduced,
     AnalysisResultsPrepared,
   }

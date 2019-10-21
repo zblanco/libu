@@ -10,7 +10,7 @@ defmodule LibuWeb.ChatLive.Index do
   """
   use Phoenix.LiveView
   alias LibuWeb.ChatView
-  alias Libu.{Chat, Messaging}
+  alias Libu.Chat
   alias Libu.Chat.Events.ActiveConversationAdded
 
   def mount(_session, socket) do
@@ -26,13 +26,11 @@ defmodule LibuWeb.ChatLive.Index do
     ChatView.render("index.html", assigns)
   end
 
-  def handle_info(%ActiveConversationAdded{} = event, socket) do
-    IO.inspect(event, label: "LiveChat Index handling")
+  def handle_info(%ActiveConversationAdded{}, socket) do
     {:noreply, fetch(socket)}
   end
 
-  def handle_info(message, socket) do
-    IO.inspect(message, label: "LiveChat catch all event handle")
+  def handle_info(_message, socket) do
     {:noreply, socket}
   end
 end

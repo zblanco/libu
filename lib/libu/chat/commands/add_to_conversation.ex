@@ -5,11 +5,14 @@ defmodule Libu.Chat.Commands.AddToConversation do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @required ~w(conversation_id message publisher_id publisher_name)a
+
   @primary_key false
   embedded_schema do
     field :conversation_id, :string
     field :message, :string
     field :publisher_id, :string
+    field :publisher_name, :string
   end
 
   def new(attrs) do
@@ -24,7 +27,7 @@ defmodule Libu.Chat.Commands.AddToConversation do
 
   defp changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:conversation_id, :message, :publisher_id])
-    |> validate_required([:conversation_id, :message, :publisher_id])
+    |> cast(attrs, @required)
+    |> validate_required(@required)
   end
 end

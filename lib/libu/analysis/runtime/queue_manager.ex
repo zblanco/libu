@@ -1,25 +1,10 @@
 defmodule Libu.Analysis.QueueManager do
   @moduledoc """
   Utilizes EtsQueue for use with Jobs and Broadway.
-
-  Behaviour we need to implement:
-
-  * enqueue one or more jobs to the queue
-  * remove jobs based on session ends (key from session ids?)
-    (we'll need to monitor sessions and handle exits to remove unecessary jobs)
-    * Instead we'll assign run_ids that our session process can keep in state for cancellations at termination
-  * remove jobs that are currently processing (place them somewhere else until ack'd for restart?)
-  * implement ack behaviour of Broadway to remove references to active jobs
-
-  Todo:
-
-  - [x] Move taken not_started jobs into active_jobs
-  - [x] Ack from active_jobs
-  - [x] active_jobs should just be a set keyed by a unique job id
   """
   use GenServer
 
-  alias Libu.Analysis.{Job, EtsQueue, JobProducer}
+  alias Libu.Analysis.{Job, EtsQueue}
 
   def start_link(_) do
     GenServer.start_link(
@@ -38,8 +23,6 @@ defmodule Libu.Analysis.QueueManager do
     with %{not_started: not_started} <- fetch_queues(),
          :ok <- EtsQueue.put(not_started, job)
     do
-      IO.inspect(job, label: "new job enqueued: ")
-      # JobProducer.notify_of_job_enqueuing()
       Libu.Messaging.publish(:job_enqueued, Libu.Analysis.topic() <> ":jobs")
     end
   end

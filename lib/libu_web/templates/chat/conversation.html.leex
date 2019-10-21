@@ -26,10 +26,10 @@
             <%= for message <- @messages do %>
                     <div class="px-4 py-2 flex items-start text-sm border-l-2 border-transparent hover:border-purple-700 hover:shadow-inner hover:bg-gray-100" 
                         id="message#-<%= message.message_number %>">
-                        <img src="https://avatars3.githubusercontent.com/u/20269183?s=460&v=4.jpg" class="w-10 h-10 rounded mr-3">
+                        <img src="<%= @current_user.avatar_url %>" class="w-10 h-10 rounded mr-3">
                         <div class="flex-1 overflow-hidden">
                             <div>
-                                <span class="font-bold text-gray-900"><%= message.publisher_id %></span>
+                                <span class="font-bold text-gray-900"><%= message.publisher_name %></span>
                                 <span class="text-gray-700 text-xs"><%= time(message.published_on) %></span>
                             </div>
                             <p class="text-gray-900 leading-normal"><%= message.body %></p>
@@ -52,7 +52,8 @@
                 phx_throttle: 1000
             )%>
 
-            <%= hidden_input :new_message, :publisher_id, value: @current_user.id  %>
+            <%= hidden_input :new_message, :publisher_id, value: @current_user.github_id %>
+            <%= hidden_input :new_message, :publisher_name, value: @current_user.publisher_name %>
             <%= hidden_input :new_message, :conversation_id, value: @conversation.conversation_id %>
             <%= submit "submit", class: "hidden" %>
         </form>

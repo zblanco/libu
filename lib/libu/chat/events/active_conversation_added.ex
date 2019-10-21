@@ -6,6 +6,7 @@ defmodule Libu.Chat.Events.ActiveConversationAdded do
   defstruct [
     :conversation_id,
     :initiated_by,
+    :initiated_by_id,
     :initial_message,
   ]
   def new(%ConversationStarted{} = started) do

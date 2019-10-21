@@ -33,7 +33,6 @@ defmodule Libu.Chat do
     Commands.EndConversation,
     Router,
     Query,
-    ConversationSession,
   }
   alias Libu.Messaging
 

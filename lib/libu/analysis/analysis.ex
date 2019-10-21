@@ -35,8 +35,5 @@ defmodule Libu.Analysis do
 
   defdelegate notify_text_changed(session_id, text),           to: SessionProcess
   defdelegate end_session(session_id),                         to: SessionProcess
-  # defdelegate activate_metric(session_id, metric_name),        to: SessionProcess
-  # defdelegate active_analyzers(session_id),                    to: Query, as: :fetch
   defdelegate fetch_analysis_results(session_id, metric_name), to: Query, as: :fetch
-  defdelegate available_metrics,                               to: Query
 end

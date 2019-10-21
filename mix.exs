@@ -45,9 +45,6 @@ defmodule Libu.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:plug, "~> 1.7"},
       {:phoenix_live_view, "0.1.0"},
-      # {:phoenix_live_view,
-      #   github: "phoenixframework/phoenix_live_view",
-      #   override: true},
       {:calendar, "~> 0.17.4"},
       {:uuid, "~> 1.1"},
       {:veritaserum, "~> 0.2.1"},
@@ -58,9 +55,6 @@ defmodule Libu.MixProject do
       {:commanded, "~> 1.0.0-rc.0"},
       {:eventstore, github: "zblanco/eventstore", branch: "backward-streaming", override: true},
       {:commanded_eventstore_adapter, "~> 1.0.0-rc.0"},
-      {:telemetry, "~> 0.4.0"},
-      {:telemetry_metrics, "~> 0.3.0"},
-      {:ex2ms, "~> 1.0"},
     ]
   end
 

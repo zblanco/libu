@@ -4,7 +4,6 @@ defmodule Libu.Analysis.SessionMetrics do
   """
   alias Libu.Analysis.{
     Events.TextChanged,
-    # Events.AnalysisResultProduced,
     Methods.Readability,
     Methods.Sentiment,
     Methods.Text,

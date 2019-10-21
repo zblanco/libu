@@ -5,8 +5,8 @@ defmodule Libu.Chat.Events.MessageAddedToConversation do
   defstruct [
     :conversation_id,
     :publisher_id,
+    :publisher_name,
     :message,
-    :parent_message_id,
     :message_number,
     :added_on,
   ]

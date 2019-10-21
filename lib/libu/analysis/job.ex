@@ -160,7 +160,6 @@ defmodule Libu.Analysis.Job do
   def run(%__MODULE__{work: work, input: input} = job) # consider mfa
   when is_function(work) do
     with {:ok, result} <- work.(input) do # we're assuming that the work function follows {:ok, _} | {:error, _} conventions - better way?
-      IO.puts "a job was successfully ran!"
       updated_job =
         job
         |> set_result(result)

@@ -4,7 +4,7 @@ defmodule LibuWeb.ChatLive.ActiveConversations do
   """
   use Phoenix.LiveView
   alias LibuWeb.ChatView
-  alias Libu.{Chat, Messaging}
+  alias Libu.Chat
   alias Libu.Chat.Events.ActiveConversationAdded
 
   def mount(_session, socket) do
@@ -20,7 +20,7 @@ defmodule LibuWeb.ChatLive.ActiveConversations do
     ChatView.render("active_conversations.html", assigns)
   end
 
-  def handle_info(%ActiveConversationAdded{} = event, socket) do
+  def handle_info(%ActiveConversationAdded{}, socket) do
     {:noreply, fetch(socket)}
   end
 

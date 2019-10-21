@@ -4,7 +4,6 @@ defmodule LibuWeb.ChatLive.InitiateConversation do
   alias LibuWeb.ChatLive
   alias LibuWeb.Router.Helpers, as: Routes
   alias Libu.Chat
-  alias Libu.Chat.Commands.InitiateConversation
 
   def mount(_session, socket) do
     {:ok,

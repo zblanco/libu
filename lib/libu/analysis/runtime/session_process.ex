@@ -21,7 +21,6 @@ defmodule Libu.Analysis.SessionProcess do
     Job,
     CollectorSupervisor,
     QueueManager,
-    Messaging,
   }
 
   def via(session_id) when is_binary(session_id) do
@@ -87,17 +86,6 @@ defmodule Libu.Analysis.SessionProcess do
     {:reply, :ok, session}
   end
 
-  # def handle_call({:toggle_metric, metric_name}, %Session{} = session) do
-  #   # Terminate the subscriber processes toggled off
-  #   session =
-  #     if Session.available_metric?(metric_name) do
-  #       Session.toggle_metric(session, metric_name)
-  #     end
-
-  #     # pause_if_deactivated(session)
-  #   {:reply, :ok, session}
-  # end
-
   defp dispatch_jobs(%Session{} = session, %TextChanged{} = event) do
     session.job_pipeline
     |> Enum.map(fn {_name, %Job{} = job} ->
@@ -105,7 +93,6 @@ defmodule Libu.Analysis.SessionProcess do
     end)
     |> Enum.map(&Job.assign_run_id(&1))
     |> Enum.map(&Job.evaluate_runnability(&1))
-    |> IO.inspect(label: "jobs being dispatched")
     |> Enum.filter(fn %Job{runnable?: runnability} -> runnability end)
     |> Enum.each(&QueueManager.enqueue(&1))
   end

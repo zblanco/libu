@@ -26,9 +26,6 @@
             <%= link("Analysis", to: "/analysis", 
                 class: "nav-item flex flex-no-grow flex-no-shrink"
             ) %>
-            <%= link("Projects", to: "/projects", 
-                class: "nav-item flex flex-no-grow flex-no-shrink"
-            ) %>
           </div>
         </div>
         <div class="lg:flex lg:items-stretch lg:flex-no-shrink lg:flex-grow" id="right-menu-options">

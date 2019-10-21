@@ -15,12 +15,15 @@ defmodule Libu.Chat.Conversation do
   defstruct [
     :id,
     :messages,
+    :title,
   ]
 
   def execute(%Conversation{id: nil}, %InitiateConversation{} = cmd) do
     %ConversationStarted{
       conversation_id: cmd.conversation_id,
-      initiated_by: cmd.initiator_id,
+      title: cmd.title,
+      initiated_by: cmd.initiator_name,
+      initiated_by_id: cmd.initiator_id,
       initial_message: cmd.initial_message,
       started_on: DateTime.utc_now(),
     }
@@ -30,6 +33,7 @@ defmodule Libu.Chat.Conversation do
     %MessageAddedToConversation{
       conversation_id: cmd.conversation_id,
       publisher_id: cmd.publisher_id,
+      publisher_name: cmd.publisher_name,
       message: cmd.message,
       message_number: length(messages) + 1,
       added_on: DateTime.utc_now(),

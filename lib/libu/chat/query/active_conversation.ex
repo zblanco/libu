@@ -12,6 +12,7 @@ defmodule Libu.Chat.Query.ActiveConversation do
 
   defstruct [
     :conversation_id, # stream identity of the conversation
+    :title,
     :initial_message, # the first message published (convo_started)
     :message_count, # counter
     :latest_activity, # timestamp
@@ -20,13 +21,17 @@ defmodule Libu.Chat.Query.ActiveConversation do
 
   def new(recorded_event) do
     %RecordedEvent{
-      data: %ConversationStarted{conversation_id: convo_id} = _event,
+      data: %ConversationStarted{
+        conversation_id: convo_id,
+        title: title,
+      } = _event,
     } = recorded_event
 
     message = Message.new(recorded_event)
 
     %__MODULE__{
       conversation_id: convo_id,
+      title: title,
       initial_message: message,
       message_count: 1,
       latest_activity: recorded_event.created_at,

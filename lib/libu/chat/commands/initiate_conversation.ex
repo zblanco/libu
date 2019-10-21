@@ -5,11 +5,15 @@ defmodule Libu.Chat.Commands.InitiateConversation do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @required ~w(initiator_id initiator_name message title)a
+
   @primary_key false
   embedded_schema do
     field :conversation_id, :string
-    field :initiator_id, :string
-    field :initial_message, :string
+    field :initiator_id, :integer
+    field :initiator_name, :string
+    field :message, :string
+    field :title, :string
   end
 
   def new(attrs) do
@@ -24,14 +28,16 @@ defmodule Libu.Chat.Commands.InitiateConversation do
 
   defp form_changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:initiator_id, :initial_message])
-    |> validate_required([:initiator_id, :initial_message])
+    |> cast(attrs, @required)
+    |> validate_required(@required)
+    |> validate_length(:title, min: 3, max: 100)
   end
 
   defp changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:initiator_id, :initial_message])
-    |> validate_required([:initiator_id, :initial_message])
+    |> cast(attrs, @required)
+    |> validate_required(@required)
+    |> validate_length(:title, min: 3, max: 100)
     |> put_change(:conversation_id, UUID.uuid4())
   end
 end

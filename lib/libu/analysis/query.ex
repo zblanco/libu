@@ -3,24 +3,7 @@ defmodule Libu.Analysis.Query do
     SessionEventLog,
   }
 
-
-  def available_metrics() do
-    []
-  end
-
-  def fetch(session_id) when is_binary(session_id) do
-    case :ets.lookup(:analysis_results, session_id) do
-      [{_id, result}] -> {:ok, result}
-      _               -> {:error, :no_analysis_results_found}
-    end
-  end
-
   def fetch(session_id, "session_event_log") do
     SessionEventLog.fetch(session_id)
-  end
-  def fetch(session_id, metric_name) do
-    # The query formats of some analysis strategies may be different.
-    # Some analysis strategy results will want a windowed time-series set of events
-    # Others will just want to store terms with key-values.
   end
 end
