@@ -7,10 +7,9 @@ defmodule Libu.Identity do
 
   ### Capabilities to implemement:
 
-  * Authenticate via OAuth2 with Github
-  * Persist to Ecto a user struct storing a github user id of some kind.
+  - [x] Authenticate via OAuth2 with Github
+  - [x] Persist to Ecto a user struct storing a github user id of some kind.
   * Keep session states in-memory.
-  * transform and persist the avatar url for use across app
   """
   alias Libu.{
     Repo,
@@ -28,6 +27,8 @@ defmodule Libu.Identity do
 
   def get_user_by(github_id: github_id),
     do: Repo.get_by(User, github_id: github_id)
+
+  def list_users(), do: Repo.all(User)
 
   def register_user(attrs \\ %{}) do
     with {:ok, user} <-

@@ -8,16 +8,18 @@ defmodule LibuWeb.ChatLive.Conversation do
     MessageReadyForQuery
   }
 
-  def mount(%{path_params: %{"id" => convo_id}}, %Socket{} = socket),
-    do: mount(%{conversation_id: convo_id}, socket)
-  def mount(%{conversation_id: convo_id}, socket) do
+  def mount(%{path_params: %{"id" => convo_id}} = session, %Socket{} = socket),
+    do: mount(%{session | conversation_id: convo_id}, socket)
+  def mount(%{conversation_id: convo_id, current_user: current_user} = session, socket) do
     if connected?(socket) do
+
+      IO.inspect(session, label: "mounted session for conversation")
       Chat.subscribe(convo_id)
 
       {:ok,
        assign(socket,
          convo_id: convo_id,
-         current_user: demo_user(),
+         current_user: current_user,
          message_changeset: Chat.add_to_conversation(%{}, form: true)
        )
        |> fetch_active_conversation(convo_id)
@@ -130,7 +132,6 @@ defmodule LibuWeb.ChatLive.Conversation do
   defp demo_user(),
     do: %{
       id: "zblanco",
-      first_name: "Zack",
-      last_name: "White"
+      name: "Zack",
     }
 end

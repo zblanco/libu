@@ -31,8 +31,8 @@ defmodule LibuWeb.IdentityController do
 
     conn
     |> put_session(:current_user, current_user)
-    |> put_session(:access_token, client.token.access_token) # we might not need the access token in session
-    |> redirect(to: "/") # authentication should be required only for chat, so we need to return to previous page?
+    # |> put_session(:access_token, client.token.access_token) # we might not need the access token in session unless we want to access repo information on behalf of users
+    |> redirect(to: "/chat") # authentication should be required only for chat, so we need to return to previous page?
   end
 
   defp get_token!("github", code), do: GithubAuth.get_token!(code: code)

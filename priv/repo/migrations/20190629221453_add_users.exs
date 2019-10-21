@@ -5,6 +5,7 @@ defmodule Libu.Repo.Migrations.AddUsers do
     create table(:users) do
       add :github_id, :integer
       add :avatar_url, :string
+      add :name, :string
 
       timestamps()
     end

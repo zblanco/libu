@@ -51,7 +51,6 @@ defmodule Libu.Analysis.JobProducer do
 
   @impl Acknowledger
   def ack(_ack_ref, successful, _failed) do
-    IO.inspect(successful, label: "acknowledging job completion")
     ack_jobs(successful)
     :ok
   end
@@ -63,9 +62,7 @@ defmodule Libu.Analysis.JobProducer do
   end
 
   defp handle_receive_messages(%{demand: demand} = state) when demand > 0 do
-    # IO.puts "producer fetching from the queue... "
     jobs = fetch_jobs(demand)
-    # IO.inspect(jobs, label: "jobs fetched by producer")
     new_demand = demand - length(jobs)
     {:noreply, jobs, %{state | demand: new_demand}}
   end
@@ -87,7 +84,7 @@ defmodule Libu.Analysis.JobProducer do
   defp to_message(%Job{} = job) do
     %Message{
       data: job,
-      acknowledger: __MODULE__,
+      acknowledger: {__MODULE__, job.run_id, job.context}
     }
   end
 end

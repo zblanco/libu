@@ -31,6 +31,21 @@
             ) %>
           </div>
         </div>
+        <div class="lg:flex lg:items-stretch lg:flex-no-shrink lg:flex-grow" id="right-menu-options">
+          <div class="lg:flex lg:items-stretch lg:justify-end ml-auto">
+            <%= if @current_user != nil do %>
+              <div class="flex items-center">
+              <img src="<%= @current_user.avatar_url %>" 
+                  alt="avatar"
+                  class="w-8 h-8 rounded-full mr-3 hover:shadow-outline">
+              </div>
+            <% else %>
+              <%= link("Sign In", to: "/auth/github", 
+                  class: "nav-item flex flex-no-grow flex-no-shrink"
+              ) %>
+            <% end %>
+          </div>
+        </div>
       </nav>
     </header>
 
