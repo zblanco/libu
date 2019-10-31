@@ -24,7 +24,7 @@ defmodule Libu.Chat.Conversation do
       title: cmd.title,
       initiated_by: cmd.initiator_name,
       initiated_by_id: cmd.initiator_id,
-      initial_message: cmd.initial_message,
+      initial_message: cmd.message,
       started_on: DateTime.utc_now(),
     }
   end

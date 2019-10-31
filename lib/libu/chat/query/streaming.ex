@@ -18,8 +18,8 @@ defmodule Libu.Chat.Query.Streaming do
     )
   end
 
-  def stream_conversation_forward(convo_id, amount) do
-    EventStreamer.stream_forward(conversation_stream_uuid(convo_id), 0, amount)
+  def stream_conversation_forward(convo_id) do
+    EventStreamer.stream_forward(conversation_stream_uuid(convo_id), 0, 1)
   end
 
   def stream_conversation_backward(convo_id, amount) do
@@ -28,7 +28,7 @@ defmodule Libu.Chat.Query.Streaming do
 
   def stream_chat_log_forward(), do: EventStreamer.stream_all_forward()
 
-  defp conversation_stream_uuid(conversation_id), do: "conversation-#{conversation_id}"
+  def conversation_stream_uuid(conversation_id), do: "conversation-#{conversation_id}"
 
   def is_message_event?(
     %EventStore.RecordedEvent{event_type: event_type}) do

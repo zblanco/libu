@@ -1,4 +1,4 @@
-defmodule Libu.Chat.ActiveConversationProjector do
+defmodule Libu.Chat.Query.ActiveConversationProjector do
   @moduledoc """
   Manages the ETS table of Active Conversations for the Active Conversation read-model.
 
@@ -48,7 +48,7 @@ defmodule Libu.Chat.ActiveConversationProjector do
 
   def handle_info(%ConversationStarted{conversation_id: convo_id} = event, state) do
     with active_convo <-
-      Streaming.stream_conversation_forward(convo_id, 1)
+      Streaming.stream_conversation_forward(convo_id)
       |> Enum.to_list()
       |> List.first()
       |> ActiveConversation.new()

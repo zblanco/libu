@@ -9,12 +9,12 @@ defmodule Libu.Chat.EventHandlers.ConversationStarted do
     application: Libu.Chat.Commanded
 
   alias Libu.Chat.Events.ConversationStarted
-  alias Libu.Chat.ConversationProjector
+  alias Libu.Chat.Query.ConversationCache
   alias Libu.Messaging
   alias Libu.Chat
 
   def handle(%ConversationStarted{conversation_id: convo_id} = event, _metadata) do
-    ConversationProjector.start(convo_id)
+    # ConversationCache.start(convo_id)
     Messaging.publish(event, Chat.topic(convo_id))
     Messaging.publish(event, Chat.topic())
     :ok

@@ -9,8 +9,8 @@ defmodule Libu.AnalysisTest do
   A wise man is content with his lot, whatever it may be, without wishing for what he has not.
   """
 
-  describe "Text Analysis:  " do
-    test "analyze/1" do
+  describe "analysis methods" do
+    test "basic sentiment analysis/1" do
       assert false
     end
 
@@ -19,6 +19,10 @@ defmodule Libu.AnalysisTest do
     end
 
     test "count_of_words/1" do
+      assert false
+    end
+
+    test "readability" do
       assert false
     end
   end

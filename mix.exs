@@ -44,7 +44,7 @@ defmodule Libu.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:plug, "~> 1.7"},
-      {:phoenix_live_view, "0.1.0"},
+      {:phoenix_live_view, "0.3.1"},
       {:calendar, "~> 0.17.4"},
       {:uuid, "~> 1.1"},
       {:veritaserum, "~> 0.2.1"},
@@ -55,6 +55,7 @@ defmodule Libu.MixProject do
       {:commanded, "~> 1.0.0-rc.0"},
       {:eventstore, github: "zblanco/eventstore", branch: "backward-streaming", override: true},
       {:commanded_eventstore_adapter, "~> 1.0.0-rc.0"},
+      {:commanded_ecto_projections, "~> 1.0.0-rc.0"},
     ]
   end
 
@@ -66,9 +67,10 @@ defmodule Libu.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
+      "event_store.init": ["event_store.drop", "event_store.create", "event_store.init"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["event_store.init", "ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 end

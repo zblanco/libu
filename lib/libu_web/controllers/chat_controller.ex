@@ -3,6 +3,10 @@ defmodule LibuWeb.ChatController do
 
   plug :authenticate when action in [:conversation]
 
+  def new(conn, _opts) do
+    render(conn, "initiate_conversation.html", current_user: get_session(conn, :current_user))
+  end
+
   def conversation(conn, %{"id" => id}) do
     render(conn, "conversation_page.html", conversation_id: id, current_user: get_session(conn, :current_user))
   end
@@ -13,6 +17,7 @@ defmodule LibuWeb.ChatController do
         conn
         |> redirect(to: "/auth/github")
         |> halt()
+
       _current_user ->
         conn
     end

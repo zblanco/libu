@@ -22,7 +22,7 @@ defmodule LibuWeb.IdentityController do
     github_user = get_user!(provider, client)
 
     current_user =
-      case Identity.get_user_by(github_id: github_user.github_id) do
+      case Identity.get_user(github_user.github_id) do
         nil ->
           {:ok, user} = Identity.register_user(github_user)
           user

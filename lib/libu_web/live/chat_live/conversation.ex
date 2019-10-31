@@ -16,7 +16,7 @@ defmodule LibuWeb.ChatLive.Conversation do
 
       {:ok,
        assign(socket,
-         convo_id: convo_id,
+         conversation_id: convo_id,
          current_user: current_user,
          message_changeset: Chat.add_to_conversation(%{}, form: true)
        )
@@ -26,10 +26,11 @@ defmodule LibuWeb.ChatLive.Conversation do
 
       {:ok,
        assign(socket,
-         convo_id: convo_id,
+         conversation_id: convo_id,
+         current_user: current_user,
          messages: [],
          message_changeset: Chat.add_to_conversation(%{}, form: true)
-       )}
+       ) |> fetch_active_conversation(convo_id)}
     end
   end
 
@@ -70,9 +71,7 @@ defmodule LibuWeb.ChatLive.Conversation do
     {:noreply, socket}
   end
 
-  def handle_info(%MessageReadyForQuery{} = event,
-    %Socket{assigns: %{messages: messages, convo_id: convo_id}} = socket
-  ) do
+  def handle_info(%MessageReadyForQuery{} = event, %Socket{assigns: %{messages: messages, conversation_id: convo_id}} = socket) do
     with {:ok, message} <- Chat.fetch_message(convo_id, event.message_number) do
       appended_messages = messages ++ [message]
       {:noreply, assign(socket, messages: appended_messages) |> fetch_active_conversation(convo_id)}
@@ -81,6 +80,7 @@ defmodule LibuWeb.ChatLive.Conversation do
         {:noreply, socket}
     end
   end
+
 
   def handle_info(_event, socket) do
     {:noreply, socket}

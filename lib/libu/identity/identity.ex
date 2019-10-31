@@ -25,8 +25,8 @@ defmodule Libu.Identity do
   def subscribe(user_id),
     do: Messaging.subscribe(topic() <> ":#{user_id}")
 
-  def get_user_by(github_id: github_id),
-    do: Repo.get_by(User, github_id: github_id)
+  def get_user(id),
+    do: Repo.get_by(User, github_id: id)
 
   def list_users(), do: Repo.all(User)
 

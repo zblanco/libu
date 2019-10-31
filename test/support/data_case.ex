@@ -22,6 +22,7 @@ defmodule Libu.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Libu.DataCase
+      import Commanded.Assertions.EventAssertions
     end
   end
 
@@ -33,6 +34,16 @@ defmodule Libu.DataCase do
     end
 
     :ok
+  end
+
+  setup do
+    {:ok, _} = Application.ensure_all_started(:libu)
+
+    on_exit(fn ->
+      :ok = Application.stop(:libu)
+
+      Libu.Storage.reset!()
+    end)
   end
 
   @doc """

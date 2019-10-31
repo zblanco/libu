@@ -56,17 +56,6 @@ defmodule Libu.Chat do
     end
   end
 
-  # def setup_conversation_session(user_id, conversation_id) do
-  #   with :ok <- ConversationSession.start(user_id, conversation_id) do
-  #     # query from projector?
-  #     Query.fetch_latest
-  #   end
-  # end
-
-  def initiate_test_convo, do: initiate_conversation(%{
-    initiator_id: "Doops", initial_message: UUID.uuid4()
-  })
-
   @doc """
   Initiates a new conversation of which other users can add to.
   """
@@ -74,8 +63,7 @@ defmodule Libu.Chat do
   def initiate_conversation(initial_conversation_attrs) do
     with {:ok, cmd} <- InitiateConversation.new(initial_conversation_attrs),
          :ok        <- Router.dispatch(cmd, consistency: :strong) do
-      # Query.conversation(cmd.conversation_id)
-      :ok
+      {:ok, cmd.conversation_id}
     else
       error -> error
     end

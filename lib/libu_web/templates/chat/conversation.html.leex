@@ -2,19 +2,20 @@
     
     <div class="flex flex-col focus:shadow-2xl max-h-screen w-auto shadow-lg rounded-b">
         
-        <div class="flex py-4 px-4 flex-none bg-gray-100 rounded-t-lg border-b border-gray-200">
+        <div class="flex py-3 px-3 flex-none bg-gray-100 rounded-t-lg border-b border-gray-200">
             <div class="flex flex-row items-center">
                 
                 <svg xmlns="http://www.w3.org/2000/svg" 
-                    viewBox="0 0 24 24" 
-                    width="24" 
-                    height="24"
-                    class="fill-current text-purple-600 h-8 w-8">
-                        <path class="heroicon-ui" d="M6 14H4a2 2 0 0 1-2-2V4c0-1.1.9-2 2-2h12a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v13a1 1 0 0 1-1.7.7L16.58 18H8a2 2 0 0 1-2-2v-2zm0-2V8c0-1.1.9-2 2-2h8V4H4v8h2zm14-4H8v8h9a1 1 0 0 1 .7.3l2.3 2.29V8z"/>
+                     viewBox="0 0 24 24" 
+                     width="24" 
+                     height="24">
+                    <path class="fill-current text-purple-600 h-8 w-8" 
+                          d="M2 15V5c0-1.1.9-2 2-2h16a2 2 0 0 1 2 2v15a1 1 0 0 1-1.7.7L16.58 17H4a2 2 0 0 1-2-2zM20 5H4v10h13a1 1 0 0 1 .7.3l2.3 2.29V5z"
+                    />
                 </svg>
                 
-                <div class="px-2 text-gray-800 truncate">
-                    <%= @conversation.initial_message.body %>
+                <div class="px-2 text-purple-700 truncate">
+                    <%= @conversation.title %>
                 </div>
             </div>
             
@@ -53,7 +54,7 @@
             )%>
 
             <%= hidden_input :new_message, :publisher_id, value: @current_user.github_id %>
-            <%= hidden_input :new_message, :publisher_name, value: @current_user.publisher_name %>
+            <%= hidden_input :new_message, :publisher_name, value: @current_user.name %>
             <%= hidden_input :new_message, :conversation_id, value: @conversation.conversation_id %>
             <%= submit "submit", class: "hidden" %>
         </form>

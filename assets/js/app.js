@@ -1,5 +1,6 @@
 import css from "../css/app.css"
 import "phoenix_html"
+import {Socket} from "phoenix"
 import LiveSocket from "phoenix_live_view"
 
 // import SentimentGuage from "./sentiment_gauge"
@@ -17,7 +18,7 @@ Hooks.MessageAdded = {
 }
 
 
-let liveSocket = new LiveSocket("/live", {hooks: Hooks})
+let liveSocket = new LiveSocket("/live", Socket, {hooks: Hooks})
 liveSocket.connect()
 
 // SentimentGuage.buildChart()

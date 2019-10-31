@@ -1,14 +1,16 @@
-defmodule Libu.Chat.ProjectionSupervisor do
+defmodule Libu.Chat.Query.QuerySupervisor do
   use Supervisor
 
   alias Libu.Chat.EventHandlers.{
-    ConversationProjectionManager,
+    ConversationCacheManager,
     ConversationStarted,
     MessageAddedToConversation,
   }
   alias Libu.Chat.{
-    ActiveConversationProjector,
-    Query.ConversationProjectionManager,
+    Query.ActiveConversationProjector,
+    Query.ConversationCacheManager,
+    Query.ConversationCacheSupervisor,
+    Query.ConversationDatabaseProjector,
   }
 
   def start_link(_) do
@@ -17,14 +19,12 @@ defmodule Libu.Chat.ProjectionSupervisor do
 
   def init(_arg) do
     Supervisor.init([
+      {ConversationCacheSupervisor, [name: ConversationCacheSupervisor]},
+      {ConversationCacheManager, [name: ConversationCacheManager]},
+      ConversationDatabaseProjector,
       {ActiveConversationProjector, [name: ActiveConversationProjector]},
       ConversationStarted,
       MessageAddedToConversation,
-      {DynamicSupervisor, [
-        name: Libu.Chat.ConversationProjectorSupervisor,
-        strategy: :one_for_one
-      ]},
-      {ConversationProjectionManager, [name: ConversationProjectionManager]},
     ], strategy: :one_for_one)
   end
 end

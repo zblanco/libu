@@ -11,7 +11,7 @@ defmodule Libu.Chat.Commands.AddToConversation do
   embedded_schema do
     field :conversation_id, :string
     field :message, :string
-    field :publisher_id, :string
+    field :publisher_id, :integer
     field :publisher_name, :string
   end
 

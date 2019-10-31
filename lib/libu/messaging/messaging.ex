@@ -10,4 +10,10 @@ defmodule Libu.Messaging do
   def publish(message, topic),
     do: Phoenix.PubSub.broadcast(pub_sub(), topic, message)
 
+  def unsubscribe(topic),
+    do: Phoenix.PubSub.unsubscribe(pub_sub(), topic)
+
+  def unsubscribe(pid, topic),
+    do: Phoenix.PubSub.unsubscribe(pub_sub(), pid, topic)
+
 end

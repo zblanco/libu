@@ -7,3 +7,82 @@
     min-height: 100%;
 }
 
+.btn {
+    @apply font-bold;
+}
+
+.btn-gray {
+    @apply bg-gray-200 text-purple-700 border border-transparent py-2 px-4 font-medium rounded-lg;
+}
+
+.btn-quiet {
+    @apply bg-transparent text-gray-700 border border-gray-300 py-2 px-4 rounded-lg;
+}
+
+.btn-quiet-gray {
+    @apply bg-gray-100 text-gray-700 text-black border border-gray-400 py-2 px-4 rounded-sm;
+}
+
+.btn-quiet-gray:hover {
+    @apply bg-purple-700 text-white;
+}
+
+.btn-quiet:hover {
+    @apply bg-purple-700 text-white;
+}
+
+.btn-gray:hover {
+    @apply bg-purple-700 text-white;
+} 
+
+.box {
+    @apply bg-white rounded-lg;
+}
+
+.tr-head {
+    @apply text-gray-600;
+}
+
+.th {
+    @apply py-2 px-4;
+}
+
+.th:hover {
+    @apply bg-gray-100;
+}
+
+.tr {
+    @apply border-b border-gray-200;
+}
+
+.tr:hover {
+    @apply bg-gray-100;
+}
+
+.td {
+    @apply py-2 px-4 font-normal text-gray-900;
+}
+
+.td:hover {
+    @apply bg-gray-200 shadow-inner;
+}
+
+.nav-item {
+    @apply font-medium px-4 text-lg relative py-2 px-4 leading-normal text-purple-700 no-underline items-center border-b-2 border-transparent;
+}
+
+.nav-item:hover {
+    @apply text-gray-800 font-bold;
+}
+
+.text-input {
+    @apply appearance-none border-b-2 border-gray-400 w-full py-2 px-3 text-gray-800 leading-tight bg-gray-100 rounded;
+}
+
+.text-input:focus {
+    @apply border-purple-700 bg-gray-200;
+}
+
+.select-input {
+    @apply appearance-none border-b-2 border-gray-400 w-full py-2 px-3 text-gray-800 leading-tight bg-gray-100 rounded;
+}

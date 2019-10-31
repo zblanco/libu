@@ -11,7 +11,7 @@
                     phx_change: "search"
                 )%>
             </form>
-            <%= link to: Routes.live_path(@socket, ChatLive.InitiateConversation), class: "btn-quiet border-b-2" do %>
+            <%= link to: Routes.chat_path(@socket, :new), class: "btn-quiet border-b-2" do %>
                 New
             <% end %>
         </div>
@@ -21,7 +21,7 @@
                 <table class="table table-auto">
                     <thead>
                         <tr class="tr-head">
-                            <th class="th">Initial Message</th>
+                            <th class="th">Title</th>
                             <th class="th">Initiated By</th>
                             <th class="th">Latest Message</th>
                             <th class="th">Initiated On</th>
@@ -35,7 +35,7 @@
                                 
                             <td class="td">
                                 <%= link to: "/chat/conversations/#{active_convo.conversation_id}", class: "hover:underline" do %> 
-                                <%= active_convo.initial_message.body %>
+                                <%= active_convo.title %>
                                 <% end %>
                             </td>
                                 
