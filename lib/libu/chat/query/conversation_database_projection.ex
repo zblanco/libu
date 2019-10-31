@@ -11,6 +11,7 @@ defmodule Libu.Chat.Query.ConversationDatabaseProjector do
     ConversationStarted,
     MessageAddedToConversation,
     MessageReadyForQuery,
+    ActiveConversationAdded,
   }
   alias Libu.Messaging
   alias Libu.Chat
@@ -24,7 +25,13 @@ defmodule Libu.Chat.Query.ConversationDatabaseProjector do
     |> Ecto.Multi.insert(:message, Message.new(convo_started, event_id))
     |> Ecto.Multi.run(:cache_message, fn _repo, %{message: message} ->
       ConversationCache.cache_message(message)
-      MessageReadyForQuery.new(message) |> Messaging.publish(Chat.topic(message.conversation_id))
+
+      MessageReadyForQuery.new(message)
+      |> Messaging.publish(Chat.topic(message.conversation_id))
+
+      ActiveConversationAdded.new(convo_started)
+      |> Messaging.publish(Chat.topic())
+
       {:ok, message}
     end)
   end)
@@ -35,8 +42,11 @@ defmodule Libu.Chat.Query.ConversationDatabaseProjector do
     |> Ecto.Multi.insert(:message, Message.new(message_added, event_id))
     |> Ecto.Multi.run(:cache_message, fn _repo, %{message: message} ->
       ConversationCache.cache_message(message)
+
       event = MessageReadyForQuery.new(message)
       Messaging.publish(event, Chat.topic(message.conversation_id))
+      Messaging.publish(event, Chat.topic())
+
       {:ok, message}
     end)
   end)

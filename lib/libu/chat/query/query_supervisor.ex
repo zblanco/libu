@@ -7,7 +7,6 @@ defmodule Libu.Chat.Query.QuerySupervisor do
     MessageAddedToConversation,
   }
   alias Libu.Chat.{
-    Query.ActiveConversationProjector,
     Query.ConversationCacheManager,
     Query.ConversationCacheSupervisor,
     Query.ConversationDatabaseProjector,
@@ -22,7 +21,6 @@ defmodule Libu.Chat.Query.QuerySupervisor do
       {ConversationCacheSupervisor, [name: ConversationCacheSupervisor]},
       {ConversationCacheManager, [name: ConversationCacheManager]},
       ConversationDatabaseProjector,
-      {ActiveConversationProjector, [name: ActiveConversationProjector]},
       ConversationStarted,
       MessageAddedToConversation,
     ], strategy: :one_for_one)

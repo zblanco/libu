@@ -15,7 +15,7 @@ defmodule Libu.Chat.Query.Schemas.Conversation do
     field :initiator_id, :integer
     field :initial_message_body, :string
     field :latest_message_body, :string
-    field :latest_publisher_id, :string
+    field :latest_publisher_id, :integer
     field :latest_publisher_name, :string
 
     timestamps()
@@ -31,6 +31,9 @@ defmodule Libu.Chat.Query.Schemas.Conversation do
       initiator_id: convo_started.initiated_by_id,
       initial_message_body: convo_started.initial_message,
       latest_message_body: convo_started.initial_message,
+      initiated_on: convo_started.started_on,
+      latest_publisher_id: convo_started.initiated_by_id,
+      latest_publisher_name: convo_started.initiated_by,
     })
   end
 

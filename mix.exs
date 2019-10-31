@@ -53,7 +53,7 @@ defmodule Libu.MixProject do
       {:essence, "~> 0.2.0"},
       {:oauth2, "~> 1.0"},
       {:commanded, "~> 1.0.0-rc.0"},
-      {:eventstore, github: "zblanco/eventstore", branch: "backward-streaming", override: true},
+      {:eventstore, "~> 1.0.0-rc.0"},
       {:commanded_eventstore_adapter, "~> 1.0.0-rc.0"},
       {:commanded_ecto_projections, "~> 1.0.0-rc.0"},
     ]

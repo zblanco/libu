@@ -13,7 +13,7 @@ defmodule LibuWeb.ChatLive.ActiveConversations do
   end
 
   defp fetch(socket) do
-    assign(socket, conversations: Chat.active_conversations())
+    assign(socket, conversations: Chat.list_conversations())
   end
 
   def render(assigns) do

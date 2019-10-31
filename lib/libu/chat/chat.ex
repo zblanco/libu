@@ -84,8 +84,8 @@ defmodule Libu.Chat do
     end
   end
 
-  defdelegate active_conversations, to: Query
-  defdelegate fetch_active_conversation(conversation_id), to: Query, as: :active_conversation
+  defdelegate list_conversations, to: Query
+  defdelegate fetch_conversation(conversation_id), to: Query
   defdelegate fetch_messages(conversation_id, start_index, end_index), to: Query
   defdelegate fetch_message(conversation_id, message_number), to: Query
 end

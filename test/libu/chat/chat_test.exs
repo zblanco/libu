@@ -1,7 +1,7 @@
 defmodule Libu.ChatTest do
   use ExUnit.Case
   alias Libu.Chat
-  alias Libu.Chat.Message
+  alias Libu.Chat.Query.Schemas.Message
 
   # test cursor based querying of conversations
   # test conversation lifecycle

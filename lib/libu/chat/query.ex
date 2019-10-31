@@ -12,9 +12,9 @@ defmodule Libu.Chat.Query do
   import Ecto.Query, warn: false
   alias Libu.{
     Chat.Query.ConversationCache,
-    Chat.Query.ActiveConversationProjector,
     Chat.Query.ConversationCacheSupervisor,
     Chat.Query.Schemas.Person,
+    Chat.Query.Schemas.Conversation,
   }
 
   alias Libu.Repo
@@ -73,15 +73,11 @@ defmodule Libu.Chat.Query do
     end
   end
 
-  def active_conversation(convo_id) do
-    ActiveConversationProjector.fetch_active_conversation(convo_id)
+  def list_conversations() do
+    Repo.all(Conversation)
   end
 
-  def active_conversations() do
-    ActiveConversationProjector.fetch_active_conversations()
-  end
-
-  def conversation(conversation_id) do
+  def fetch_conversation(conversation_id) do
     case Repo.get(Conversation, conversation_id) do
       nil          -> {:error, :conversation_not_found}
       conversation -> {:ok, conversation}
