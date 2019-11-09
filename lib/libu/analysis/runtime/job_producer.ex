@@ -21,12 +21,12 @@ defmodule Libu.Analysis.JobProducer do
 
   @impl true
   def init(_) do
-    Messaging.subscribe(Libu.Analysis.topic() <> ":jobs")
     {:producer, %{demand: 0}}
   end
 
-  def notify_of_job_enqueuing() do
-    GenStage.cast(__MODULE__, :job_enqueued)
+  def notify_of_enqueuing() do
+    producer_module = Broadway.producer_names(AnalysisBroadway) |> Enum.random()
+    GenStage.cast(producer_module, :job_enqueued)
   end
 
   @impl true

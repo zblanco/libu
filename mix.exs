@@ -49,7 +49,7 @@ defmodule Libu.MixProject do
       {:uuid, "~> 1.1"},
       {:veritaserum, "~> 0.2.1"},
       {:flow, "~> 0.14.3"},
-      {:broadway, "~> 0.4.0"},
+      {:broadway, "~> 0.5.0"},
       {:essence, "~> 0.2.0"},
       {:oauth2, "~> 1.0"},
       {:commanded, "~> 1.0.0-rc.0"},

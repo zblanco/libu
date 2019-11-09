@@ -1,5 +1,5 @@
 %{
-  "broadway": {:hex, :broadway, "0.4.0", "b8daf580baed44347a9690449f9d8d7a308c1ca086648397d1a88eea893d047e", [:mix], [{:gen_stage, "~> 0.14", [hex: :gen_stage, repo: "hexpm", optional: false]}], "hexpm"},
+  "broadway": {:hex, :broadway, "0.5.0", "6fdbbb00f2fa06ea4352df4db88d9d8a71ee78279570ef92bef840f4b3c9340f", [:mix], [{:gen_stage, "~> 0.14", [hex: :gen_stage, repo: "hexpm", optional: false]}], "hexpm"},
   "calendar": {:hex, :calendar, "0.17.6", "ec291cb2e4ba499c2e8c0ef5f4ace974e2f9d02ae9e807e711a9b0c7850b9aee", [:mix], [{:tzdata, "~> 0.5.20 or ~> 0.1.201603 or ~> 1.0", [hex: :tzdata, repo: "hexpm", optional: false]}], "hexpm"},
   "certifi": {:hex, :certifi, "2.5.1", "867ce347f7c7d78563450a18a6a28a8090331e77fa02380b4a21962a65d36ee5", [:rebar3], [{:parse_trans, "~>3.3", [hex: :parse_trans, repo: "hexpm", optional: false]}], "hexpm"},
   "commanded": {:hex, :commanded, "1.0.0-rc.1", "93187c67f6c5abad9e69b9b7a233b9b6c06bad12212afaafc895a7496febc149", [:mix], [{:elixir_uuid, "~> 1.2", [hex: :elixir_uuid, repo: "hexpm", optional: false]}, {:jason, "~> 1.1", [hex: :jason, repo: "hexpm", optional: true]}, {:phoenix_pubsub, "~> 1.1", [hex: :phoenix_pubsub, repo: "hexpm", optional: true]}], "hexpm"},

@@ -4,7 +4,7 @@ defmodule Libu.Analysis.QueueManager do
   """
   use GenServer
 
-  alias Libu.Analysis.{Job, EtsQueue}
+  alias Libu.Analysis.{Job, EtsQueue, JobProducer}
 
   def start_link(_) do
     GenServer.start_link(
@@ -23,7 +23,7 @@ defmodule Libu.Analysis.QueueManager do
     with %{not_started: not_started} <- fetch_queues(),
          :ok <- EtsQueue.put(not_started, job)
     do
-      Libu.Messaging.publish(:job_enqueued, Libu.Analysis.topic() <> ":jobs")
+      JobProducer.notify_of_enqueuing()
     end
   end
 

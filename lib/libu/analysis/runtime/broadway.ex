@@ -15,10 +15,9 @@ defmodule Libu.Analysis.Broadway do
   def start_link(_opts) do
     Broadway.start_link(__MODULE__,
       name: AnalysisBroadway,
-      producers: [
-        default: [
-          module: {JobProducer, []}
-        ],
+      producer: [
+        module: {JobProducer, []},
+        stages: 1,
       ],
       processors: [
         default: [stages: 10]

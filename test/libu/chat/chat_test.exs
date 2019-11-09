@@ -2,6 +2,10 @@ defmodule Libu.ChatTest do
   use ExUnit.Case
   alias Libu.Chat
   alias Libu.Chat.Query.Schemas.Message
+  alias Libu.Chat.Query.{
+    ConversationCache,
+    ConversationCacheSupervisor,
+  }
 
   # test cursor based querying of conversations
   # test conversation lifecycle
@@ -63,25 +67,25 @@ defmodule Libu.ChatTest do
     test "initiating a conversation starts a projector" do
       {:ok, convo_id} = start_test_conversation()
 
-      assert Chat.ConversationProjectorSupervisor.is_conversation_projecting?(convo_id)
+      assert ConversationCacheSupervisor.is_conversation_caching?(convo_id)
     end
 
     test "adding a message to a conversation without a running projector restarts the projector" do
       {:ok, convo_id} = start_test_conversation()
-      :ok = Chat.ConversationProjectorSupervisor.stop_conversation_projector(convo_id)
+      :ok = ConversationCacheSupervisor.stop_conversation_projector(convo_id)
 
       :ok = add_message_to_test_conversation(convo_id)
 
-      assert Chat.ConversationProjectorSupervisor.is_conversation_projecting?(convo_id)
+      assert ConversationCacheSupervisor.is_conversation_caching?(convo_id)
     end
 
     test "fetching messages of a conversation activates a projector cache" do
       {:ok, convo_id} = start_test_conversation()
-      :ok = Chat.ConversationProjectorSupervisor.stop_conversation_projector(convo_id)
+      :ok = ConversationCacheSupervisor.stop_conversation_projector(convo_id)
 
       {:ok, _messages} = Chat.fetch_messages(convo_id, 0, 10)
 
-      assert Chat.ConversationProjectorSupervisor.is_conversation_projecting?(convo_id)
+      assert ConversationCacheSupervisor.is_conversation_caching?(convo_id)
     end
 
     test "we can fetch an individual message by number" do
@@ -118,15 +122,14 @@ defmodule Libu.ChatTest do
       assert List.first(messages).message_number == 1
     end
 
-    test "a message fetched resets the time to live" do
-      # setup convo
-      # assert that a message isn't yet cached
-      # fetch message
-      # assert that the message is now cached with a ttl
+    test "a message fetched resets the time to live in the cache" do
       {:ok, convo_id} = setup_full_conversation()
-      # check the ttl of a message
-      # fetch the message,
-      assert false
+      assert ConversationCache.is_cached?(convo_id, 2)
+
+      {:ok, ttl} = ConversationCache.get_ttl_of_message(convo_id, 2)
+      message = Chat.fetch_message(convo_id, 2)
+      {:ok, new_ttl} = ConversationCache.get_ttl_of_message(convo_id, 2)
+      assert new_ttl > ttl
     end
 
     test "when all projected messages expire, the projector shuts down" do
@@ -138,19 +141,18 @@ defmodule Libu.ChatTest do
     end
 
     test "trying to fetch messages of an invalid/never-initiated conversation returns an error" do
-      assert Chat.fetch_messages("some-bogus-convo-id", 1, 5) == {:error, :invalid_conversation}
-
-      # assert that there isn't a projector active
+      bogus_convo_id = "some-bogus-convo-id"
+      assert Chat.fetch_messages(bogus_convo_id, 1, 5) == {:error, :invalid_conversation}
+      assert !ConversationCacheSupervisor.is_conversation_caching?(bogus_convo_id)
     end
 
     test "freshly active conversations are projected automatically" do
-      # setup convo
-      # check supervisor that a projector is already active for that convo
-      # check active conversation state that the conversation is there
-      assert false
+      {:ok, convo_id} = setup_full_conversation()
+      assert ConversationCache.is_cached?(convo_id, 2)
+      assert ConversationCacheSupervisor.is_conversation_caching?(convo_id)
     end
 
-    test "latest messages are updated in the active conversation" do
+    test "latest messages are updated in the conversation read model" do
       # setup a convo
       # fetch active conversations
       # get an active conversation
