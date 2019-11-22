@@ -44,7 +44,8 @@ defmodule Libu.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:plug, "~> 1.7"},
-      {:phoenix_live_view, "0.3.1"},
+      {:phoenix_live_view, github: "phoenixframework/phoenix_live_view"},
+      {:floki, ">= 0.0.0", only: :test},
       {:calendar, "~> 0.17.4"},
       {:uuid, "~> 1.1"},
       {:veritaserum, "~> 0.2.1"},
@@ -52,10 +53,10 @@ defmodule Libu.MixProject do
       {:broadway, "~> 0.5.0"},
       {:essence, "~> 0.2.0"},
       {:oauth2, "~> 1.0"},
-      {:commanded, "~> 1.0.0-rc.0"},
-      {:eventstore, "~> 1.0.0-rc.0"},
-      {:commanded_eventstore_adapter, "~> 1.0.0-rc.0"},
-      {:commanded_ecto_projections, "~> 1.0.0-rc.0"},
+      {:commanded, "~> 1.0.0"},
+      {:eventstore, "~> 1.0.0"},
+      {:commanded_eventstore_adapter, "~> 1.0.0"},
+      {:commanded_ecto_projections, "~> 1.0.0"},
     ]
   end
 
