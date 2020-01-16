@@ -6,6 +6,8 @@ defmodule Libu.Chat.Query.Schemas.Conversation do
   alias Libu.Chat.Events.{ConversationStarted, MessageAddedToConversation}
 
   @primary_key {:conversation_id, :binary_id, autogenerate: false}
+  @foreign_key_type :binary_id
+  @timestamps_opts [type: :utc_datetime_usec]
   schema "chat_conversations" do
     field :title, :string
     field :message_count, :integer

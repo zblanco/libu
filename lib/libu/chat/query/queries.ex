@@ -9,7 +9,6 @@ defmodule Libu.Chat.Query.Queries do
   }
 
   def fetch_conversation(convo_id) do
-    {:ok, convo_id} = Ecto.UUID.cast(convo_id)
     from(m in Conversation,
       select: m,
       where: m.conversation_id == ^convo_id,
@@ -18,7 +17,6 @@ defmodule Libu.Chat.Query.Queries do
   end
 
   def fetch_latest_messages(convo_id, message_count) when is_integer(message_count) do
-    {:ok, convo_id} = Ecto.UUID.cast(convo_id)
     from(m in Message,
       select: m,
       where: m.conversation_id == ^convo_id,
@@ -28,7 +26,6 @@ defmodule Libu.Chat.Query.Queries do
   end
 
   def fetch_message_by_number(convo_id, message_number) when is_integer(message_number) do
-    {:ok, convo_id} = Ecto.UUID.cast(convo_id)
     from(m in Message,
       select: m,
       where: m.conversation_id == ^convo_id and m.message_number == ^message_number
@@ -36,7 +33,6 @@ defmodule Libu.Chat.Query.Queries do
   end
 
   def fetch_messages_by_number(convo_id, message_numbers) when is_list(message_numbers) do
-    {:ok, convo_id} = Ecto.UUID.cast(convo_id)
     Message
     |> select([m], m)
     |> where(conversation_id: ^convo_id)

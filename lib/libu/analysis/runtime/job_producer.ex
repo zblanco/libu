@@ -13,7 +13,6 @@ defmodule Libu.Analysis.JobProducer do
   use GenStage
 
   alias Libu.Analysis.{Job, QueueManager}
-  alias Libu.Messaging
   alias Broadway.{Message, Producer, Acknowledger}
 
   @behaviour Producer

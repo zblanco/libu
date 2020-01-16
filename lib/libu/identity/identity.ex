@@ -1,15 +1,8 @@
 defmodule Libu.Identity do
   @moduledoc """
-
-  Registration:
-  * Redirect to Login with Github
-  * If no user created for Github id
-
-  ### Capabilities to implemement:
-
   - [x] Authenticate via OAuth2 with Github
   - [x] Persist to Ecto a user struct storing a github user id of some kind.
-  * Keep session states in-memory.
+  - [ ] Keep session states in-memory.
   """
   alias Libu.{
     Repo,

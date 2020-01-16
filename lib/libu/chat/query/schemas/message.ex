@@ -9,6 +9,8 @@ defmodule Libu.Chat.Query.Schemas.Message do
   }
 
   @primary_key {:id, :binary_id, autogenerate: false}
+  @foreign_key_type :binary_id
+  @timestamps_opts [type: :utc_datetime_usec]
   schema "chat_messages" do
     field :body, :string
     field :message_number, :integer

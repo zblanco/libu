@@ -28,7 +28,6 @@ defmodule LibuWeb.Router do
   scope "/", LibuWeb do
     pipe_through [:browser, LibuWeb.Plugs.Auth]
 
-    # live "/chat/conversations/new", ChatLive.InitiateConversation, session: [:current_user]
     get "/chat/conversations/new", ChatController, :new
     get "/chat/conversations/:id", ChatController, :conversation
     live "/chat", ChatLive.Index

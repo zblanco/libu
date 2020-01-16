@@ -16,7 +16,7 @@
 }
 
 .btn-quiet {
-    @apply bg-transparent text-gray-700 border border-gray-300 py-2 px-4 rounded-lg;
+    @apply bg-transparent text-gray-700 border border-gray-300 py-2 px-3 rounded-lg;
 }
 
 .btn-quiet-gray {
@@ -40,7 +40,7 @@
 }
 
 .tr-head {
-    @apply text-gray-500 font-light;
+    @apply text-gray-700 text-sm;
 }
 
 .th {

@@ -16,7 +16,6 @@ defmodule Libu.Chat.Query.ConversationDatabaseProjector do
   alias Libu.Messaging
   alias Libu.Chat
   alias Libu.Chat.Query.Schemas.{Conversation, Message}
-  alias Libu.Chat.Query
   alias Libu.Chat.Query.ConversationCache
 
   project(%ConversationStarted{} = convo_started, %{event_id: event_id}, fn multi ->

@@ -8,9 +8,8 @@ defmodule LibuWeb.ChatLive.Conversation do
     MessageReadyForQuery
   }
 
-  def mount(%{path_params: %{"id" => convo_id}} = session, %Socket{} = socket),
-    do: mount(%{session | conversation_id: convo_id}, socket)
-  def mount(%{conversation_id: convo_id, current_user: current_user}, socket) do
+
+  def mount(%{"conversation_id" => convo_id, "current_user" => current_user}, socket) do
     if connected?(socket) do
       Chat.subscribe(convo_id)
 
@@ -40,7 +39,7 @@ defmodule LibuWeb.ChatLive.Conversation do
 
   defp fetch_conversation(socket, convo_id) do
     with {:ok, conversation} <- Chat.fetch_conversation(convo_id) do
-      assign(socket, conversation: conversation)
+      assign(socket, conversation: conversation, conversation_id: convo_id)
     else
       _ -> redirect(socket, to: "/chat")
     end
@@ -72,6 +71,7 @@ defmodule LibuWeb.ChatLive.Conversation do
   end
 
   def handle_info(%MessageReadyForQuery{} = event, %Socket{assigns: %{messages: messages, conversation_id: convo_id}} = socket) do
+    IO.inspect(socket)
     with {:ok, message} <- Chat.fetch_message(convo_id, event.message_number) do
       appended_messages = messages ++ [message]
       {:noreply, assign(socket, messages: appended_messages) |> fetch_conversation(convo_id)}
