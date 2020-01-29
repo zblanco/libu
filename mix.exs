@@ -57,6 +57,7 @@ defmodule Libu.MixProject do
       {:eventstore, "~> 1.0.0"},
       {:commanded_eventstore_adapter, "~> 1.0.0"},
       {:commanded_ecto_projections, "~> 1.0.0"},
+      {:eventually, "~> 1.1"},
     ]
   end
 

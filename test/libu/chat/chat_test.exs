@@ -6,6 +6,7 @@ defmodule Libu.ChatTest do
     ConversationCache,
     ConversationCacheSupervisor,
   }
+  import Eventually
 
   # test cursor based querying of conversations
   # test conversation lifecycle
@@ -67,7 +68,7 @@ defmodule Libu.ChatTest do
     test "initiating a conversation starts a projector" do
       {:ok, convo_id} = start_test_conversation()
 
-      assert ConversationCacheSupervisor.is_conversation_caching?(convo_id)
+      assert_eventually ConversationCacheSupervisor.is_conversation_caching?(convo_id)
     end
 
     test "adding a message to a conversation without a running projector restarts the projector" do
@@ -76,7 +77,7 @@ defmodule Libu.ChatTest do
 
       :ok = add_message_to_test_conversation(convo_id)
 
-      assert ConversationCacheSupervisor.is_conversation_caching?(convo_id)
+      assert_eventually ConversationCacheSupervisor.is_conversation_caching?(convo_id)
     end
 
     test "fetching messages of a conversation activates a projector cache" do
@@ -85,7 +86,7 @@ defmodule Libu.ChatTest do
 
       {:ok, _messages} = Chat.fetch_messages(convo_id, 0, 10)
 
-      assert ConversationCacheSupervisor.is_conversation_caching?(convo_id)
+      assert_eventually ConversationCacheSupervisor.is_conversation_caching?(convo_id)
     end
 
     test "we can fetch an individual message by number" do
@@ -141,7 +142,7 @@ defmodule Libu.ChatTest do
     end
 
     test "trying to fetch messages of an invalid/never-initiated conversation returns an error" do
-      bogus_convo_id = "some-bogus-convo-id"
+      bogus_convo_id = Ecto.UUID.generate()
       assert Chat.fetch_messages(bogus_convo_id, 1, 5) == {:error, :invalid_conversation}
       assert !ConversationCacheSupervisor.is_conversation_caching?(bogus_convo_id)
     end
@@ -149,7 +150,7 @@ defmodule Libu.ChatTest do
     test "freshly active conversations are projected automatically" do
       {:ok, convo_id} = setup_full_conversation()
       assert ConversationCache.is_cached?(convo_id, 2)
-      assert ConversationCacheSupervisor.is_conversation_caching?(convo_id)
+      assert_eventually ConversationCacheSupervisor.is_conversation_caching?(convo_id)
     end
 
     test "latest messages are updated in the conversation read model" do

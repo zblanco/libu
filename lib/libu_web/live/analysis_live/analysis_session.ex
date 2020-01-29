@@ -20,7 +20,7 @@ defmodule LibuWeb.AnalysisSession do
   }
   alias Phoenix.LiveView.Socket
 
-  def mount(_session, %Socket{} = socket) do
+  def mount(_params, _session, %Socket{} = socket) do
     if connected?(socket) do
       {:ok, session_id} = Analysis.setup_session()
       Analysis.subscribe(session_id)

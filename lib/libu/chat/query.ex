@@ -49,12 +49,12 @@ defmodule Libu.Chat.Query do
     do: ConversationCache.fetch_message(convo_id, message_number)
 
   defp is_valid_conversation_id?(convo_id) do
-    # case Repo.one(Queries.fetch_conversation(convo_id)) do
-    #   {:ok, _convo} ->
-    #     :ok
-    #   {:error, :conversation_not_found} ->
-    #     {:error, :invalid_conversation}
-    # end
+    case fetch_conversation(convo_id) do
+      {:ok, _convo} ->
+        :ok
+      {:error, :conversation_not_found} ->
+        {:error, :invalid_conversation}
+    end
     :ok
   end
 

@@ -24,6 +24,8 @@ defmodule LibuWeb do
       import Plug.Conn
       import LibuWeb.Gettext
       alias LibuWeb.Router.Helpers, as: Routes
+
+      import Phoenix.LiveView.Controller
     end
   end
 
@@ -43,7 +45,7 @@ defmodule LibuWeb do
       import LibuWeb.Gettext
       alias LibuWeb.Router.Helpers, as: Routes
 
-      import Phoenix.LiveView, only: [live_render: 2, live_render: 3]
+      import Phoenix.LiveView.Helpers
     end
   end
 

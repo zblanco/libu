@@ -7,7 +7,7 @@ defmodule LibuWeb.ChatLive.ActiveConversations do
   alias Libu.Chat
   alias Libu.Chat.Events.ActiveConversationAdded
 
-  def mount(_session, socket) do
+  def mount(_params, _session, socket) do
     if connected?(socket), do: Chat.subscribe()
     {:ok, fetch(socket)}
   end

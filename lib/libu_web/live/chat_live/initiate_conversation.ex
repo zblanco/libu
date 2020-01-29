@@ -3,7 +3,7 @@ defmodule LibuWeb.ChatLive.InitiateConversation do
   alias LibuWeb.Router.Helpers, as: Routes
   alias Libu.Chat
 
-  def mount(%{current_user: current_user}, socket) do
+  def mount(_params, %{current_user: current_user}, socket) do
     {:ok,
      assign(socket, %{
        current_user: current_user,
