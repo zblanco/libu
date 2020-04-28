@@ -24,18 +24,13 @@ defmodule Libu.Chat.Query.ConversationCache do
   """
   use GenServer, restart: :transient
 
-  alias Libu.Chat.Events.{
-    MessageAddedToConversation,
-  }
   alias Libu.Chat.{
     Query.Schemas.Message,
     Query.ConversationCacheManager,
-    Query.Streaming,
     Query.ConversationCacheSupervisor,
-    Query,
     Query.Queries,
   }
-  alias Libu.{Chat, Messaging}
+  alias Libu.Chat
   alias Libu.Repo
 
   @default_timeout :timer.minutes(30)
@@ -67,7 +62,7 @@ defmodule Libu.Chat.Query.ConversationCache do
 
   def init(convo_id) do
     init_state = %{
-      cache: :ets.new(:cache, [:set, :public]),
+      cache: :ets.new(:cache, [:set, :public, read_concurrency: true]),
       conversation_id: convo_id,
     }
     ConversationCacheManager.notify_of_caching_conversation(convo_id, init_state.cache)
@@ -152,10 +147,10 @@ defmodule Libu.Chat.Query.ConversationCache do
 
   def fetch_from_cache(cache, message_number) do
     case :ets.lookup(cache, message_number) do
-      [{_msg_no, message, _last_touch, _ttl} = meta_message] ->
+      [{_msg_no, message, _last_touch, _expiration} = meta_message] ->
         requeried_meta_message =
           meta_message
-          |> put_elem(2, DateTime.utc_now())
+          |> put_elem(2, timestamp())
 
         :ets.insert(cache, requeried_meta_message)
         {:ok, message}
@@ -165,11 +160,16 @@ defmodule Libu.Chat.Query.ConversationCache do
     end
   end
 
-  # def handle_info(:purge, %{log: log, registry: registry} = tables) do
-  #   # go through cache registry to find expired
-  #   # remove from log & registry
-  #   {:noreply, tables}
-  # end
+  def handle_info(:purge, %{cache: cache} = state) do
+    timestamp = timestamp()
+    :ets.select_delete(cache, [{
+      {:_, :_, :_, :"$1"}, # matching {_msg_no, _msg, _last_touch, expiration}
+      [{:<, :"$1", timestamp}], # finding where expiration < current_time
+      [true]
+    }])
+
+    {:noreply, state}
+  end
 
   def handle_info(_, state) do
     {:noreply, state}
@@ -190,19 +190,27 @@ defmodule Libu.Chat.Query.ConversationCache do
     end
   end
 
-  defp do_cache_message(tid, %Message{} = msg) do
+  defp do_cache_message(tid, msg) do
     insert_message(tid, msg)
     msg
   end
 
-  defp insert_message(tid, %Message{} = msg) do
-    :ets.insert(tid, {msg.message_number, msg, DateTime.utc_now(), @default_timeout})
+  defp insert_message(tid, msg) do
+    :ets.insert(tid, {msg.message_number, msg, timestamp(), expiration(@default_timeout)})
   end
 
   def is_cached?(message_number, registry) do
     case :ets.lookup(registry, message_number) do
-      [{^message_number, _msg, _last_touch, _ttl}] -> true
+      [{^message_number, _msg, _last_touch, _expiration}] -> true
       _ -> false
     end
+  end
+
+  defp timestamp(), do: DateTime.to_unix(DateTime.utc_now())
+
+  defp expiration(ttl) do
+    DateTime.utc_now()
+    |> DateTime.add(ttl * 60, :second)
+    |> DateTime.to_unix()
   end
 end

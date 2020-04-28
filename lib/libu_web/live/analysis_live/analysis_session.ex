@@ -11,8 +11,7 @@ defmodule LibuWeb.AnalysisSession do
   The Session Process setup during `mount/2` of this LiveView is responsible for backend communication such as
     managing subscriptions, and calling analyzers to minimize the Analysis API consumption here.
   """
-  use Phoenix.LiveView
-  alias LibuWeb.AnalysisView
+  use LibuWeb, :live_view
   alias Libu.Analysis
   alias Libu.Analysis.Events.{
     AnalysisResultProduced,
@@ -71,10 +70,6 @@ defmodule LibuWeb.AnalysisSession do
 
   def handle_info(_, state) do
     {:noreply, state}
-  end
-
-  def render(assigns) do
-    AnalysisView.render("analysis_session.html", assigns)
   end
 
   def handle_event("say", %{"msg" => msg}, %Socket{assigns: %{session_id: session_id}} = socket) do

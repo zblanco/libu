@@ -2,7 +2,7 @@
     <%= label( f, :title,
         class: "block mb-2 text-gray-700"
     )%>
-    <%= text_input( f, :title, 
+    <%= text_input( f, :title,
         class: "appearance-none text-input py-2 px-3 mb-3 leading-tight "
     )%>
     <%= error_tag( f, :title )%>
@@ -10,7 +10,7 @@
     <%= label( f, :message,
         class: "block mb-2 text-gray-700"
     )%>
-    <%= textarea( f, :message, 
+    <%= textarea( f, :message,
         class: "appearance-none text-input py-2 px-3 mb-3 leading-tight "
     )%>
     <%= error_tag( f, :message )%>
@@ -18,8 +18,8 @@
     <%= hidden_input f, :initiator_id, value: @current_user.github_id %>
     <%= hidden_input f, :initiator_name, value: @current_user.name %>
     <div>
-        <%= submit("Submit", phx_disable_with: "Submitting...", 
-        class: "btn-gray" 
+        <%= submit("Submit", phx_disable_with: "Submitting...",
+        class: "btn-gray"
         )%>
     </div>
 </form>

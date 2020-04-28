@@ -9,7 +9,6 @@ defmodule Libu.Chat.EventHandlers.ConversationStarted do
     application: Libu.Chat.Commanded
 
   alias Libu.Chat.Events.ConversationStarted
-  alias Libu.Chat.Query.ConversationCache
   alias Libu.Messaging
   alias Libu.Chat
 

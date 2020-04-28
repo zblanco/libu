@@ -22,7 +22,7 @@ defmodule Libu.Chat.Query.ConversationCacheManager do
   end
 
   def init(_opts) do
-    _tid = :ets.new(:cached_conversations, [:named_table, :set, :public])
+    _tid = :ets.new(:cached_conversations, [:named_table, :set, :public, read_concurrency: true])
     {:ok, []}
   end
 

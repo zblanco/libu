@@ -1,17 +1,17 @@
-<div class="w-screen h-full">
+<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
     <!--<h2 class="flex justify-center font-serif text-2xl italic font-bold text-purple-700">Live Analysis</h2></br>-->
 
     <div class="flex flex-row mx-4">
-        
+
         <div class="w-1/3">
             <form phx-change="say">
                 <%= textarea(:chat, :name,
-                    class: "text-xl w-full appearance-none border-2 border-transparent p-3 
-                            rounded focus:border-purple-700 focus:bg-gray-200 p-0 
-                            text-gray-800 leading-tight bg-gray-100 box shadow-lg hover:shadow-2xl",
+                    class: "text-xl w-full appearance-none border-2 border-transparent p-3
+                            rounded-lg focus:border-purple-700 p-0 placeholder-gray-500
+                            text-gray-800 leading-tight bg-gray-50 box shadow-lg focus:shadow-2xl hover:shadow-2xl",
                     name: "msg",
                     placeholder: "Say Something",
-                    phx_throttle: 1000,
+                    phx_throttle: 300,
                     rows: 10
                 )%>
             </form>
@@ -19,7 +19,7 @@
 
         <div class="w-2/3 flex flex-col">
 
-            <div class="border-b border-gray-300 bg-white shadow-lg rounded hover:shadow-2xl ml-4">
+            <div class="border-b border-gray-300 bg-white shadow-lg rounded-lg hover:shadow-2xl ml-4 overflow-hidden">
                 <table class="table table-auto">
                     <th class="th text-gray-700 font-medium">Sentiment Score:</th>
                         <td class="td"><%= @sentiment_score %></td>
@@ -32,20 +32,13 @@
                 </table>
             </div>
 
-            <div class="p-2 bg-white shadow-lg rounded h-60 hover:shadow-2xl ml-4 mt-4">
-                <h1 class="text-gray-700 text-lg pb-2">Event Log:</h1>
-                <div class="h-48">
-                    <ul phx-hook="NewLoggedEvents" 
-                        id="event_log" 
-                        class="logged_events overflow-y-auto h-full bg-gray-100 
-                               list-none shadow-inner rounded"> 
-                    <table class="table table-auto">
-                        <tbody>
-                        <%= for event <- @event_log do 
-                            render("_logged_event.html", event: event)
-                        end %>
-                        </tbody>
-                    </table>
+            <div class="ml-4 mt-4">
+                <h1 class="text-gray-700 text-lg pl-4">Event Log:</h1>
+                <div class="bg-white shadow-lg overflow-hidden rounded-lg mt-4 h-64">
+                    <ul class="overflow-y-scroll">
+                        <%= for event <- @event_log do %>
+                            <%= live_component(@socket, LibuWeb.LoggedEvent, event: event) %>
+                        <% end %>
                     </ul>
                 </div>
             </div>

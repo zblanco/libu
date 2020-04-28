@@ -5,8 +5,10 @@ defmodule Libu.Application do
   def start(_type, _args) do
     children = [
       Libu.Repo,
+      LibuWeb.Telemetry,
       LibuWeb.Endpoint,
       {Libu.Chat.ChatSupervisor, []},
+      {Libu.Messaging.MessagingSupervisor, []},
       {Libu.Analysis.AnalysisSupervisor, []},
     ]
 

@@ -1,11 +1,11 @@
 defmodule LibuWeb.LiveClock do
-  use Phoenix.LiveView
+  use LibuWeb, :live_view
   import Calendar.Strftime
 
   def render(assigns) do
     ~L"""
     <div>
-      <h3 class="font-sans text-2xl">It's <%= strftime!(@date, "%r") %></h3>
+      <h3 class="font-sans text-2xl text-purple-800">It's <%= strftime!(@date, "%r") %></h3>
     </div>
     """
   end

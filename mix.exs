@@ -33,10 +33,10 @@ defmodule Libu.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.2"},
-      {:phoenix_pubsub, "~> 1.1"},
+      {:phoenix, "~> 1.5.0-rc.0", override: true},
+      {:phoenix_pubsub, "~> 2.0", override: true},
       {:phoenix_ecto, "~> 4.0"},
-      {:ecto_sql, "~> 3.0"},
+      {:ecto_sql, "~> 3.4"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.13"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -44,20 +44,23 @@ defmodule Libu.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:plug, "~> 1.7"},
-      {:phoenix_live_view, github: "phoenixframework/phoenix_live_view"},
+      {:phoenix_live_view, "~> 0.12.0"},
       {:floki, ">= 0.0.0", only: :test},
       {:calendar, "~> 0.17.4"},
-      {:uuid, "~> 1.1"},
+      {:elixir_uuid, "~> 1.2"},
       {:veritaserum, "~> 0.2.1"},
       {:flow, "~> 0.14.3"},
       {:broadway, "~> 0.5.0"},
       {:essence, "~> 0.2.0"},
-      {:oauth2, "~> 1.0"},
-      {:commanded, "~> 1.0.0"},
+      {:argon2_elixir, "~> 2.0"},
+      {:commanded, github: "zblanco/commanded", override: true},
       {:eventstore, "~> 1.0.0"},
       {:commanded_eventstore_adapter, "~> 1.0.0"},
       {:commanded_ecto_projections, "~> 1.0.0"},
       {:eventually, "~> 1.1"},
+      {:phoenix_live_dashboard, "~> 0.1.0"},
+      {:telemetry_metrics, "~> 0.4"},
+      {:telemetry_poller, "~> 0.4"},
     ]
   end
 

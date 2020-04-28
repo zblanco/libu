@@ -1,0 +1,70 @@
+<div class="flex w-full justify-between h-full">
+    <div class="p-3 pr-0 w-1/5">
+        <%= live_render(@conn, LibuWeb.ChatLive.ActiveConversations)%>
+    </div>
+    <div class="p-3 w-4/5 h-full">
+        <div class="flex flex-col focus:shadow-2xl max-h-screen w-auto shadow-lg rounded-b">
+
+            <div class="flex py-3 px-3 flex-none bg-gray-100 rounded-t-lg border-b">
+                <div class="flex flex-row items-center">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        height="24">
+                        <path class="fill-current text-purple-600 h-6 w-6"
+                            d="M2 15V5c0-1.1.9-2 2-2h16a2 2 0 0 1 2 2v15a1 1 0 0 1-1.7.7L16.58 17H4a2 2 0 0 1-2-2zM20 5H4v10h13a1 1 0 0 1 .7.3l2.3 2.29V5z"
+                        />
+                    </svg>
+
+                    <div class="px-2 text-purple-700 truncate">
+                        <%= @conversation.title %>
+                    </div>
+                </div>
+
+            </div>
+            <!-- Message Container -->
+            <div class="bg-white overflow-y-auto max-h-full">
+
+                <!-- Messages -->
+                <%= for message <- @messages do %>
+                        <div class="px-4 py-2 flex items-start text-sm border-l-2 border-transparent hover:border-purple-700 hover:shadow-inner hover:bg-gray-100"
+                            id="message#-<%= message.message_number %>">
+                            <img src="<%= @current_user.avatar_url %>" class="w-10 h-10 rounded mr-3">
+                            <div class="flex-1 overflow-hidden">
+                                <div>
+                                    <span class="font-bold text-gray-900"><%= message.publisher_name %></span>
+                                    <span class="text-gray-700 text-xs"><%= time(message.published_on) %></span>
+                                </div>
+                                <p class="text-gray-900 leading-normal"><%= message.body %></p>
+                            </div>
+                        </div>
+                <% end %>
+
+            </div>
+
+            <div class="border-t">
+                <%= _f = form_for @message_changeset, "#", [
+                    phx_change: :validate,
+                    phx_submit: :new_message,
+                ]%>
+                    <%= text_input(:new_message, :message,
+                        class: "bg-gray-200 focus:bg-gray-300 border-2 border-transparent w-full leading-tight rounded-b-lg
+                                hover:bg-gray-300 rounded-t-none p-4 focus:border-purple-700 text-gray-600 focus:text-gray-800",
+                        value: @message_changeset.data.message,
+                        phx_blur: "typing_stopped",
+                        placeholder: "  Add to the conversation...",
+                        phx_throttle: 1000
+                    )%>
+
+                    <%= hidden_input :new_message, :publisher_id, value: @current_user.github_id %>
+                    <%= hidden_input :new_message, :publisher_name, value: @current_user.name %>
+                    <%= hidden_input :new_message, :conversation_id, value: @conversation.conversation_id %>
+                    <%= submit "submit", class: "hidden" %>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+

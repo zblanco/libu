@@ -1,77 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Libu · LiveView Experiments</title>
-    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
-    <%= csrf_meta_tag() %>
-  </head>
-
-  <body class="min-h-screen font-sans antialiased leading-tight max-h-screen" 
+<body class="min-h-screen font-sans antialiased leading-tight max-h-screen"
         style="background-image: url('<%= Routes.static_url(@conn, "/images/seigaiha_purple.png") %>')">
 
-    <header>
-      <nav id="site-navigation" class="relative select-none flex items-stretch w-full items-center">
-        <div class="flex flex-no-shrink items-stretch">
-          <a href="/" class="no-underline">
-              <div class="px-4 p-4 w-20">
-              <img src="<%= Routes.static_path(@conn, "/images/darkphoenix.png") %>" alt="Phoenix Framework Logo"/>
-              </div>
-          </a>
-          <div class="flex items-stretch ml-auto">
-            <%= link to: "/chat", 
-                class: "nav-item flex flex-no-grow flex-no-shrink group" do %>
-                
-                <svg xmlns="http://www.w3.org/2000/svg" 
-                    viewBox="0 0 24 24" 
-                    width="24" 
-                    height="24"
-                    class="fill-current group-hover:text-gray-900 text-purple-600 h-8 w-6 mr-2">
-                        <path class="heroicon-ui" d="M6 14H4a2 2 0 0 1-2-2V4c0-1.1.9-2 2-2h12a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v13a1 1 0 0 1-1.7.7L16.58 18H8a2 2 0 0 1-2-2v-2zm0-2V8c0-1.1.9-2 2-2h8V4H4v8h2zm14-4H8v8h9a1 1 0 0 1 .7.3l2.3 2.29V8z"/>
-                </svg>
-                <span> Chat </span>
-            <% end %>
-            <%= link to: "/analysis", 
-                class: "nav-item flex flex-no-grow flex-no-shrink group" do %>
-                
-                <svg xmlns="http://www.w3.org/2000/svg" 
-                    viewBox="0 0 24 24" 
-                    width="24" 
-                    height="24"
-                    class="fill-current group-hover:text-gray-900 text-purple-600 h-8 w-6 mr-2">
-                  <path class="heroicon-ui" 
-                    d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/>
-                </svg>
-                <span> Analysis </span>
-            <% end %>
-          </div>
-        </div>
-        <div class="lg:flex lg:items-stretch lg:flex-no-shrink lg:flex-grow" id="right-menu-options">
-          <div class="lg:flex lg:items-stretch lg:justify-end ml-auto">
-            <%= if @current_user != nil do %>
-              <div class="flex items-center">
-              <img src="<%= @current_user.avatar_url %>" 
-                  alt="avatar"
-                  class="w-8 h-8 rounded-full mr-3 hover:shadow-outline">
-              </div>
-            <% else %>
-              <%= link("Sign In", to: "/auth/github", 
-                  class: "nav-item flex flex-no-grow flex-no-shrink"
-              ) %>
-            <% end %>
-          </div>
-        </div>
-      </nav>
-    </header>
-
-    <main role="main">
-      <div id="content">
-          <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>
-      </div>
-    </main>
-    
-    <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
-  </body>
-</html>
+<main role="main">
+  <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+  <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+  <%= @inner_content %>
+</main>
+</body>

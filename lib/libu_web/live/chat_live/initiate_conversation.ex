@@ -1,23 +1,19 @@
 defmodule LibuWeb.ChatLive.InitiateConversation do
-  use Phoenix.LiveView
-  alias LibuWeb.Router.Helpers, as: Routes
+  use LibuWeb, :live_component
   alias Libu.Chat
 
-  def mount(_params, %{current_user: current_user}, socket) do
+  def update(assigns, socket) do
     {:ok,
-     assign(socket, %{
-       current_user: current_user,
-       changeset: Chat.initiate_conversation(%{}, form: true)
-     })}
+     socket
+     |> assign(assigns)
+     |> assign(:changeset, Chat.initiate_conversation(%{}, form: true))}
   end
-
-  def render(assigns), do: LibuWeb.ChatView.render("new_conversation_form.html", assigns)
 
   def handle_event("validate", %{"initiate_conversation" => params}, socket) do
     changeset =
       params
       |> Chat.initiate_conversation(form: true)
-      |> Map.put(:action, :insert)
+      |> Map.put(:action, :validate)
 
     {:noreply, assign(socket, changeset: changeset)}
   end
@@ -27,8 +23,8 @@ defmodule LibuWeb.ChatLive.InitiateConversation do
       {:ok, convo_id} ->
         {:stop,
          socket
-         |> put_flash(:info, "conversation intiated")
-         |> redirect(to: Routes.chat_path(socket, :conversation, convo_id))}
+         |> put_flash(:info, "Conversation initiated")
+         |> push_redirect(to: Routes.chat_show_path(socket, :show, convo_id))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}

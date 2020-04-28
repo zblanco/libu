@@ -1,0 +1,48 @@
+<%= if @live_action in [:initiate_conversation] do %>
+    <%= live_modal @socket, LibuWeb.ChatLive.Form,
+        id: :initiate_conversation,
+        title: @page_title,
+        action: @live_action,
+        initiate_conversation_changeset: @initiate_conversation_changeset,
+        return_to: Routes.chat_index_path(@socket, :index) %>
+<% end %>
+
+<div class="flex flex-col justify-center p-2">
+    <div class="box max-w-4xl mx-auto overflow-hidden shadow-lg">
+        <div class="flex justify-end p-4 border-b">
+            <img class="fill-current" src="<%= Routes.static_path(@socket, "/images/chat.svg") %>" alt="Conversations"/>
+            <form phx-change="search" class="flex-grow px-4">
+                <%= text_input(:search, :name,
+                    class: "text-input bg-gray-100 focus:bg-gray-200 rounded-t-sm",
+                    name: "query",
+                    placeholder: "Search...",
+                    phx_change: "search"
+                )%>
+            </form>
+            <%= live_patch "New", to: Routes.chat_index_path(@socket, :initiate_conversation), class: "btn-quiet border-b-2" %>
+        </div>
+
+        <div class="w-auto mx-auto">
+            <div class="">
+                <%= for convo <- @conversations do %>
+                    <tr class="tr" id="<%= convo.conversation_id %>" >
+
+                    <td class="td">
+                        <%= live_redirect to: Routes.chat_show_path(@socket, :show, convo), class: "hover:underline" do %>
+                            <%= convo.title %>
+                        <% end %>
+                    </td>
+
+                    <td class="td"><%= convo.initiator_name %></td>
+                    <td class="td"><%= convo.latest_message_body %></td>
+                    <td class="td"><%= time(convo.initiated_on) %></td>
+                    <td class="td"><%= time(convo.latest_activity) %></td>
+                    <td class="td"><%= convo.message_count %></td>
+                    </tr>
+                <% end %>
+            </div>
+        </div>
+
+    </div>
+
+</div>

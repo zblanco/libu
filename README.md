@@ -53,7 +53,7 @@ We maintain a 1:1 Analysis Session with the LiveView using `DynamicSupervisor`. 
 
 ### Chat
 
-Chat features are a classic for Elixir/Phoenix demos. I wanted to deviate from the typical Phoenix Chat implementation that uses Ecto and Postgres for persistence and implement the query layer entirely in-memory. We can do this by event-sourcing our chat features and projecting our query state into ETS. We can easily layer on Text Analysis features to provide live insight into a conversation.
+Chat features are a classic for Elixir/Phoenix Libus. I wanted to deviate from the typical Phoenix Chat implementation that uses Ecto and Postgres for persistence and implement the query layer entirely in-memory. We can do this by event-sourcing our chat features and projecting our query state into ETS. We can easily layer on Text Analysis features to provide live insight into a conversation.
 
 ### Identity
 

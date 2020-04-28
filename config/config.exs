@@ -15,7 +15,7 @@ config :libu, LibuWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "wgulZ17IG1bmDpVOs32xJnCTD9JSpx27Lglw5nPKfP7vuesHrHFp4c2zNW7AHzdN",
   render_errors: [view: LibuWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Libu.PubSub, adapter: Phoenix.PubSub.PG2],
+  pubsub_server: Libu.Messaging.PubSub,
   live_view: [signing_salt: "eHwaY+4fde9j2pR4dHhhEKUA3p72cwVk"]
 
 # Configures Elixir's Logger

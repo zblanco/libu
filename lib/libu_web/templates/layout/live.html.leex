@@ -1,0 +1,60 @@
+<body class="min-h-screen font-sans antialiased leading-tight max-h-screen"
+        style="background-image: url('<%= Routes.static_url(@socket, "/images/seigaiha_purple.png") %>')">
+
+    <header>
+      <nav id="site-navigation" class="relative select-none flex items-stretch w-full items-center">
+        <div class="flex flex-no-shrink items-stretch items-center">
+          <a href="/" class="no-underline">
+              <div class="px-4 p-4 w-20">
+              <img src="<%= Routes.static_path(@socket, "/images/darkphoenix.png") %>" alt="Phoenix Framework Logo"/>
+              </div>
+          </a>
+          <div class="flex ml-auto items-center">
+            <%= live_redirect to: Routes.chat_index_path(@socket, :index) do %>
+                <div class="nav-item flex flex-no-grow flex-no-shrink group">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        height="24"
+                        class="fill-current group-hover:text-gray-900 text-purple-600 h-8 w-6 mr-2">
+                            <path class="heroicon-ui" d="M6 14H4a2 2 0 0 1-2-2V4c0-1.1.9-2 2-2h12a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v13a1 1 0 0 1-1.7.7L16.58 18H8a2 2 0 0 1-2-2v-2zm0-2V8c0-1.1.9-2 2-2h8V4H4v8h2zm14-4H8v8h9a1 1 0 0 1 .7.3l2.3 2.29V8z"/>
+                    </svg>
+                    <span> Chat </span>
+                </div>
+            <% end %>
+            <%= live_redirect to: Routes.live_path(@socket, LibuWeb.AnalysisSession) do %>
+                <div class="nav-item flex flex-no-grow flex-no-shrink group">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        height="24"
+                        class="fill-current group-hover:text-gray-900 text-purple-600 h-8 w-6 mr-2">
+                    <path class="heroicon-ui"
+                        d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/>
+                    </svg>
+                    <span> Analysis </span>
+                </div>
+            <% end %>
+          </div>
+        </div>
+        <div class="lg:flex lg:items-stretch lg:flex-no-shrink lg:flex-grow" id="right-menu-options">
+          <div class="lg:flex lg:items-stretch lg:justify-end ml-auto">
+
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <p class="alert alert-info" role="alert"
+            phx-click="lv:clear-flash"
+            phx-value-key="info"><%= live_flash(@flash, :info) %></p>
+
+        <p class="alert alert-danger" role="alert"
+            phx-click="lv:clear-flash"
+            phx-value-key="error"><%= live_flash(@flash, :error) %></p>
+            <%= @inner_content %>
+        </div>
+    </main>
+  </body>

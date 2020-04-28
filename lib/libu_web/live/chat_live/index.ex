@@ -8,29 +8,41 @@ defmodule LibuWeb.ChatLive.Index do
   * Convert to table
 
   """
-  use Phoenix.LiveView
-  alias LibuWeb.ChatView
+  use LibuWeb, :live_view
   alias Libu.Chat
   alias Libu.Chat.Events.ActiveConversationAdded
 
   def mount(_params, _session, socket) do
     if connected?(socket), do: Chat.subscribe()
-    {:ok, fetch(socket)}
+    {:ok, socket}
   end
 
-  defp fetch(socket) do
-    assign(socket, conversations: Chat.list_conversations())
+  def handle_params(params, _url, socket) do
+    {:noreply, handle_action(socket.assigns.live_action, params, socket)}
   end
 
-  def render(assigns) do
-    ChatView.render("index.html", assigns)
+  defp handle_action(:initiate_conversation, _params, socket) do
+    socket
+    |> assign(:page_title, "Initiate Conversation")
+    |> assign(:initiate_conversation_changeset, Chat.initiate_conversation(%{}, form: true))
+    |> assign(:conversations, &fetch_conversations/0)
+  end
+
+  defp handle_action(:index, _params, socket) do
+    socket
+    |> assign(:page_title, "Listing Conversations")
+    |> assign(conversations: fetch_conversations())
   end
 
   def handle_info(%ActiveConversationAdded{}, socket) do
-    {:noreply, fetch(socket)}
+    {:noreply, assign(socket, :conversations, fetch_conversations())}
   end
 
   def handle_info(_message, socket) do
     {:noreply, socket}
+  end
+
+  def fetch_conversations do
+    Chat.list_conversations()
   end
 end
