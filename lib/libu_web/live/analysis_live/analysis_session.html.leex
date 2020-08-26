@@ -19,21 +19,63 @@
 
         <div class="w-2/3 flex flex-col">
 
-            <div class="border-b border-gray-300 bg-white shadow-lg rounded-lg hover:shadow-2xl ml-4 overflow-hidden">
-                <table class="table table-auto">
-                    <th class="th text-gray-700 font-medium">Sentiment Score:</th>
-                        <td class="td"><%= @sentiment_score %></td>
-                    <th class="th text-gray-700 font-medium">Average Sentiment Per Word:</th>
-                        <td class="td"><%= @average_sentiment_per_word %></td>
-                    <th class="th text-gray-700 font-medium">Readability:</th>
-                        <td class="td"><%= @readability %></td>
-                    <th class="th text-gray-700 font-medium">Word Count:</th><td class="td">
-                        <%= @total_count_of_words %></td>
-                </table>
+            <div class="ml-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg">
+                    <div class="px-4 py-4 sm:p-4">
+                        <dl>
+                        <dt class="text-sm leading-5 font-medium text-gray-500 truncate">
+                            Overall Sentiment Score
+                        </dt>
+                        <dd class="mt-1 text-3xl leading-9 font-semibold text-purple-700">
+                            <%= @sentiment_score %>
+                        </dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="bg-white shadow rounded-lg hover:shadow-lg">
+                    <div class="px-4 py-4 sm:p-4">
+                        <dl>
+                        <dt class="text-sm leading-5 font-medium text-gray-500 truncate">
+                            Average Sentiment Per Word
+                        </dt>
+                        <dd class="mt-1 text-3xl leading-9 font-semibold text-purple-700">
+                            <%= @average_sentiment_per_word %>
+                        </dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg">
+                    <div class="px-4 py-4 sm:p-4">
+                        <dl>
+                        <dt class="text-sm leading-5 font-medium text-gray-500 truncate">
+                            Readability
+                        </dt>
+                        <dd class="mt-1 text-3xl leading-9 font-semibold text-purple-700">
+                            <%= @readability %>
+                        </dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg">
+                    <div class="px-4 py-4 sm:p-4">
+                        <dl>
+                        <dt class="text-sm leading-5 font-medium text-gray-500 truncate">
+                            Word Count
+                        </dt>
+                        <dd class="mt-1 text-3xl leading-9 font-semibold text-purple-700">
+                            <%= @total_count_of_words %>
+                        </dd>
+                        </dl>
+                    </div>
+                </div>
+
             </div>
 
             <div class="ml-4 mt-4">
-                <h1 class="text-gray-700 text-lg pl-4">Event Log:</h1>
+                <h1 class="text-gray-700 text-lg pl-4">Event Log</h1>
                 <div class="bg-white shadow-lg overflow-hidden rounded-lg mt-4 h-64">
                     <ul class="overflow-y-scroll">
                         <%= for event <- @event_log do %>

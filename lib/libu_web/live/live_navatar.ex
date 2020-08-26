@@ -24,8 +24,7 @@ defmodule LibuWeb.Navatar do
 
   def render(assigns) do
     ~L"""
-
-      <button
+    <button
         phx-click="toggle-profile-menu"
         phx-blur="hide-profile-menu"
         phx-target="<%= @myself %>"

@@ -21,6 +21,10 @@ defmodule Libu.Identity do
   def subscribe(user_id),
     do: Messaging.subscribe(topic() <> ":#{user_id}")
 
+  def list_users() do
+    Repo.all(User)
+  end
+
   ## Database getters
 
   @doc """

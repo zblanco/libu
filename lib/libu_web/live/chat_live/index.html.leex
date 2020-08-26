@@ -10,25 +10,16 @@
 <div class="flex flex-col justify-center p-2">
     <div class="box max-w-4xl mx-auto overflow-hidden shadow-lg">
         <div class="flex justify-end p-4 border-b">
-            <img class="fill-current" src="<%= Routes.static_path(@socket, "/images/chat.svg") %>" alt="Conversations"/>
-            <form phx-change="search" class="flex-grow px-4">
-                <%= text_input(:search, :name,
-                    class: "text-input bg-gray-100 focus:bg-gray-200 rounded-t-sm",
-                    name: "query",
-                    placeholder: "Search...",
-                    phx_change: "search"
-                )%>
-            </form>
             <%= live_patch "New", to: Routes.chat_index_path(@socket, :initiate_conversation), class: "btn-quiet border-b-2" %>
         </div>
 
         <div class="w-auto mx-auto">
             <div class="">
                 <%= for convo <- @conversations do %>
-                    <tr class="tr" id="<%= convo.conversation_id %>" >
+                    <tr class="tr" >
 
                     <td class="td">
-                        <%= live_redirect to: Routes.chat_show_path(@socket, :show, convo), class: "hover:underline" do %>
+                        <%= live_redirect to: Routes.chat_show_path(@socket, :show, convo.conversation_id), class: "hover:underline" do %>
                             <%= convo.title %>
                         <% end %>
                     </td>
